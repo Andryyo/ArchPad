@@ -1,0 +1,27 @@
+<resources>
+
+    <string name="app_name">Archery</string>
+    <string name="title_activity_main">Archery</string>
+    <string name="Number_of_series">Количество серий</string>
+    <string name="Arrows_in_series">Количество стрел в серии</string>
+    <string-array name="Number_of_series_array">
+        <item>1</item>
+        <item>3</item>
+        <item>5</item>
+        <item>6</item>
+        <item>10</item>
+        <item>12</item>
+    </string-array>
+    <string-array name="Arrows_in_series_array">
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+    </string-array>
+    <string name="Start">Начать</string>
+    <string name="Filename">Archery_log</string>
+    <string name="title_activity_start">Стрельба</string>
+    <string name="title_activity_display">Статистика</string>
+
+</resources>

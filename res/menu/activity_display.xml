@@ -1,0 +1,5 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/clear" android:title="Очистить статистику"/>
+    <item android:id="@+id/expand" android:title="Развернуть все серии" />
+    <item android:id="@+id/hide" android:title="Cвернуть все серии" />
+</menu>
