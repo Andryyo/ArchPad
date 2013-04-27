@@ -1,4 +1,4 @@
-package com.example.archery.archeryView;
+package com.example.archery;
 
 import com.example.archery.target.CRing;
 
@@ -22,10 +22,10 @@ public class CShot implements Serializable{
         this.y = y;
     }
 
-    public CShot(Vector<CRing> rings,float x,float y) {
+    public CShot(Vector<CRing> rings,float x,float y,float arrowRadius) {
         this.x = x;
         this.y = y;
-        this.calcPoints(rings);
+        this.calcPoints(rings,arrowRadius);
     }
 
     public int getPoints()  {
@@ -42,11 +42,11 @@ public class CShot implements Serializable{
         return (float) Math.hypot(x,y);
     }
 
-    public void calcPoints(Vector<CRing> rings)
+    public void calcPoints(Vector<CRing> rings,float arrowRadius)
     {
         float distance = getDistance();
         for (int i = 0;i<rings.size();i++)
-            if (distance<=rings.get(i).distanceFromCenter)
+            if (distance-arrowRadius<=rings.get(i).distanceFromCenter)
             {
                 points = rings.get(i).points;
                 return;

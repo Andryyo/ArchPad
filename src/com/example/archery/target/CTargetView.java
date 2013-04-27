@@ -2,21 +2,17 @@ package com.example.archery.target;
 
 import android.content.Context;
 
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Rect;
-import android.os.Vibrator;
+import android.graphics.*;
 import android.preference.PreferenceManager;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 import com.example.archery.MainActivity;
 import com.example.archery.archeryView.CArcheryView;
+import com.example.archery.CShot;
 import com.example.archery.archeryView.CDistance;
-import com.example.archery.archeryView.CShot;
 
 import java.io.ObjectInputStream;
-import java.util.Vector;
 
 /**
  * Created with IntelliJ IDEA.
@@ -32,12 +28,14 @@ public class CTargetView extends View {
     int screenWidth;
     int screenHeight;
     boolean haveZoom;
-    float zoom = 0.2f;
+    float zoom = 0.1f;
     float x;
     float y;
     Rect zoomDestRect;
     Rect zoomSrcRect;
+    Paint arrowPaint = new Paint();
     CArcheryView mArcheryView;
+    CDistance distance;
 
     public CTargetView(Context context,CArcheryView mArcheryView) {
         super(context);
@@ -45,6 +43,8 @@ public class CTargetView extends View {
         this.mArcheryView = mArcheryView;
         String  name = PreferenceManager.getDefaultSharedPreferences(context).getString("target_name","default_target");
         target = loadFromFile(name);
+        arrowPaint.setStyle(Paint.Style.STROKE);
+        arrowPaint.setColor(Color.GREEN);
     }
 
     @Override
@@ -63,8 +63,18 @@ public class CTargetView extends View {
         Bitmap bitmap = Bitmap.createBitmap(maxr*2,maxr*2,Bitmap.Config.RGB_565);
         Canvas canvas = new Canvas(bitmap);
         target.draw(canvas,maxr);
+        distance = mArcheryView.getCurrentDistance();
+        for (CShot [] series : distance.finishedSeries)
+            for (CShot shot : series)
+                canvas.drawCircle((shot.x+1)*maxr,(shot.y+1)*maxr,distance.arrow.radius*maxr,arrowPaint);
+        for (CShot shot : distance.currentSeries)
+            canvas.drawCircle((shot.x+1)*maxr,(shot.y+1)*maxr,distance.arrow.radius*maxr,arrowPaint);
         if (haveZoom)
+        {
+            canvas.drawPoint(x,y,arrowPaint);
+            canvas.drawCircle(x,y,distance.arrow.radius*maxr,arrowPaint);
             canvas.drawBitmap(bitmap,zoomSrcRect,zoomDestRect,null);
+        }
         screenCanvas.drawBitmap(bitmap,0,0,null);
     }
 
@@ -117,7 +127,8 @@ public class CTargetView extends View {
 		if (event.getAction() == MotionEvent.ACTION_UP)
         {
             haveZoom = false;
-            mArcheryView.addShot(new CShot(target.rings, x / maxr - 1, y / maxr - 1));
+            mArcheryView.addShot(new CShot(target.rings, x / maxr - 1, y / maxr - 1,
+                    mArcheryView.getCurrentDistance().arrow.radius));
             MainActivity.vibrator.vibrate(100);
 			mArcheryView.invalidate();
             return true;

@@ -14,7 +14,6 @@ import android.widget.ExpandableListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.example.archery.archeryView.CDistance;
-import com.example.archery.archeryView.CShot;
 
 public class StatisticsActivity extends Activity{
 
@@ -110,7 +109,14 @@ public class StatisticsActivity extends Activity{
 
 	public void Clean()
 	{
-		distances.clear();
+		if (distances.lastElement().isFinished)
+            distances.clear();
+        else
+        {
+            CDistance buf = distances.lastElement();
+            distances.clear();
+            distances.add(buf);
+        }
         notifyDataSetChanged();
 	}
 	

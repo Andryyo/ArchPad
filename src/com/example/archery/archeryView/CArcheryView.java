@@ -5,9 +5,11 @@ import java.util.Vector;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.view.ViewGroup;
+import android.preference.PreferenceManager;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+import com.example.archery.CArrow;
+import com.example.archery.CShot;
 import com.example.archery.target.CRing;
 import com.example.archery.target.CTarget;
 import com.example.archery.target.CTargetView;
@@ -17,26 +19,29 @@ public  class CArcheryView extends LinearLayout {
 	public int numberOfSeries;
     public int arrowsInSeries;
     private Context context;
-    public CDistance distance;
     private Vector<CDistance> distances = null;
+    private boolean alwaysNotEmpty;
     
 	public CArcheryView(Context context,int a, int b) {
 		super(context);
         this.context = context;
 		pen = new Paint();
-		numberOfSeries =a;
-		arrowsInSeries =b;
-        /*
-        try
+		numberOfSeries = a;
+		arrowsInSeries = b;
+
+       //context.deleteFile("Archery");
+        /*try
         {
             ObjectOutputStream oos =
                     new ObjectOutputStream(context.openFileOutput("Targets",Context.MODE_PRIVATE));
             Vector<CRing> rings = new Vector<CRing>();
-            rings.add(new CRing(10,1,Color.YELLOW));
+            rings.add(new CRing(10,1, Color.YELLOW));
             rings.add(new CRing(9,2,Color.YELLOW));
             rings.add(new CRing(8,3,Color.RED));
             rings.add(new CRing(7,4,Color.RED));
             rings.add(new CRing(6,5,Color.BLUE));
+            rings.add(new CRing(5,6,Color.BLUE));
+            rings.add(new CRing(0,7,Color.WHITE));
             CTarget target = new CTarget("default_target",rings);
             CTarget targets [] = {target};
             oos.writeObject(targets);
@@ -46,7 +51,20 @@ public  class CArcheryView extends LinearLayout {
         {
             Toast toast = Toast.makeText(context, e.getMessage(), 3000);
             toast.show();
-        }        */
+        }
+        try
+        {
+            ObjectOutputStream oos =
+                    new ObjectOutputStream(context.openFileOutput("Arrows",Context.MODE_PRIVATE));
+            CArrow arrows [] = {new CArrow("defaultArrow","люминь",0.02f)};
+            oos.writeObject(arrows);
+            oos.close();
+        }
+        catch (Exception e)
+        {
+            Toast toast = Toast.makeText(context, e.getMessage(), 3000);
+            toast.show();
+        }           */
         this.setOrientation(VERTICAL);
         LinearLayout layout = new LinearLayout(context);
         layout.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, 0,0.9f));
@@ -86,54 +104,64 @@ public  class CArcheryView extends LinearLayout {
             distances = (Vector<CDistance>) oos.readObject();
             oos.close();
         }
+        catch (FileNotFoundException e)
+        {
+            distances = new Vector<CDistance>();
+        }
         catch (Exception e)
         {
             Toast toast = Toast.makeText(context, e.getMessage(), 3000);
             toast.show();
         }
-        if (distances.isEmpty())
+        if (!distances.isEmpty())
         {
-            distances = new Vector<CDistance>();
-            distance = new CDistance(numberOfSeries, arrowsInSeries);
-            distances.add(distance);
+            if (distances.lastElement().isFinished==true)
+                distances.add(new CDistance(numberOfSeries, arrowsInSeries,getCurrentArrow()));
         }
         else
-        if (!distances.lastElement().isFinished)
-            distance = distances.lastElement();
-        else
-        {
-            distance = new CDistance(numberOfSeries, arrowsInSeries);
-            distances.add(distance);
+            distances.add(new CDistance(numberOfSeries, arrowsInSeries,getCurrentArrow()));
+        alwaysNotEmpty = true;
         }
-    }
 
-	public void deleteLastShot()
-	{
-		distance.deleteLastShot();
+	public void deleteLastShot()    {
+		distances.lastElement().deleteLastShot();
 	}
 
     public void endCurrentDistance() {
-        distance.isFinished = true;
-        distance = new CDistance(numberOfSeries, arrowsInSeries);
-        distances.add(distance);
+        distances.lastElement().isFinished = true;
     }
 
     public void addShot(CShot shot) {
-        if (distance.addShot(shot) == 0)
-        {
-            distance = new CDistance(numberOfSeries, arrowsInSeries);
-            distances.add(distance);
-        }
+        alwaysNotEmpty = false;
+        if (distances.lastElement().addShot(shot) == 0)
+            distances.add(new CDistance(numberOfSeries, arrowsInSeries,getCurrentArrow()));
     }
 	
-	private static void Sort(int[] m) {
-        int t;
-        int i, j;
-        for ( i=0; i < m.length; i++) {
-          t = m[i];
-          for ( j=i-1; j>=0 && m[j] > t; j--)
-              m[j+1] = m[j];
-          m[j+1] = t;
+    public CArrow getCurrentArrow() {
+        String arrowName = PreferenceManager.getDefaultSharedPreferences(context).getString("arrowName","defaultArrow");
+        try
+        {
+            ObjectInputStream oos =
+                    new ObjectInputStream(context.openFileInput("Arrows"));
+            CArrow arrows[] = (CArrow[]) oos.readObject();
+            for (CArrow arrow : arrows)
+                if (arrow.name.equals(arrowName))
+                    return arrow;
+            oos.close();
         }
-      }
+        catch (Exception e)
+        {
+            Toast toast = Toast.makeText(context, e.getMessage(), 3000);
+            toast.show();
+        }
+        return null;
+    }
+
+    public CDistance getCurrentDistance()   {
+        if (distances.lastElement().isEmpty()&&!alwaysNotEmpty)
+            if (distances.size()>1)
+                if (distances.get(distances.size()-2).isFinished)
+                    return distances.get(distances.size()-2);
+        return distances.lastElement();
+     }
 }

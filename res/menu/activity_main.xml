@@ -1,6 +1,4 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/new_serie" android:title="Начать заново"></item>
-    <item android:id="@+id/backspace" android:title="Стереть результат последнего выстрела"></item>
     <item android:id="@+id/show_statistics" android:title="Показать статистику"></item>
     <item android:id="@+id/info" android:title="О программе"></item>
     <item android:id="@+id/save" android:title="Закончить серию"></item>

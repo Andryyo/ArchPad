@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.os.Vibrator;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup.LayoutParams;
@@ -32,7 +33,6 @@ public class MainActivity extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_main, menu);
-        
         return true;
     }
     
@@ -40,19 +40,6 @@ public class MainActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
     	switch (item.getItemId())
     	{
-    	case R.id.new_serie:
-    	{
-    		Intent intent=new Intent(this, StartActivity.class);
-    		startActivity(intent);
-    		mArcheryView.invalidate();
-			break;
-    	}
-    	case R.id.backspace:
-    	{
-    		mArcheryView.deleteLastShot();
-    		mArcheryView.invalidate();
-    		break;
-    	}
     	case R.id.show_statistics:
     	{
     		Intent intent = new Intent(this, StatisticsActivity.class);
@@ -85,8 +72,7 @@ public class MainActivity extends Activity {
     }
 
     @Override
-    public void onPause()
-    {
+    public void onPause()   {
         super.onPause();
         mArcheryView.saveDistances();
         vibrator.cancel();
@@ -97,5 +83,23 @@ public class MainActivity extends Activity {
         super.onResume();
         mArcheryView.loadDistances();
         vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+    }
+
+    @Override
+    public boolean onKeyLongPress(int keyCode, KeyEvent event)   {
+        if (keyCode == KeyEvent.KEYCODE_BACK)
+        {
+            mArcheryView.endCurrentDistance();
+            finish();
+            return true;
+        }
+        return super.onKeyLongPress(keyCode, event);
+    }
+
+    @Override
+    public void onBackPressed() {
+        mArcheryView.deleteLastShot();
+        mArcheryView.invalidate();
+        return;
     }
 }

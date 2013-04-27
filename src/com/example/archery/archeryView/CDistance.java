@@ -1,5 +1,8 @@
 package com.example.archery.archeryView;
 
+import com.example.archery.CArrow;
+import com.example.archery.CShot;
+
 import java.io.*;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -14,16 +17,18 @@ import java.util.Vector;
  */
 public class CDistance implements Serializable{
     public Calendar timemark;
-    boolean isFinished;
+    public boolean isFinished;
     int numberOfArrows;
     int numberOfSeries;
+    public CArrow arrow;
     public Vector<CShot[]> finishedSeries;
-    Vector<CShot> currentSeries;
+    public Vector<CShot> currentSeries;
 
-    public CDistance(int numberOfSeries, int numberOfArrows)    {
+    public CDistance(int numberOfSeries, int numberOfArrows, CArrow arrow)  {
         timemark = Calendar.getInstance();
         this.numberOfSeries = numberOfSeries;
         this.numberOfArrows = numberOfArrows;
+        this.arrow = arrow;
         isFinished = false;
         finishedSeries = new Vector<CShot[]>();
         currentSeries = new Vector<CShot>();
@@ -38,7 +43,7 @@ public class CDistance implements Serializable{
         }
         if (finishedSeries.size() ==  numberOfSeries)
         {
-            currentSeries = null;
+            currentSeries.clear();
             isFinished = true;
             return 0;
         }
@@ -46,8 +51,7 @@ public class CDistance implements Serializable{
             return 1;
     }
 
-    public void deleteLastShot()
-    {
+    public void deleteLastShot()    {
         if (currentSeries.size()>0)
         {
             currentSeries.remove(currentSeries.lastElement());
@@ -59,6 +63,13 @@ public class CDistance implements Serializable{
                 currentSeries.remove(currentSeries.lastElement());
                 finishedSeries.remove(finishedSeries.lastElement());
             }
+    }
+
+    public boolean isEmpty()    {
+        if (finishedSeries.isEmpty()&&currentSeries.isEmpty())
+            return true;
+        else
+            return false;
     }
 
 }

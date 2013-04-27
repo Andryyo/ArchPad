@@ -5,8 +5,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.view.View;
+import com.example.archery.CShot;
 
-import java.util.Vector;
 /**
  * Created with IntelliJ IDEA.
  * User: Андрей
@@ -40,7 +40,7 @@ public class CCurrentSeriesView extends View {
     @Override
     public void onDraw(Canvas canvas)   {
         int i=0;
-        distance = mArcheryView.distance;
+        distance = mArcheryView.getCurrentDistance();
         textWidth = screenWidth/(distance.numberOfArrows+1);
         CShot buf[];
         if ((distance.currentSeries.size()==0)&&(!distance.finishedSeries.isEmpty()))
