@@ -128,7 +128,10 @@ public  class CArcheryView extends LinearLayout {
 	}
 
     public void endCurrentDistance() {
-        distances.lastElement().isFinished = true;
+        if (!distances.lastElement().isEmpty())
+            distances.lastElement().isFinished = true;
+        else
+            distances.remove(distances.lastElement());
     }
 
     public void addShot(CShot shot) {

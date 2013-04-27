@@ -34,8 +34,8 @@ public class CShot implements Serializable{
 
     public String toString()    {
         if (points != 0)
-            return (Integer.toString(points));
-        else return "M";
+            return (Integer.toString(points)+"");
+        else return "M ";
     }
 
     public float getDistance()  {

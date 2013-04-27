@@ -100,6 +100,11 @@ public class MainActivity extends Activity {
     public void onBackPressed() {
         mArcheryView.deleteLastShot();
         mArcheryView.invalidate();
-        return;
+    }
+
+    @Override
+    public void onStop()    {
+        mArcheryView.endCurrentDistance();
+        super.onStop();
     }
 }
