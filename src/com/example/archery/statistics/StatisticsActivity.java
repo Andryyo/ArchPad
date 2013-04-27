@@ -1,4 +1,4 @@
-package com.example.archery;
+package com.example.archery.statistics;
 
 import java.io.*;
 import java.util.Arrays;
@@ -10,7 +10,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.view.*;
 import android.widget.*;
-import com.example.archery.archeryView.CCurrentSeriesView;
+import com.example.archery.CShot;
+import com.example.archery.R;
 import com.example.archery.archeryView.CDistance;
 
 public class StatisticsActivity extends Activity    {
@@ -146,7 +147,6 @@ public class StatisticsActivity extends Activity    {
         LayoutInflater infalInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         convertView = infalInflater.inflate(R.layout.statistics_block, null);
         createStatisticsBlockView((LinearLayout) convertView,(CShot[][]) getChild(groupPosition,childPosition));
-        //convertView = new StatisticsBlockView(context, (CShot[][]) getChild(groupPosition,childPosition),sum);
         return convertView;
 	}
 
@@ -205,7 +205,7 @@ public class StatisticsActivity extends Activity    {
 		return false;
 	}
 
-        public void createStatisticsBlockView(LinearLayout layout, CShot[][] series)  {
+        private void createStatisticsBlockView(LinearLayout layout, CShot[][] series)  {
             int first_series_sum = 0;
             int second_series_sum = 0;
             for (CShot shot : series[0])
@@ -213,22 +213,23 @@ public class StatisticsActivity extends Activity    {
             if (series[1]!=null)
                 for (CShot shot : series[1])
                     second_series_sum+=shot.getPoints();
-            TextView tv = (TextView)layout.findViewById(R.id.first_series);
+            BorderedTextView tv = (BorderedTextView)layout.findViewById(R.id.first_series);
             tv.setText(Arrays.deepToString(series[0]));
             if (series[1]!=null)
                 {
-                tv = (TextView)layout.findViewById(R.id.second_series);
+                tv = (BorderedTextView)layout.findViewById(R.id.second_series);
                 tv.setText(Arrays.deepToString(series[1]));
-                tv = (TextView)layout.findViewById(R.id.second_series_sum);
+                tv = (BorderedTextView)layout.findViewById(R.id.second_series_sum);
                 tv.setText(Integer.toString(second_series_sum));
                 }
-            tv = (TextView)layout.findViewById(R.id.first_series_sum);
+            tv = (BorderedTextView)layout.findViewById(R.id.first_series_sum);
             tv.setText(Integer.toString(first_series_sum));
-            tv = (TextView)layout.findViewById(R.id.two_series);
+            tv = (BorderedTextView)layout.findViewById(R.id.two_series);
             tv.setText(Integer.toString((first_series_sum+second_series_sum)));
-            tv = (TextView)layout.findViewById(R.id.all_series);
+            tv = (BorderedTextView)layout.findViewById(R.id.all_series);
             sum+=first_series_sum+second_series_sum;
             tv.setText(Integer.toString(sum));
         }
     }
+
 }

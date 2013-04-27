@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:BorderedTextView="http://schemas.android.com/apk/res/com.example.archery"
               android:orientation="horizontal"
               android:layout_width="match_parent"
               android:layout_height="wrap_content">
@@ -13,20 +14,24 @@
                           android:orientation="horizontal"
                           android:layout_height="wrap_content"
                           android:layout_width="match_parent">
-                            <TextView
+                            <com.example.archery.statistics.BorderedTextView
                                 android:id="@+id/first_series"
                                 android:layout_height="wrap_content"
                                 android:layout_width="0dp"
                                 android:layout_weight="1"
                                 android:gravity="center"
                                 android:textColor="#ffffff"
+                                BorderedTextView:borderColor = "#ffffff"
+                                BorderedTextView:borderWidth = "1"
                             />
-                            <TextView
+                            <com.example.archery.statistics.BorderedTextView
                                 android:id="@+id/first_series_sum"
                                 android:layout_height="wrap_content"
                                 android:layout_width="wrap_content"
                                 android:gravity="center"
                                 android:textColor="#ffffff"
+                                BorderedTextView:borderColor = "#ffffff"
+                                BorderedTextView:borderWidth = "1"
                             />
                   </LinearLayout>
                   <LinearLayout
@@ -34,35 +39,43 @@
                           android:layout_height="wrap_content"
                           android:layout_width="match_parent"
                           >
-                      <TextView
+                      <com.example.archery.statistics.BorderedTextView
                               android:id="@+id/second_series"
                               android:layout_height="wrap_content"
                               android:layout_width="0dp"
                               android:layout_weight="1"
                               android:gravity="center"
                               android:textColor="#ffffff"
+                              BorderedTextView:borderColor = "#ffffff"
+                              BorderedTextView:borderWidth = "1"
                               />
-                      <TextView
+                      <com.example.archery.statistics.BorderedTextView
                               android:id="@+id/second_series_sum"
                               android:layout_height="wrap_content"
                               android:layout_width="wrap_content"
                               android:gravity="center"
                               android:textColor="#ffffff"
+                              BorderedTextView:borderColor = "#ffffff"
+                              BorderedTextView:borderWidth = "1"
                               />
                   </LinearLayout>
               </LinearLayout>
-              <TextView
+              <com.example.archery.statistics.BorderedTextView
                     android:id="@+id/two_series"
                     android:layout_height="match_parent"
                     android:layout_width="0dp"
                     android:layout_weight="0.2"
                     android:gravity="center"
-                    android:textColor="#ffffff"/>
-              <TextView
+                    android:textColor="#ffffff"
+                    BorderedTextView:borderColor = "#ffffff"
+                    BorderedTextView:borderWidth = "1"/>
+              <com.example.archery.statistics.BorderedTextView
                     android:id="@+id/all_series"
                     android:layout_height="match_parent"
                     android:layout_width="0dp"
                     android:layout_weight="0.2"
                     android:gravity="center"
-                    android:textColor="#ffffff"/>
+                    android:textColor="#ffffff"
+                    BorderedTextView:borderColor = "#ffffff"
+                    BorderedTextView:borderWidth = "1"/>
 </LinearLayout>

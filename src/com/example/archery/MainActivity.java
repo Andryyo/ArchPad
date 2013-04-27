@@ -14,6 +14,7 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import com.example.archery.archeryView.CArcheryView;
+import com.example.archery.statistics.StatisticsActivity;
 
 public class MainActivity extends Activity {
     public CArcheryView mArcheryView = null;

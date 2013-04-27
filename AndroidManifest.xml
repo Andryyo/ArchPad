@@ -31,7 +31,7 @@
                 android:value="com.example.archery.MainActivity" />
         </activity>
         <activity
-            android:name=".StatisticsActivity"
+            android:name=".statistics.StatisticsActivity"
             android:label="@string/title_activity_display" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
