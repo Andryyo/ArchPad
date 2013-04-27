@@ -98,7 +98,6 @@ public class StatisticsActivity extends Activity    {
     private class ExpandListAdapter extends BaseExpandableListAdapter   {
 	Context context;
 	Vector<CDistance> distances;
-    private int sum;
 
     public void delete_record(int n)
     {
@@ -142,11 +141,12 @@ public class StatisticsActivity extends Activity    {
 
 	public View getChildView(int groupPosition, int childPosition,
 			boolean isLastChild, View convertView, ViewGroup parent) {
-        if (childPosition==0)
-            sum = 0;
         LayoutInflater infalInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         convertView = infalInflater.inflate(R.layout.statistics_block, null);
-        createStatisticsBlockView((LinearLayout) convertView,(CShot[][]) getChild(groupPosition,childPosition));
+        int sum = 0;
+        for (int i=0;i<childPosition;i++)
+            sum+=getChildSum(groupPosition,i);
+        createStatisticsBlockView((LinearLayout) convertView,(CShot[][]) getChild(groupPosition,childPosition),sum);
         return convertView;
 	}
 
@@ -205,7 +205,18 @@ public class StatisticsActivity extends Activity    {
 		return false;
 	}
 
-        private void createStatisticsBlockView(LinearLayout layout, CShot[][] series)  {
+    private int getChildSum(int groupPosition,int childPosition)
+    {
+        int sum = 0;
+        CShot series[][] = (CShot[][]) getChild(groupPosition,childPosition);
+        for (CShot shot : series[0])
+            sum+=shot.getPoints();
+        if (series[1]!=null)
+            for (CShot shot : series[1])
+                sum+=shot.getPoints();
+        return sum;
+    }
+        private void createStatisticsBlockView(LinearLayout layout, CShot[][] series, int sum)  {
             int first_series_sum = 0;
             int second_series_sum = 0;
             for (CShot shot : series[0])
