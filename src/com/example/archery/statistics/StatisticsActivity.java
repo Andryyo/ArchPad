@@ -123,10 +123,10 @@ public class StatisticsActivity extends Activity    {
 			boolean isLastChild, View convertView, ViewGroup parent) {
         LayoutInflater infalInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         convertView = infalInflater.inflate(R.layout.expandlistchild,null);
+        sum = 0;
         for (int i =0; i<(distances.get(groupPosition).series.size()+1)/2;i++)
         {
             LinearLayout view = (LinearLayout) infalInflater.inflate(R.layout.statistics_block, null);
-            int sum = 0;
             createStatisticsBlockView(view,(CShot[][]) getChild(groupPosition,i));
             ((LinearLayout)convertView).addView(view);
         }
