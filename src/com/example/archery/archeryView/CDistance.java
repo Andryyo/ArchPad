@@ -1,5 +1,8 @@
 package com.example.archery.archeryView;
 
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import com.example.archery.CArrow;
 import com.example.archery.CShot;
 
@@ -16,13 +19,13 @@ import java.util.Vector;
  * To change this template use File | Settings | File Templates.
  */
 public class CDistance implements Serializable{
+    int _id;
     public Calendar timemark;
     public boolean isFinished;
     int numberOfArrows;
     int numberOfSeries;
     public CArrow arrow;
-    public Vector<CShot[]> finishedSeries;
-    public Vector<CShot> currentSeries;
+    public Vector<Vector<CShot>> series;
 
     public CDistance(int numberOfSeries, int numberOfArrows, CArrow arrow)  {
         timemark = Calendar.getInstance();
@@ -30,20 +33,37 @@ public class CDistance implements Serializable{
         this.numberOfArrows = numberOfArrows;
         this.arrow = arrow;
         isFinished = false;
-        finishedSeries = new Vector<CShot[]>();
-        currentSeries = new Vector<CShot>();
+        series = new Vector<Vector<CShot>>();
+        series.add(new Vector<CShot>());
+    }
+
+    public CDistance(Cursor cursor)
+    {
+        //"series" "numberOfSeries" "numberOfArrows" "isFinished" "timemark"
+        try
+        {
+            setSeries(cursor.getBlob(cursor.getColumnIndex("series")));
+            setCalendar(cursor.getBlob(cursor.getColumnIndex("timemark")));
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        _id = cursor.getInt(cursor.getColumnIndex("id"));
+        numberOfSeries = cursor.getInt(cursor.getColumnIndex("numberOfSeries"));
+        numberOfArrows = cursor.getInt(cursor.getColumnIndex("numberOfArrows"));
+        isFinished = (cursor.getInt(cursor.getColumnIndex("isFinished"))!=0);
+        this.arrow = arrow;
     }
 
     public int addShot(CShot shot)   {
-        currentSeries.add(shot);
-        if (currentSeries.size() == numberOfArrows)
+        series.lastElement().add(shot);
+        if (series.lastElement().size() == numberOfArrows)
         {
-            finishedSeries.add(currentSeries.toArray(new CShot[0]));
-            currentSeries = new Vector<CShot>();
+            series.add(new Vector<CShot>());
         }
-        if (finishedSeries.size() ==  numberOfSeries)
+        if (series.size() ==  numberOfSeries+1)
         {
-            currentSeries.clear();
+            series.remove(series.lastElement());
             isFinished = true;
             return 0;
         }
@@ -52,24 +72,76 @@ public class CDistance implements Serializable{
     }
 
     public void deleteLastShot()    {
-        if (currentSeries.size()>0)
+        if (series.lastElement().size()>0)
         {
-            currentSeries.remove(currentSeries.lastElement());
+            series.lastElement().remove(series.lastElement().lastElement());
         }
         else
-            if (finishedSeries.size()>0)
+        if (series.size()>1)
             {
-                currentSeries = new Vector<CShot>(Arrays.asList(finishedSeries.lastElement()));
-                currentSeries.remove(currentSeries.lastElement());
-                finishedSeries.remove(finishedSeries.lastElement());
+                series.remove(series.lastElement());
+                series.lastElement().remove(series.lastElement().lastElement());
             }
     }
 
     public boolean isEmpty()    {
-        if (finishedSeries.isEmpty()&&currentSeries.isEmpty())
+        if (series.isEmpty())
             return true;
         else
-            return false;
+        if ((series.size()==1)&&(series.lastElement().isEmpty()))
+            return true;
+        else
+        return false;
     }
 
+    private byte[] getSeries() throws Exception
+    {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(baos);
+        byte [] out = baos.toByteArray();
+        oos.writeObject(series);
+        baos.close();
+        return baos.toByteArray();
+    }
+
+    private void setSeries(byte[] s) throws Exception
+    {
+        ByteArrayInputStream baos = new ByteArrayInputStream(s);
+        ObjectInputStream oos = new ObjectInputStream(baos);
+        series = (Vector<Vector<CShot>>) oos.readObject();
+        oos.close();
+    }
+
+    private byte[] getCalendar() throws Exception
+    {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(baos);
+        byte [] bytes = baos.toByteArray();
+        oos.writeObject(timemark);
+        bytes = baos.toByteArray();
+        oos.close();
+        bytes = baos.toByteArray();
+        return baos.toByteArray();
+    }
+
+    private void setCalendar(byte [] s) throws Exception {
+        ByteArrayInputStream baos = new ByteArrayInputStream(s);
+        ObjectInputStream oos = new ObjectInputStream(baos);
+        timemark = (Calendar) oos.readObject();
+        oos.close();
+    }
+
+    public void addToDatabase(SQLiteDatabase database) throws Exception  {
+        ContentValues values = new ContentValues();
+        values.put("series",getSeries());
+        values.put("numberOfSeries",numberOfSeries);
+        values.put("numberOfArrows",numberOfArrows);
+        values.put("isFinished",isFinished);
+        values.put("timemark",getCalendar());
+        long i = database.insert("distances",null,values);
+    }
+
+    public int getId()  {
+        return _id;
+    }
 }

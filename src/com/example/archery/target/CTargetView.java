@@ -13,6 +13,7 @@ import com.example.archery.CShot;
 import com.example.archery.archeryView.CDistance;
 
 import java.io.ObjectInputStream;
+import java.util.Vector;
 
 /**
  * Created with IntelliJ IDEA.
@@ -35,7 +36,6 @@ public class CTargetView extends View {
     Rect zoomSrcRect;
     Paint arrowPaint = new Paint();
     CArcheryView mArcheryView;
-    CDistance distance;
 
     public CTargetView(Context context,CArcheryView mArcheryView) {
         super(context);
@@ -63,17 +63,17 @@ public class CTargetView extends View {
         Bitmap bitmap = Bitmap.createBitmap(maxr*2,maxr*2,Bitmap.Config.RGB_565);
         Canvas canvas = new Canvas(bitmap);
         target.draw(canvas,maxr);
-        distance = mArcheryView.getCurrentDistance();
-        for (CShot [] series : distance.finishedSeries)
+        CDistance distance = mArcheryView.getCurrentDistance();
+        for (Vector<CShot> series : distance.series)
             for (CShot shot : series)
-                canvas.drawCircle((shot.x+1)*maxr,(shot.y+1)*maxr,distance.arrow.radius*maxr,arrowPaint);
-        for (CShot shot : distance.currentSeries)
-            canvas.drawCircle((shot.x+1)*maxr,(shot.y+1)*maxr,distance.arrow.radius*maxr,arrowPaint);
+                canvas.drawCircle((shot.x+1)*maxr,(shot.y+1)*maxr,0.02F*maxr,arrowPaint);
+
         if (haveZoom)
         {
-            canvas.drawPoint(x,y,arrowPaint);
-            canvas.drawCircle(x,y,distance.arrow.radius*maxr,arrowPaint);
-            canvas.drawBitmap(bitmap,zoomSrcRect,zoomDestRect,null);
+            //TODO:Убрать, когда будет создана БД со стрелам
+                canvas.drawPoint(x,y,arrowPaint);
+                canvas.drawCircle(x,y,0.02F*maxr,arrowPaint);
+                canvas.drawBitmap(bitmap,zoomSrcRect,zoomDestRect,null);
         }
         screenCanvas.drawBitmap(bitmap,0,0,null);
     }
@@ -128,7 +128,8 @@ public class CTargetView extends View {
         {
             haveZoom = false;
             mArcheryView.addShot(new CShot(target.rings, x / maxr - 1, y / maxr - 1,
-                    mArcheryView.getCurrentDistance().arrow.radius));
+            //TODO: И это тоже убрать после добавления БД со стрелами, краб
+                    0.02F));
             MainActivity.vibrator.vibrate(100);
 			mArcheryView.invalidate();
             return true;

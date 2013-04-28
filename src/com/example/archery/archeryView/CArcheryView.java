@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 import com.example.archery.CArrow;
 import com.example.archery.CShot;
+import com.example.archery.database.CMySQLiteOpenHelper;
 import com.example.archery.target.CRing;
 import com.example.archery.target.CTarget;
 import com.example.archery.target.CTargetView;
@@ -19,8 +20,8 @@ public  class CArcheryView extends LinearLayout {
 	public int numberOfSeries;
     public int arrowsInSeries;
     private Context context;
-    private Vector<CDistance> distances = null;
-    private boolean alwaysNotEmpty;
+    private CDistance currentDistance = null;
+    private CDistance previousDistance = null;
     
 	public CArcheryView(Context context,int a, int b) {
 		super(context);
@@ -30,7 +31,7 @@ public  class CArcheryView extends LinearLayout {
 		arrowsInSeries = b;
 
        //context.deleteFile("Archery");
-        /*try
+        try
         {
             ObjectOutputStream oos =
                     new ObjectOutputStream(context.openFileOutput("Targets",Context.MODE_PRIVATE));
@@ -64,7 +65,7 @@ public  class CArcheryView extends LinearLayout {
         {
             Toast toast = Toast.makeText(context, e.getMessage(), 3000);
             toast.show();
-        }           */
+        }
         this.setOrientation(VERTICAL);
         LinearLayout layout = new LinearLayout(context);
         layout.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, 0,0.9f));
@@ -82,62 +83,69 @@ public  class CArcheryView extends LinearLayout {
     	}
 
     public void saveDistances()  {
-        try
+        if (currentDistance!=null)
         {
-            ObjectOutputStream oos =
-                    new ObjectOutputStream(context.openFileOutput("Archery",Context.MODE_PRIVATE));
-            oos.writeObject(distances);
-            oos.close();
+        if (!currentDistance.isEmpty())
+        {
+            CMySQLiteOpenHelper helper = new CMySQLiteOpenHelper(context);
+            try
+            {
+            helper.addDistance(currentDistance);
+            }
+            catch (Exception e)
+            {
+                Toast toast = Toast.makeText(context, e.getMessage(), 3000);
+                toast.show();
+            }
         }
-        catch (Exception e)
-        {
-            Toast toast = Toast.makeText(context, e.getMessage(), 3000);
-            toast.show();
         }
     }
 
     public void loadDistances()  {
+        CMySQLiteOpenHelper helper = new CMySQLiteOpenHelper(context);
         try
         {
-            ObjectInputStream oos =
-                    new ObjectInputStream(context.openFileInput("Archery"));
-            distances = (Vector<CDistance>) oos.readObject();
-            oos.close();
-        }
-        catch (FileNotFoundException e)
-        {
-            distances = new Vector<CDistance>();
+            currentDistance = helper.getUnfinishedDistance();
         }
         catch (Exception e)
         {
             Toast toast = Toast.makeText(context, e.getMessage(), 3000);
             toast.show();
         }
-        if (!distances.isEmpty())
-        {
-            if (distances.lastElement().isFinished==true)
-                distances.add(new CDistance(numberOfSeries, arrowsInSeries,getCurrentArrow()));
-        }
-        else
-            distances.add(new CDistance(numberOfSeries, arrowsInSeries,getCurrentArrow()));
-        alwaysNotEmpty = true;
         }
 
 	public void deleteLastShot()    {
-		distances.lastElement().deleteLastShot();
+		currentDistance.deleteLastShot();
 	}
 
     public void endCurrentDistance() {
-        if (!distances.lastElement().isEmpty())
-            distances.lastElement().isFinished = true;
-        else
-            distances.remove(distances.lastElement());
+        if (currentDistance!=null)
+        {
+            if (!currentDistance.isEmpty())
+            {
+                CMySQLiteOpenHelper helper = new CMySQLiteOpenHelper(context);
+                helper.deleteDistance(currentDistance);
+                currentDistance.isFinished = true;
+            }
+            else
+                currentDistance = null;
+        }
     }
 
     public void addShot(CShot shot) {
-        alwaysNotEmpty = false;
-        if (distances.lastElement().addShot(shot) == 0)
-            distances.add(new CDistance(numberOfSeries, arrowsInSeries,getCurrentArrow()));
+        if (currentDistance == null)
+        {
+            currentDistance = new CDistance(numberOfSeries, arrowsInSeries,getCurrentArrow());
+            currentDistance.addShot(shot);
+        }
+        else
+        if (currentDistance.addShot(shot) == 0)
+        {
+            endCurrentDistance();
+            saveDistances();
+            previousDistance = currentDistance;
+            currentDistance = null;
+        }
     }
 	
     public CArrow getCurrentArrow() {
@@ -161,10 +169,13 @@ public  class CArcheryView extends LinearLayout {
     }
 
     public CDistance getCurrentDistance()   {
-        if (distances.lastElement().isEmpty()&&!alwaysNotEmpty)
-            if (distances.size()>1)
-                if (distances.get(distances.size()-2).isFinished)
-                    return distances.get(distances.size()-2);
-        return distances.lastElement();
-     }
+        if ((currentDistance==null)&&(previousDistance==null))
+            return new CDistance(numberOfSeries,arrowsInSeries,null);
+        if (currentDistance==null)
+            return previousDistance;
+        if ((currentDistance.isEmpty()&&(previousDistance!=null)))
+            return previousDistance;
+        else
+            return currentDistance;
+    }
 }

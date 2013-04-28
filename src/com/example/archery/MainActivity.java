@@ -83,6 +83,7 @@ public class MainActivity extends Activity {
     public void onResume()  {
         super.onResume();
         mArcheryView.loadDistances();
+        mArcheryView.invalidate();
         vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
     }
 
@@ -101,11 +102,5 @@ public class MainActivity extends Activity {
     public void onBackPressed() {
         mArcheryView.deleteLastShot();
         mArcheryView.invalidate();
-    }
-
-    @Override
-    public void onStop()    {
-        mArcheryView.endCurrentDistance();
-        super.onStop();
     }
 }
