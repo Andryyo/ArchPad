@@ -115,7 +115,8 @@ public  class CArcheryView extends LinearLayout {
         }
 
 	public void deleteLastShot()    {
-		currentDistance.deleteLastShot();
+        if (currentDistance!=null)
+		    currentDistance.deleteLastShot();
 	}
 
     public void endCurrentDistance() {
