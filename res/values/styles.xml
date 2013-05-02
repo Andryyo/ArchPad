@@ -1,5 +1,7 @@
 <resources>
 
     <style name="AppTheme" parent="android:Theme.Light" />
-
+    <style name="Theme_galleryItemBackground">
+        <item name="android:background">?android:galleryItemBackground</item>
+    </style>
 </resources>

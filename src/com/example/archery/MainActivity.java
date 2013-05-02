@@ -22,11 +22,12 @@ public class MainActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        RelativeLayout content=(RelativeLayout) getLayoutInflater().inflate(R.layout.activity_start, null);
+        RelativeLayout content=(RelativeLayout) getLayoutInflater().inflate(R.layout.activity_main, null);
         setContentView(content);
         Intent intent = getIntent();
         mArcheryView = new CArcheryView(this, intent.getIntExtra(StartActivity.NUMBER_OF_SERIES,1)
-				  ,intent.getIntExtra(StartActivity.ARROWS_IN_SERIES,1));
+				  ,intent.getIntExtra(StartActivity.ARROWS_IN_SERIES,1),intent.getLongExtra(StartActivity.TARGET_ID,1),
+                intent.getLongExtra(StartActivity.ARROW_ID,1));
         mArcheryView.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT));
         content.addView(mArcheryView);
     }

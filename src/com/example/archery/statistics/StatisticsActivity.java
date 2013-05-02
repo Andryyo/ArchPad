@@ -1,11 +1,9 @@
 package com.example.archery.statistics;
 
-import java.io.*;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Vector;
 
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Context;
@@ -87,7 +85,7 @@ public class StatisticsActivity extends Activity    {
 
     public ExpandListAdapter(Context context)  {
         this.context=context;
-        helper = new CMySQLiteOpenHelper(context);
+        helper = CMySQLiteOpenHelper.getHelper(context);
         distances = helper.getAllDistances();
     }
 
@@ -100,7 +98,7 @@ public class StatisticsActivity extends Activity    {
 
 	public void Clean()
 	{
-        helper.clean();
+        helper.deleteAllDistances();
         distances = helper.getAllDistances();
         notifyDataSetChanged();
     }

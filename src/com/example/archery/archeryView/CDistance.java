@@ -3,8 +3,10 @@ package com.example.archery.archeryView;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.preference.PreferenceManager;
 import com.example.archery.CArrow;
 import com.example.archery.CShot;
+import com.example.archery.database.CMySQLiteOpenHelper;
 
 import java.io.*;
 import java.util.Arrays;
@@ -19,19 +21,21 @@ import java.util.Vector;
  * To change this template use File | Settings | File Templates.
  */
 public class CDistance implements Serializable{
-    int _id;
+    long _id;
     public Calendar timemark;
     public boolean isFinished;
     int numberOfArrows;
     int numberOfSeries;
-    public CArrow arrow;
+    public long targetId;
     public Vector<Vector<CShot>> series;
+    public long arrowId;
 
-    public CDistance(int numberOfSeries, int numberOfArrows, CArrow arrow)  {
+    public CDistance(int numberOfSeries, int numberOfArrows, long targetId, long arrowId)  {
         timemark = Calendar.getInstance();
         this.numberOfSeries = numberOfSeries;
         this.numberOfArrows = numberOfArrows;
-        this.arrow = arrow;
+        this.targetId = targetId;
+        this.arrowId = arrowId;
         isFinished = false;
         series = new Vector<Vector<CShot>>();
         series.add(new Vector<CShot>());
@@ -42,17 +46,18 @@ public class CDistance implements Serializable{
         //"series" "numberOfSeries" "numberOfArrows" "isFinished" "timemark"
         try
         {
-            setSeries(cursor.getBlob(cursor.getColumnIndex("series")));
-            setCalendar(cursor.getBlob(cursor.getColumnIndex("timemark")));
+            series = (Vector<Vector<CShot>>) CMySQLiteOpenHelper.setObjectBytes(cursor.getBlob(cursor.getColumnIndex("series")));
+            timemark = (Calendar) CMySQLiteOpenHelper.setObjectBytes(cursor.getBlob(cursor.getColumnIndex("timemark")));
         }
         catch (Exception e) {
             e.printStackTrace();
         }
-        _id = cursor.getInt(cursor.getColumnIndex("id"));
+        _id = cursor.getLong(cursor.getColumnIndex("_id"));
         numberOfSeries = cursor.getInt(cursor.getColumnIndex("numberOfSeries"));
         numberOfArrows = cursor.getInt(cursor.getColumnIndex("numberOfArrows"));
         isFinished = (cursor.getInt(cursor.getColumnIndex("isFinished"))!=0);
-        this.arrow = arrow;
+        targetId = cursor.getLong(cursor.getColumnIndex("targetId"));
+        arrowId = cursor.getLong(cursor.getColumnIndex("arrowId"));
     }
 
     public int addShot(CShot shot)   {
@@ -94,54 +99,28 @@ public class CDistance implements Serializable{
         return false;
     }
 
-    private byte[] getSeries() throws Exception
+    public void writeToDatabase(SQLiteDatabase database)
     {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(baos);
-        byte [] out = baos.toByteArray();
-        oos.writeObject(series);
-        baos.close();
-        return baos.toByteArray();
-    }
-
-    private void setSeries(byte[] s) throws Exception
-    {
-        ByteArrayInputStream baos = new ByteArrayInputStream(s);
-        ObjectInputStream oos = new ObjectInputStream(baos);
-        series = (Vector<Vector<CShot>>) oos.readObject();
-        oos.close();
-    }
-
-    private byte[] getCalendar() throws Exception
-    {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(baos);
-        byte [] bytes = baos.toByteArray();
-        oos.writeObject(timemark);
-        bytes = baos.toByteArray();
-        oos.close();
-        bytes = baos.toByteArray();
-        return baos.toByteArray();
-    }
-
-    private void setCalendar(byte [] s) throws Exception {
-        ByteArrayInputStream baos = new ByteArrayInputStream(s);
-        ObjectInputStream oos = new ObjectInputStream(baos);
-        timemark = (Calendar) oos.readObject();
-        oos.close();
-    }
-
-    public void addToDatabase(SQLiteDatabase database) throws Exception  {
+        try
+        {
         ContentValues values = new ContentValues();
-        values.put("series",getSeries());
+        values.put("series", CMySQLiteOpenHelper.getObjectBytes(series));
         values.put("numberOfSeries",numberOfSeries);
         values.put("numberOfArrows",numberOfArrows);
         values.put("isFinished",isFinished);
-        values.put("timemark",getCalendar());
-        long i = database.insert("distances",null,values);
+        values.put("timemark",CMySQLiteOpenHelper.getObjectBytes(timemark));
+        values.put("targetId",targetId);
+        values.put("arrowId",arrowId);
+        database.insert("distances",null,values);
+        }
+        catch (Exception e)
+        {
+        }
     }
 
-    public int getId()  {
+    public long getId()  {
         return _id;
     }
+
+
 }

@@ -1,6 +1,52 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent" 
-    android:background="#ff000000">
-</RelativeLayout>
+	android:orientation="vertical" 
+	android:background="#ff000000">
+    
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/Number_of_series" 
+        android:textColor="#ffffffff"/>
+
+    <Spinner
+        android:id="@+id/spinner1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/Arrows_in_series"
+        android:textColor="#ffffffff" />
+
+    <Spinner
+        android:id="@+id/spinner2"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" />
+
+    <Button
+            android:id="@+id/button1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/Start"
+            android:onClick="Start"/>
+
+    <com.example.archery.start.CTargetSelectView
+            android:id = "@+id/targetPreivew"
+            android:layout_height="100dp"
+            android:layout_width="match_parent"
+            android:gravity="center_horizontal"
+            android:unselectedAlpha="0.5">
+    </com.example.archery.start.CTargetSelectView>
+
+    <com.example.archery.start.CArrowSelectView
+            android:id="@+id/arrowSelectView"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" />
+
+
+
+</LinearLayout>

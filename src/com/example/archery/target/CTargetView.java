@@ -7,10 +7,12 @@ import android.preference.PreferenceManager;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
+import com.example.archery.CArrow;
 import com.example.archery.MainActivity;
 import com.example.archery.archeryView.CArcheryView;
 import com.example.archery.CShot;
 import com.example.archery.archeryView.CDistance;
+import com.example.archery.database.CMySQLiteOpenHelper;
 
 import java.io.ObjectInputStream;
 import java.util.Vector;
@@ -25,6 +27,7 @@ import java.util.Vector;
 public class CTargetView extends View {
     Context context;
     CTarget target;
+    CArrow arrow;
     int maxr;
     int screenWidth;
     int screenHeight;
@@ -41,8 +44,9 @@ public class CTargetView extends View {
         super(context);
         this.context = context;
         this.mArcheryView = mArcheryView;
-        String  name = PreferenceManager.getDefaultSharedPreferences(context).getString("target_name","default_target");
-        target = loadFromFile(name);
+        CMySQLiteOpenHelper helper = CMySQLiteOpenHelper.getHelper(context);
+        target = helper.getTarget(mArcheryView.getCurrentDistance().targetId);
+        arrow = helper.getArrow(mArcheryView.getCurrentDistance().arrowId);
         arrowPaint.setStyle(Paint.Style.STROKE);
         arrowPaint.setColor(Color.GREEN);
     }
@@ -66,38 +70,15 @@ public class CTargetView extends View {
         CDistance distance = mArcheryView.getCurrentDistance();
         for (Vector<CShot> series : distance.series)
             for (CShot shot : series)
-                canvas.drawCircle((shot.x+1)*maxr,(shot.y+1)*maxr,0.02F*maxr,arrowPaint);
+                canvas.drawCircle((shot.x+1)*maxr,(shot.y+1)*maxr,arrow.radius*maxr,arrowPaint);
 
         if (haveZoom)
         {
-            //TODO:Убрать, когда будет создана БД со стрелам
                 canvas.drawPoint(x,y,arrowPaint);
-                canvas.drawCircle(x,y,0.02F*maxr,arrowPaint);
+                canvas.drawCircle(x,y,arrow.radius*maxr,arrowPaint);
                 canvas.drawBitmap(bitmap,zoomSrcRect,zoomDestRect,null);
         }
         screenCanvas.drawBitmap(bitmap,0,0,null);
-    }
-
-    public CTarget loadFromFile(String name)  {
-        CTarget targets [];
-        try
-        {
-            ObjectInputStream ois = new ObjectInputStream(context.openFileInput("Targets"));
-            targets = (CTarget[]) ois.readObject();
-            ois.close();
-        }
-        catch (Exception e)
-        {
-            Toast toast = Toast.makeText(context, e.getMessage(), 3000);
-            toast.show();
-            return null;
-        }
-        for (CTarget target : targets)
-        {
-            if (target.name.equals(name))
-                return new CTarget(target);
-        }
-        return null;
     }
 
     @Override
@@ -128,8 +109,7 @@ public class CTargetView extends View {
         {
             haveZoom = false;
             mArcheryView.addShot(new CShot(target.rings, x / maxr - 1, y / maxr - 1,
-            //TODO: И это тоже убрать после добавления БД со стрелами, краб
-                    0.02F));
+                    arrow.radius));
             MainActivity.vibrator.vibrate(100);
 			mArcheryView.invalidate();
             return true;
