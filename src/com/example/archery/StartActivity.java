@@ -1,6 +1,5 @@
 package com.example.archery;
 
-import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
@@ -10,7 +9,6 @@ import android.app.Activity;
 import android.content.Intent;
 import com.example.archery.database.CMySQLiteOpenHelper;
 import com.example.archery.start.CArrowSelectView;
-import com.example.archery.start.CTargetPreview;
 import com.example.archery.start.CTargetSelectView;
 import com.example.archery.target.CRing;
 import com.example.archery.target.CTarget;
@@ -80,8 +78,8 @@ public class StartActivity extends Activity implements OnItemSelectedListener{
     public void onDestroy()    {
         ((CTargetSelectView) findViewById(R.id.targetPreivew)).closeCursor();
         ((CArrowSelectView) findViewById(R.id.arrowSelectView)).closeCursor();
-        helper.closeCursorDatabase();
-        helper.closeArrowDatabase();
+        helper.closeTargetsDatabase();
+        helper.closeArrowsDatabase();
         super.onStop();
     }
 

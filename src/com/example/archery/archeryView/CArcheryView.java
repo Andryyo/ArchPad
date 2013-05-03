@@ -12,7 +12,6 @@ import com.example.archery.database.CMySQLiteOpenHelper;
 import com.example.archery.target.CTargetView;
 
 public  class CArcheryView extends LinearLayout {
-	public Paint pen;
 	public int numberOfSeries;
     public int arrowsInSeries;
     private Context context;
@@ -24,7 +23,6 @@ public  class CArcheryView extends LinearLayout {
 	public CArcheryView(Context context,int numberOfSeries, int arrowsInSeries, long targetId, long arrowId) {
 		super(context);
         this.context = context;
-		this.pen = new Paint();
 		this.numberOfSeries = numberOfSeries;
 		this.arrowsInSeries = arrowsInSeries;
         this.targetId = targetId;
@@ -111,26 +109,6 @@ public  class CArcheryView extends LinearLayout {
             previousDistance = currentDistance;
             currentDistance = null;
         }
-    }
-	
-    public CArrow getCurrentArrow() {
-        String arrowName = PreferenceManager.getDefaultSharedPreferences(context).getString("arrowName","defaultArrow");
-        try
-        {
-            ObjectInputStream oos =
-                    new ObjectInputStream(context.openFileInput("Arrows"));
-            CArrow arrows[] = (CArrow[]) oos.readObject();
-            for (CArrow arrow : arrows)
-                if (arrow.name.equals(arrowName))
-                    return arrow;
-            oos.close();
-        }
-        catch (Exception e)
-        {
-            Toast toast = Toast.makeText(context, e.getMessage(), 3000);
-            toast.show();
-        }
-        return null;
     }
 
     public CDistance getCurrentDistance()   {
