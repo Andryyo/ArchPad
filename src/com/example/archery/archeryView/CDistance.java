@@ -11,6 +11,7 @@ import com.example.archery.database.CMySQLiteOpenHelper;
 import java.io.*;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.Vector;
 
 /**
@@ -47,11 +48,12 @@ public class CDistance implements Serializable{
         try
         {
             series = (Vector<Vector<CShot>>) CMySQLiteOpenHelper.setObjectBytes(cursor.getBlob(cursor.getColumnIndex("series")));
-            timemark = (Calendar) CMySQLiteOpenHelper.setObjectBytes(cursor.getBlob(cursor.getColumnIndex("timemark")));
         }
         catch (Exception e) {
             e.printStackTrace();
         }
+        timemark = Calendar.getInstance();
+        timemark.setTimeInMillis(cursor.getLong(cursor.getColumnIndex("timemark")));
         _id = cursor.getLong(cursor.getColumnIndex("_id"));
         numberOfSeries = cursor.getInt(cursor.getColumnIndex("numberOfSeries"));
         numberOfArrows = cursor.getInt(cursor.getColumnIndex("numberOfArrows"));
@@ -108,7 +110,7 @@ public class CDistance implements Serializable{
         values.put("numberOfSeries",numberOfSeries);
         values.put("numberOfArrows",numberOfArrows);
         values.put("isFinished",isFinished);
-        values.put("timemark",CMySQLiteOpenHelper.getObjectBytes(timemark));
+        values.put("timemark",timemark.getTimeInMillis());
         values.put("targetId",targetId);
         values.put("arrowId",arrowId);
         database.insert("distances",null,values);

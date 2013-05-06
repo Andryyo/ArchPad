@@ -1,11 +1,10 @@
 package com.example.archery.statistics;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Vector;
 
 import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Context;
@@ -36,10 +35,10 @@ public class StatisticsActivity extends Activity    {
     }
 
     @Override
-    public void onStop() {
+    public void onDestroy() {
         cursor.close();
-        CMySQLiteOpenHelper.getHelper(this).closeDistancesDatabase();
-        super.onStop();
+        CMySQLiteOpenHelper.getHelper(this).close();
+        super.onDestroy();
     }
 
     @Override
@@ -53,7 +52,7 @@ public class StatisticsActivity extends Activity    {
     	{
     	case R.id.clear:
     	{
-			adapter.Clean();
+			adapter.deleteAll();
 	    	break;
     	}
     	case R.id.expand:
@@ -83,7 +82,7 @@ public class StatisticsActivity extends Activity    {
         {
             ExpandableListView.ExpandableListContextMenuInfo info =
                     (ExpandableListView.ExpandableListContextMenuInfo)menuItem.getMenuInfo();
-            adapter.delete_record(ExpandableListView.getPackedPositionGroup(info.packedPosition));
+            adapter.delete_record(info.id);
         }
         return true;
     }
@@ -97,91 +96,18 @@ public class StatisticsActivity extends Activity    {
             helper = CMySQLiteOpenHelper.getHelper(context);
         }
 
-        public void delete_record(int n)
-    {
-        /*helper.deleteDistance(distances.get(n));
-        distances.remove(n);
-        notifyDataSetChanged();*/
-    }
+        public void delete_record(long id)
+        {
+            helper.deleteDistance(id);
+            adapter.changeCursor(helper.getDistancesCursor());
+        }
 
-	public void Clean()
+	public void deleteAll()
 	{
         helper.deleteAllDistances();
-        notifyDataSetChanged();
-    }
-	/*
-	public Object getChild(int groupPosition, int childPosition) {
-        CShot shots[][] = new CShot[2][];
-        shots[0] = distances.get(groupPosition).series.get(childPosition*2).toArray(new CShot[0]);
-        if (childPosition*2+1==distances.get(groupPosition).series.size())
-            shots[1] = null;
-        else
-            shots[1] = distances.get(groupPosition).series.get(childPosition*2+1).toArray(new CShot[1]);
-        return shots;
-	}
-
-	public long getChildId(int groupPosition, int childPosition) {
-		return childPosition;
-	}
-
-	public View getChildView(int groupPosition, int childPosition,
-			boolean isLastChild, View convertView, ViewGroup parent) {
-        LayoutInflater infalInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        convertView = infalInflater.inflate(R.layout.expandlistchild,null);
-        sum = 0;
-        for (int i =0; i<(distances.get(groupPosition).series.size()+1)/2;i++)
-        {
-            LinearLayout view = (LinearLayout) infalInflater.inflate(R.layout.statistics_block, null);
-            createStatisticsBlockView(view,(CShot[][]) getChild(groupPosition,i));
-            ((LinearLayout)convertView).addView(view);
-        }
-        CBorderedTextView view = new CBorderedTextView(context);
-        view.setText(String.valueOf(distances.get(groupPosition).isFinished));
-        ((LinearLayout)convertView).addView(view);
-        return convertView;
-	}
-
-	public int getChildrenCount(int groupPosition) {
-		//return (distances.get(groupPosition).series.size()+1)/2;
-	    return 1;
+        adapter.changeCursor(helper.getDistancesCursor());
     }
 
-	public Object getGroup(int groupPosition) {
-		return distances.get(groupPosition);
-	}
-
-	public int getGroupCount() {
-		return distances.size();
-	}
-
-	public long getGroupId(int groupPosition) {
-		return groupPosition;
-	}
-
-	public View getGroupView(int groupPosition, boolean isExpanded,
-			View convertView, ViewGroup parent) {
-		if (convertView == null){
-			LayoutInflater infalInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			convertView = infalInflater.inflate(R.layout.expandlistgroup, null);
-		}
-		TextView textview = (TextView) convertView.findViewById(R.id.group);
-        Calendar calendar = distances.get(groupPosition).timemark;
-		textview.setText(calendar.get(Calendar.DATE)+":"+
-                         calendar.get(Calendar.MONTH)+":"+
-                         calendar.get(Calendar.YEAR)+" "+
-                         calendar.get(Calendar.HOUR_OF_DAY)+":"+
-                         calendar.get(Calendar.MINUTE));
-		return convertView;
-	}
-
-	public boolean hasStableIds() {
-		return false;
-	}
-
-	public boolean isChildSelectable(int groupPosition, int childPosition) {
-		return false;
-	}
-     */
         private void createStatisticsBlockView(LinearLayout layout, CShot[][] series)  {
             int first_series_sum = 0;
             int second_series_sum = 0;
@@ -212,7 +138,9 @@ public class StatisticsActivity extends Activity    {
 
         @Override
         protected Cursor getChildrenCursor(Cursor groupCursor) {
+            long l = groupCursor.getLong(groupCursor.getColumnIndex("_id"));
             Cursor cursor = helper.getDistanceCursor(groupCursor.getLong(groupCursor.getColumnIndex("_id")));
+            l = cursor.getCount();
             startManagingCursor(cursor);
             return cursor;
         }
@@ -220,33 +148,16 @@ public class StatisticsActivity extends Activity    {
         @Override
         protected View newGroupView(Context context, Cursor cursor, boolean b, ViewGroup viewGroup) {
             TextView textview = new TextView(context);
-            Calendar calendar;
-            try {
-                calendar = (Calendar) CMySQLiteOpenHelper.setObjectBytes(cursor.getBlob(cursor.getColumnIndex("timemark")));
-            } catch (IOException e) {
-                return null;
-            } catch (ClassNotFoundException e) {
-                return null;
-            }
-            textview.setText(calendar.get(Calendar.DATE)+":"+
-                    calendar.get(Calendar.MONTH)+":"+
-                    calendar.get(Calendar.YEAR)+" "+
-                    calendar.get(Calendar.HOUR_OF_DAY)+":"+
-                    calendar.get(Calendar.MINUTE));
+            textview.setTextColor(Color.GREEN);
             return textview;
         }
 
         @Override
         protected void bindGroupView(View view, Context context, Cursor cursor, boolean b) {
-            Calendar calendar;
-            try {
-                calendar = (Calendar) CMySQLiteOpenHelper.setObjectBytes(cursor.getBlob(cursor.getColumnIndex("timemark")));
-            } catch (IOException e) {
-                return;
-            } catch (ClassNotFoundException e) {
-                return;
-            }
-            ((TextView)view).setText(calendar.get(Calendar.DATE) + ":" +
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(cursor.getLong(cursor.getColumnIndex("timemark")));
+            ((TextView)view).setText(cursor.getLong(cursor.getColumnIndex("_id"))+"___"+
+                    calendar.get(Calendar.DATE) + ":" +
                     calendar.get(Calendar.MONTH) + ":" +
                     calendar.get(Calendar.YEAR) + " " +
                     calendar.get(Calendar.HOUR_OF_DAY) + ":" +
@@ -255,35 +166,17 @@ public class StatisticsActivity extends Activity    {
 
         @Override
         protected View newChildView(Context context, Cursor cursor, boolean b, ViewGroup viewGroup) {
-            View convertView;
             LayoutInflater infalInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = infalInflater.inflate(R.layout.expandlistchild,null);
-            CDistance distance = new CDistance(cursor);
-            sum = 0;
-            for (int i =0; i<distance.series.size()-distance.series.size()%2;i++)
-            {
-                LinearLayout view = (LinearLayout) infalInflater.inflate(R.layout.statistics_block, null);
-                createStatisticsBlockView(view,new CShot[][]{distance.series.get(i).toArray(new CShot[0]),
-                                          distance.series.get(i+1).toArray(new CShot[0])});
-                ((LinearLayout)convertView).addView(view);
-            }
-            if (distance.series.size()%2!=0)
-            {
-                LinearLayout view = (LinearLayout) infalInflater.inflate(R.layout.statistics_block, null);
-                createStatisticsBlockView(view,new CShot[][]{distance.series.lastElement().toArray(new CShot[0]),
-                        null});
-                ((LinearLayout)convertView).addView(view);
-            }
-            return convertView;
+            return infalInflater.inflate(R.layout.expandlistchild,null);
         }
 
         @Override
         protected void bindChildView(View view, Context context, Cursor cursor, boolean b) {
+            ((LinearLayout)view).removeAllViews();
             LayoutInflater infalInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            view = infalInflater.inflate(R.layout.expandlistchild,null);
             CDistance distance = new CDistance(cursor);
             sum = 0;
-            for (int i =0; i<distance.series.size()-distance.series.size()%2;i++)
+            for (int i =0; i<distance.series.size()-distance.series.size()%2;i+=2)
             {
                 LinearLayout statisticsBlock = (LinearLayout) infalInflater.inflate(R.layout.statistics_block, null);
                 createStatisticsBlockView(statisticsBlock,new CShot[][]{distance.series.get(i).toArray(new CShot[0]),

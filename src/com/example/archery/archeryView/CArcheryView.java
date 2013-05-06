@@ -87,7 +87,7 @@ public  class CArcheryView extends LinearLayout {
             if (!currentDistance.isEmpty())
             {
                 CMySQLiteOpenHelper helper = CMySQLiteOpenHelper.getHelper(context);
-                helper.deleteDistance(currentDistance);
+                helper.deleteDistance(currentDistance.getId());
                 currentDistance.isFinished = true;
             }
             else

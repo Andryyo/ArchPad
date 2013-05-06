@@ -22,7 +22,6 @@ public class StartActivity extends Activity implements OnItemSelectedListener{
     public int Arrows_in_series;
     public int targetId = 0;
     public Spinner Arrows_in_series_spinner;
-    private CMySQLiteOpenHelper helper;
     public final static String NUMBER_OF_SERIES="com.example.Archery.NUMBER_OF_SERIES";
     public final static String ARROWS_IN_SERIES="com.example.Archery.ARROWS_IN_SERIES";
     public final static String TARGET_ID="com.example.Archery.TARGET_ID";
@@ -40,7 +39,7 @@ public class StartActivity extends Activity implements OnItemSelectedListener{
         rings.add(new CRing(5,6,Color.BLUE));
         rings.add(new CRing(0,7,Color.WHITE));
         CTarget target = new CTarget("default_target",rings,30,0);
-        helper = CMySQLiteOpenHelper.getHelper(this);
+        //helper = CMySQLiteOpenHelper.getHelper(this);
         //helper.addTarget(target);
         //helper.addTarget(target);
         //helper.addArrow(new CArrow("Алюминий","",0.05f,0));
@@ -78,9 +77,8 @@ public class StartActivity extends Activity implements OnItemSelectedListener{
     public void onDestroy()    {
         ((CTargetSelectView) findViewById(R.id.targetPreivew)).closeCursor();
         ((CArrowSelectView) findViewById(R.id.arrowSelectView)).closeCursor();
-        helper.closeTargetsDatabase();
-        helper.closeArrowsDatabase();
-        super.onStop();
+        CMySQLiteOpenHelper.getHelper(this).close();
+        super.onDestroy();
     }
 
 	public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2,

@@ -22,9 +22,8 @@ import java.util.Vector;
 public class CMySQLiteOpenHelper extends SQLiteOpenHelper {
 
     private static CMySQLiteOpenHelper mInstance;
-    public SQLiteDatabase closeTargetsDatabase;
-    public SQLiteDatabase arrowsDatabase;
-    private SQLiteDatabase distancesDatabase;
+    public SQLiteDatabase readableDatabase;
+    public SQLiteDatabase writeableDatabase;
 
     public static CMySQLiteOpenHelper getHelper(Context context)    {
         if (mInstance == null)
@@ -34,6 +33,8 @@ public class CMySQLiteOpenHelper extends SQLiteOpenHelper {
 
     private CMySQLiteOpenHelper(Context context) {
         super(context, "Archery", null, 1);
+        readableDatabase = null;
+        writeableDatabase = null;
     }
 
     @Override
@@ -43,7 +44,7 @@ public class CMySQLiteOpenHelper extends SQLiteOpenHelper {
         String CREATE_ARROWS_TABLE = "CREATE TABLE arrows(_id INTEGER PRIMARY KEY, radius INTEGER,name STRING,description STRING)";
         database.execSQL(CREATE_ARROWS_TABLE);
         String CREATE_DISTANCES_TABLE = "CREATE TABLE distances(_id INTEGER PRIMARY KEY,series BLOB,numberOfSeries INTEGER," +
-                "numberOfArrows INTEGER,isFinished INTEGER,timemark BLOB,arrowId INTEGER," +
+                "numberOfArrows INTEGER,isFinished INTEGER,timemark INTEGER,arrowId INTEGER," +
                 "targetId INTEGER,FOREIGN KEY(targetId) REFERENCES targets(_id),FOREIGN KEY(arrowId) REFERENCES arrows(_id))";
         database.execSQL(CREATE_DISTANCES_TABLE);
     }
@@ -54,10 +55,6 @@ public class CMySQLiteOpenHelper extends SQLiteOpenHelper {
         database.execSQL("DROP TABLE IF EXISTS targets");
         database.execSQL("DROP TABLE IF EXISTS arrows");
         onCreate(database);
-    }
-
-    public void closeTargetsDatabase() {
-        closeTargetsDatabase.close();
     }
 
     public CTarget getTarget(long _id) {
@@ -118,8 +115,9 @@ public class CMySQLiteOpenHelper extends SQLiteOpenHelper {
 
     public Cursor getTargetsCursor()
     {
-        closeTargetsDatabase = this.getReadableDatabase();
-        return closeTargetsDatabase.rawQuery("SELECT * FROM targets",null);
+        if (readableDatabase == null)
+            readableDatabase = this.getReadableDatabase();
+        return readableDatabase.rawQuery("SELECT * FROM targets",null);
     }
 
 
@@ -129,15 +127,6 @@ public class CMySQLiteOpenHelper extends SQLiteOpenHelper {
         database.close();
     }
 
-    public int getDistanceCount()
-    {
-        SQLiteDatabase database = this.getReadableDatabase();
-        Cursor cursor = database.rawQuery("SELECT * FROM distances",null);
-        int count = cursor.getCount();
-        cursor.close();
-        return count;
-    }
-
     public void addDistance(CDistance distance) throws Exception{
         SQLiteDatabase database = this.getWritableDatabase();
         distance.writeToDatabase(database);
@@ -145,19 +134,24 @@ public class CMySQLiteOpenHelper extends SQLiteOpenHelper {
     }
 
     public Cursor getDistancesCursor()  {
-        distancesDatabase = this.getReadableDatabase();
-        return distancesDatabase.rawQuery("SELECT * FROM distances",null);
+        if (readableDatabase == null)
+            readableDatabase = this.getReadableDatabase();
+        else
+        if (!readableDatabase.isOpen())
+            readableDatabase = this.getReadableDatabase();
+        return readableDatabase.query("distances",new String[]{"_id","timemark"},null,null,null,null,null);
     }
 
     public Cursor getDistanceCursor(long _id)   {
-        distancesDatabase = this.getReadableDatabase();
-        return  distancesDatabase.query("distances", new String[]{"_id","series", "numberOfSeries", "numberOfArrows",
+        if (readableDatabase == null)
+            readableDatabase = this.getReadableDatabase();
+        Cursor cursor = readableDatabase.query("distances", new String[]{"_id","series", "numberOfSeries", "numberOfArrows",
                 "isFinished", "timemark","targetId","arrowID"},
-                "_id=?", new String[]{String.valueOf(_id)}, null, null, null,null);
-    }
-
-    public void closeDistancesDatabase()    {
-        distancesDatabase.close();
+                "_id=?", new String[]{Long.toString(_id)}, null, null, null,null);
+        if (!cursor.moveToFirst())
+            return null;
+        else
+            return cursor;
     }
 
     public CDistance getUnfinishedDistance()    {
@@ -172,15 +166,15 @@ public class CMySQLiteOpenHelper extends SQLiteOpenHelper {
             return null;
         }
         CDistance distance = new CDistance(cursor);
-        deleteDistance(distance);
+        deleteDistance(distance.getId());
         cursor.close();
         database.close();
         return distance;
     }
 
-    public void deleteDistance(CDistance distance)  {
+    public void deleteDistance(long _id)  {
         SQLiteDatabase database = this.getWritableDatabase();
-        database.delete("distances", "_id = ?", new String[]{String.valueOf(distance.getId())});
+        database.delete("distances", "_id = ?", new String[]{Long.toString(_id)});
         database.close();
     }
 
@@ -212,12 +206,22 @@ public class CMySQLiteOpenHelper extends SQLiteOpenHelper {
     }
 
     public Cursor getArrowsCursor()  {
-        arrowsDatabase = this.getReadableDatabase();
-        return arrowsDatabase.rawQuery("SELECT * FROM arrows",null);
+        if (readableDatabase == null)
+            readableDatabase = this.getReadableDatabase();
+        return readableDatabase.rawQuery("SELECT * FROM arrows",null);
     }
 
-    public void closeArrowsDatabase() {
-        arrowsDatabase.close();
+    public void close()    {
+        if (readableDatabase!=null)
+        {
+            readableDatabase.close();
+            readableDatabase = null;
+        }
+        if (writeableDatabase!=null)
+        {
+            writeableDatabase.close();
+            writeableDatabase = null;
+        }
     }
 
     static public byte [] getObjectBytes(Object o) throws IOException  {
