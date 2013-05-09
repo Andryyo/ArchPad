@@ -23,5 +23,5 @@
     <string name="Filename">Archery_log</string>
     <string name="title_activity_start">Стрельба</string>
     <string name="title_activity_display">Статистика</string>
-
+    <string name="title_activity_sight">Управление прицелами</string>
 </resources>

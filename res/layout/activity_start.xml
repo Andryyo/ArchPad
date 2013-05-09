@@ -1,8 +1,11 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" 
-	android:orientation="vertical" 
-	android:background="#ff000000">
+    android:layout_height="match_parent"
+    android:background="#ff000000">
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+	android:orientation="vertical">
     
     <TextView
         android:id="@+id/textView1"
@@ -27,13 +30,6 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" />
 
-    <Button
-            android:id="@+id/button1"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/Start"
-            android:onClick="Start"/>
-
     <com.example.archery.start.CTargetSelectView
             android:id = "@+id/targetPreivew"
             android:layout_height="100dp"
@@ -47,6 +43,13 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content" />
 
+    <Button
+            android:id="@+id/button1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/Start"
+            android:onClick="Start"/>
 
 
 </LinearLayout>
+</ScrollView>

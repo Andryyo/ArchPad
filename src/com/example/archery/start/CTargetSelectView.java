@@ -23,18 +23,14 @@ public class CTargetSelectView extends Gallery {
 
     public CTargetSelectView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        //init(context);
-    }
-
-    public void closeCursor()   {
-        adapter.getCursor().close();
-    }
-
-    public void init(Context context)  {
         CMySQLiteOpenHelper helper = CMySQLiteOpenHelper.getHelper(context);
         Cursor targets = helper.getTargetsCursor();
         adapter = new CTargetsSelectAdapter(context,targets);
         this.setAdapter(adapter);
+    }
+
+    public void closeCursor()   {
+        adapter.getCursor().close();
     }
 
     private class CTargetsSelectAdapter extends CursorAdapter {

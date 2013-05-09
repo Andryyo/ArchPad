@@ -1,5 +1,6 @@
 package com.example.archery;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -7,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.os.Vibrator;
+import android.preference.PreferenceManager;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,9 +16,11 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import com.example.archery.archeryView.CArcheryView;
+import com.example.archery.sight.CSightPropertiesActivity;
 import com.example.archery.statistics.StatisticsActivity;
 
 public class MainActivity extends Activity {
+    public static final int SIGHT_REQUEST = 1;
     public CArcheryView mArcheryView = null;
     public static Vibrator vibrator;
     @Override
@@ -62,15 +66,30 @@ public class MainActivity extends Activity {
     		break;
     	}
         case R.id.save:
-            {
-             mArcheryView.endCurrentDistance();
-             Intent intent=new Intent(this, StartActivity.class);
-             startActivity(intent);
-             mArcheryView.invalidate();
-             break;
-            }
+        {
+            mArcheryView.endCurrentDistance();
+            finish();
+            break;
+        }
+        case R.id.sight:
+        {
+            Intent intent = new Intent(this, CSightPropertiesActivity.class);
+            startActivityForResult(intent, SIGHT_REQUEST);
+            break;
+        }
     	}
     	return true;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data)  {
+        if (requestCode==SIGHT_REQUEST)
+            if (resultCode!=RESULT_CANCELED)
+            {
+                SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
+                editor.putLong("sightId",data.getLongExtra("sightId",0));
+                editor.commit();
+            }
     }
 
     @Override

@@ -19,7 +19,6 @@ public class StatisticsActivity extends Activity    {
 
 	private ExpandListAdapter adapter;
 	private ExpandableListView expandableListView;
-    private Cursor cursor;
 
     //TODO:Поработать над статистикой:подсчёт очков, графики т.д.
 
@@ -27,7 +26,8 @@ public class StatisticsActivity extends Activity    {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display);
-        cursor = CMySQLiteOpenHelper.getHelper(this).getDistancesCursor();
+        Cursor cursor = CMySQLiteOpenHelper.getHelper(this).getDistancesCursor();
+        startManagingCursor(cursor);
         adapter = new ExpandListAdapter(cursor,this,true);
         expandableListView = (ExpandableListView) findViewById(R.id.expandableListView1);
         expandableListView.setAdapter(adapter);
@@ -36,7 +36,6 @@ public class StatisticsActivity extends Activity    {
 
     @Override
     public void onDestroy() {
-        cursor.close();
         CMySQLiteOpenHelper.getHelper(this).close();
         super.onDestroy();
     }
@@ -108,7 +107,7 @@ public class StatisticsActivity extends Activity    {
         adapter.changeCursor(helper.getDistancesCursor());
     }
 
-        private void createStatisticsBlockView(LinearLayout layout, CShot[][] series)  {
+        private void fillStatisticsBlockView(LinearLayout layout, CShot[][] series)  {
             int first_series_sum = 0;
             int second_series_sum = 0;
             for (CShot shot : series[0])
@@ -179,14 +178,14 @@ public class StatisticsActivity extends Activity    {
             for (int i =0; i<distance.series.size()-distance.series.size()%2;i+=2)
             {
                 LinearLayout statisticsBlock = (LinearLayout) infalInflater.inflate(R.layout.statistics_block, null);
-                createStatisticsBlockView(statisticsBlock,new CShot[][]{distance.series.get(i).toArray(new CShot[0]),
-                        distance.series.get(i+1).toArray(new CShot[0])});
+                fillStatisticsBlockView(statisticsBlock, new CShot[][]{distance.series.get(i).toArray(new CShot[0]),
+                        distance.series.get(i + 1).toArray(new CShot[0])});
                 ((LinearLayout)view).addView(statisticsBlock);
             }
             if (distance.series.size()%2!=0)
             {
                 LinearLayout statisticsBlock = (LinearLayout) infalInflater.inflate(R.layout.statistics_block, null);
-                createStatisticsBlockView(statisticsBlock,new CShot[][]{distance.series.lastElement().toArray(new CShot[0]),
+                fillStatisticsBlockView(statisticsBlock, new CShot[][]{distance.series.lastElement().toArray(new CShot[0]),
                         null});
                 ((LinearLayout)view).addView(statisticsBlock);
             }
