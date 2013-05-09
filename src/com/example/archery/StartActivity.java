@@ -39,11 +39,11 @@ public class StartActivity extends Activity implements OnItemSelectedListener{
         rings.add(new CRing(5,6,Color.BLUE));
         rings.add(new CRing(0,7,Color.WHITE));
         CTarget target = new CTarget("default_target",rings,30,0);
-        //helper = CMySQLiteOpenHelper.getHelper(this);
+        CMySQLiteOpenHelper helper = CMySQLiteOpenHelper.getHelper(this);
         //helper.addTarget(target);
         //helper.addTarget(target);
         //helper.addArrow(new CArrow("Алюминий","",0.05f,0));
-        //helper.addArrow(new CArrow("Карбонь","",0.01f,0));
+        //helper.addArrow(new CArrow("Карбон","а тут описание",0.01f,0));
         setContentView(R.layout.activity_start);
         Number_of_series_spinner=(Spinner) findViewById(R.id.spinner1);
         Arrows_in_series_spinner=(Spinner) findViewById(R.id.spinner2);
@@ -55,8 +55,6 @@ public class StartActivity extends Activity implements OnItemSelectedListener{
         Arrows_in_series_spinner.setAdapter(Arrows_in_series_adapter);
         Number_of_series_spinner.setOnItemSelectedListener(this);
         Arrows_in_series_spinner.setOnItemSelectedListener(this);
-        ((CTargetSelectView) findViewById(R.id.targetPreivew)).init(this);
-        ((CArrowSelectView) findViewById(R.id.arrowSelectView)).init(this);
     }
             
     public void Start(View view)

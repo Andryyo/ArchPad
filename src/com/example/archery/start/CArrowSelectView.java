@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
-import android.R;
+import com.example.archery.R;
 import com.example.archery.database.CMySQLiteOpenHelper;
 
 /**
@@ -19,31 +19,18 @@ import com.example.archery.database.CMySQLiteOpenHelper;
  * To change this template use File | Settings | File Templates.
  */
 public class CArrowSelectView extends Spinner {
-    SimpleCursorAdapter adapter;
 
     public CArrowSelectView(Context context, AttributeSet attrs) {
         super(context, attrs);
-    }
-
-    public void init(Context context)  {
-        adapter = new SimpleCursorAdapter(context,
-                R.layout.simple_list_item_1,
+        setAdapter(new SimpleCursorAdapter(context,
+                R.layout.select_spinner_child,
                 CMySQLiteOpenHelper.getHelper(context).getArrowsCursor(),
                 new String[]{"name","description"},
-                new int[]{R.id.text1});
-        setAdapter(adapter);
+                new int[]{R.id.name,R.id.description}));
     }
 
-    /*public int getSelectedItemId() {
-        Cursor cursor = adapter.getCursor();
-        cursor.moveToPosition(getSelectedItemPosition());
-        int i = cursor.getInt(cursor.getColumnIndex("_id"));
-        cursor.close();
-        return i;
-    } */
-
     public void closeCursor()   {
-        adapter.getCursor().close();
+        ((SimpleCursorAdapter)this.getAdapter()).getCursor().close();
     }
 
 }
