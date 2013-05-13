@@ -84,21 +84,19 @@
         <view
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                class="com.example.archery.sight.CSightSelectView"
+                class="com.example.archery.sight.CSightPropertiesActivity$CSightSelectView"
                 android:id="@+id/sight_select_view"
                 android:layout_weight="1"/>
 
         <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:id="@+id/imageButton"
                 android:src="@android:drawable/ic_input_add"
                 android:onClick="addSight"/>
 
         <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:id="@+id/deleteSight"
                 android:onClick="deleteSight"
                 android:src="@android:drawable/ic_delete"/>
 

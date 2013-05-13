@@ -2,20 +2,16 @@ package com.example.archery.sight;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.AdapterView;
-import android.widget.EditText;
-import android.widget.Spinner;
-import android.widget.Toast;
+import android.widget.*;
 import com.example.archery.MainActivity;
 import com.example.archery.R;
 import com.example.archery.database.CMySQLiteOpenHelper;
@@ -96,13 +92,13 @@ public class CSightPropertiesActivity extends Activity implements Spinner.OnItem
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
         builder.setTitle("Новая конфигурация прицела");
-        builder.setView(inflater.inflate(R.layout.sight_add_dialog, null));
+        builder.setView(inflater.inflate(R.layout.add_dialog, null));
         builder.setPositiveButton("Создать", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int id) {
                 CMySQLiteOpenHelper.getHelper(getApplicationContext()).addSight(
-                        ((EditText) ((AlertDialog) dialog).findViewById(R.id.name)).getText().toString(),
-                        ((EditText) ((AlertDialog) dialog).findViewById(R.id.description)).getText().toString()
+                        ((EditText) ((AlertDialog) dialog).findViewById(R.id.text1)).getText().toString(),
+                        ((EditText) ((AlertDialog) dialog).findViewById(R.id.text2)).getText().toString()
                 );
             }
         });
@@ -168,5 +164,45 @@ public class CSightPropertiesActivity extends Activity implements Spinner.OnItem
     public void onDestroy() {
         ((CSightSelectView)findViewById(R.id.sight_select_view)).closeCursor();
         super.onDestroy();
+    }
+
+    /**
+     * Created with IntelliJ IDEA.
+     * User: Андрей
+     * Date: 06.05.13
+     * Time: 21:09
+     * To change this template use File | Settings | File Templates.
+     */
+    public static class CSightSelectView extends Spinner {
+        SimpleCursorAdapter adapter;
+
+        public CSightSelectView(Context context, AttributeSet attrs) {
+            super(context, attrs);
+            adapter = new SimpleCursorAdapter(context,
+                    R.layout.spinner_child_2,
+                    CMySQLiteOpenHelper.getHelper(context).getSightsCursor(),
+                    new String[]{"name","description"},
+                    new int[]{R.id.text1,R.id.text2});
+            setAdapter(adapter);
+        }
+
+        public void closeCursor()   {
+            ((SimpleCursorAdapter)this.getAdapter()).getCursor().close();
+        }
+
+        public void update()    {
+            adapter.changeCursor(CMySQLiteOpenHelper.getHelper(getContext()).getSightsCursor());
+        }
+
+        public void setSelection(long sightId) {
+            for (int i = 0;i<adapter.getCount();i++)
+                if (adapter.getItemId(i)==sightId)
+                    setSelection(i);
+        }
+
+        public void deleteSigth() {
+            CMySQLiteOpenHelper.getHelper(getContext()).deleteSight(getSelectedItemId());
+            update();
+        }
     }
 }

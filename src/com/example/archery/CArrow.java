@@ -26,6 +26,12 @@ public class CArrow implements Serializable{
         this._id = id;
     }
 
+    public CArrow(String name, String description, float radius)   {
+        this.name = name;
+        this.description = description;
+        this.radius = radius;
+    }
+
 
     public void writeToDatabase(SQLiteDatabase database) {
         try

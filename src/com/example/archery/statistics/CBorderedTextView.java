@@ -10,6 +10,13 @@ import android.util.AttributeSet;
 import android.widget.TextView;
 import com.example.archery.R;
 
+/**
+* Created with IntelliJ IDEA.
+* User: Андрей
+* Date: 12.05.13
+* Time: 12:25
+* To change this template use File | Settings | File Templates.
+*/
 public class CBorderedTextView extends TextView {
         int color;
         int width;

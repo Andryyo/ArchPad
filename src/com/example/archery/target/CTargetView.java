@@ -3,10 +3,8 @@ package com.example.archery.target;
 import android.content.Context;
 
 import android.graphics.*;
-import android.preference.PreferenceManager;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Toast;
 import com.example.archery.CArrow;
 import com.example.archery.MainActivity;
 import com.example.archery.archeryView.CArcheryView;
@@ -14,7 +12,6 @@ import com.example.archery.CShot;
 import com.example.archery.archeryView.CDistance;
 import com.example.archery.database.CMySQLiteOpenHelper;
 
-import java.io.ObjectInputStream;
 import java.util.Vector;
 
 /**
@@ -66,7 +63,7 @@ public class CTargetView extends View {
             return;
         Bitmap bitmap = Bitmap.createBitmap(maxr*2,maxr*2,Bitmap.Config.RGB_565);
         Canvas canvas = new Canvas(bitmap);
-        target.draw(canvas,maxr);
+        target.draw(canvas, maxr, maxr);
         CDistance distance = mArcheryView.getCurrentDistance();
         for (Vector<CShot> series : distance.series)
             for (CShot shot : series)

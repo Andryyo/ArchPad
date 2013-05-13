@@ -2,10 +2,9 @@ package com.example.archery.start;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.util.AttributeSet;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Gallery;
-import android.widget.LinearLayout;
 import com.example.archery.R;
 import com.example.archery.target.CTarget;
 
@@ -18,13 +17,21 @@ import com.example.archery.target.CTarget;
  */
 public class CTargetPreview extends View {
 
-    CTarget target;
+    CTarget target = null;
     int maxr;
+
+    public CTargetPreview(Context context, AttributeSet attrs)  {
+        super(context,attrs,R.style.Theme_galleryItemBackground);
+    }
 
     public CTargetPreview(Context context, CTarget target) {
         super(context,null, R.style.Theme_galleryItemBackground);
         this.target = target;
         this.setLayoutParams(new Gallery.LayoutParams(100,100));
+    }
+
+    public void setTarget(CTarget target)   {
+        this.target = target;
     }
 
     @Override
@@ -35,10 +42,12 @@ public class CTargetPreview extends View {
 
     @Override
     public void onDraw(Canvas canvas)   {
-        target.draw(canvas,maxr);
+        if (target!=null)
+            if (!target.isEmpty())
+                target.draw(canvas, maxr, maxr);
     }
 
-    public int getTargetId()    {
+    public long getTargetId()    {
         return target.id;
     }
 }

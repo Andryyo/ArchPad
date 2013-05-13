@@ -9,6 +9,7 @@ import android.widget.*;
 import com.example.archery.database.CMySQLiteOpenHelper;
 import com.example.archery.target.CTarget;
 
+import java.io.IOException;
 import java.util.Vector;
 
 /**
@@ -33,6 +34,16 @@ public class CTargetSelectView extends Gallery {
         adapter.getCursor().close();
     }
 
+    public void deleteSelectedTarget() {
+        CMySQLiteOpenHelper.getHelper(getContext()).deleteTarget(getSelectedItemId());
+        update();
+    }
+
+    public void update() {
+        adapter.changeCursor(CMySQLiteOpenHelper.getHelper(getContext()).getTargetsCursor());
+        invalidate();
+    }
+
     private class CTargetsSelectAdapter extends CursorAdapter {
 
 
@@ -42,12 +53,25 @@ public class CTargetSelectView extends Gallery {
 
         @Override
         public View newView(Context context, Cursor cursor, ViewGroup viewGroup) {
-            return new CTargetPreview(context,CMySQLiteOpenHelper.getTarget(cursor));
+            try {
+                return new CTargetPreview(context,new CTarget(cursor));
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+            return null;
         }
 
         @Override
         public void bindView(View view, Context context, Cursor cursor) {
-            view = new CTargetPreview(context,CMySQLiteOpenHelper.getTarget(cursor));
+            try {
+                ((CTargetPreview)view).setTarget(new CTarget(cursor));
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            };
         }
     }
 }

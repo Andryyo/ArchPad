@@ -17,6 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import com.example.archery.archeryView.CArcheryView;
 import com.example.archery.sight.CSightPropertiesActivity;
+import com.example.archery.start.StartActivity;
 import com.example.archery.statistics.StatisticsActivity;
 
 public class MainActivity extends Activity {
@@ -75,6 +76,12 @@ public class MainActivity extends Activity {
         {
             Intent intent = new Intent(this, CSightPropertiesActivity.class);
             startActivityForResult(intent, SIGHT_REQUEST);
+            break;
+        }
+        case R.id.notes:
+        {
+            Intent intent = new Intent(this, NotesActivity.class);
+            startActivity(intent);
             break;
         }
     	}

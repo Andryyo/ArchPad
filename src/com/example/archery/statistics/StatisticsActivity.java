@@ -3,10 +3,10 @@ package com.example.archery.statistics;
 import java.util.Arrays;
 import java.util.Calendar;
 
+import android.app.ExpandableListActivity;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.app.Activity;
 import android.content.Context;
 import android.view.*;
 import android.widget.*;
@@ -15,7 +15,7 @@ import com.example.archery.R;
 import com.example.archery.archeryView.CDistance;
 import com.example.archery.database.CMySQLiteOpenHelper;
 
-public class StatisticsActivity extends Activity    {
+public class StatisticsActivity extends ExpandableListActivity {
 
 	private ExpandListAdapter adapter;
 	private ExpandableListView expandableListView;
@@ -25,12 +25,12 @@ public class StatisticsActivity extends Activity    {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_display);
         Cursor cursor = CMySQLiteOpenHelper.getHelper(this).getDistancesCursor();
         startManagingCursor(cursor);
         adapter = new ExpandListAdapter(cursor,this,true);
-        expandableListView = (ExpandableListView) findViewById(R.id.expandableListView1);
-        expandableListView.setAdapter(adapter);
+        setListAdapter(adapter);
+        expandableListView = (ExpandableListView) findViewById(android.R.id.list);
+        expandableListView.setBackgroundColor(Color.BLACK);
         registerForContextMenu(expandableListView);
     }
 
@@ -81,7 +81,7 @@ public class StatisticsActivity extends Activity    {
         {
             ExpandableListView.ExpandableListContextMenuInfo info =
                     (ExpandableListView.ExpandableListContextMenuInfo)menuItem.getMenuInfo();
-            adapter.delete_record(info.id);
+            adapter.deleteRecord(info.id);
         }
         return true;
     }
@@ -95,7 +95,7 @@ public class StatisticsActivity extends Activity    {
             helper = CMySQLiteOpenHelper.getHelper(context);
         }
 
-        public void delete_record(long id)
+        public void deleteRecord(long id)
         {
             helper.deleteDistance(id);
             adapter.changeCursor(helper.getDistancesCursor());
@@ -137,25 +137,22 @@ public class StatisticsActivity extends Activity    {
 
         @Override
         protected Cursor getChildrenCursor(Cursor groupCursor) {
-            long l = groupCursor.getLong(groupCursor.getColumnIndex("_id"));
             Cursor cursor = helper.getDistanceCursor(groupCursor.getLong(groupCursor.getColumnIndex("_id")));
-            l = cursor.getCount();
             startManagingCursor(cursor);
             return cursor;
         }
 
         @Override
         protected View newGroupView(Context context, Cursor cursor, boolean b, ViewGroup viewGroup) {
-            TextView textview = new TextView(context);
-            textview.setTextColor(Color.GREEN);
-            return textview;
+            LayoutInflater infalInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            return infalInflater.inflate(R.layout.expand_list_group, null);
         }
 
         @Override
         protected void bindGroupView(View view, Context context, Cursor cursor, boolean b) {
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis(cursor.getLong(cursor.getColumnIndex("timemark")));
-            ((TextView)view).setText(cursor.getLong(cursor.getColumnIndex("_id"))+"___"+
+            ((TextView)view.findViewById(R.id.text1)).setText(
                     calendar.get(Calendar.DATE) + ":" +
                     calendar.get(Calendar.MONTH) + ":" +
                     calendar.get(Calendar.YEAR) + " " +
@@ -165,8 +162,12 @@ public class StatisticsActivity extends Activity    {
 
         @Override
         protected View newChildView(Context context, Cursor cursor, boolean b, ViewGroup viewGroup) {
-            LayoutInflater infalInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            return infalInflater.inflate(R.layout.expandlistchild,null);
+            LinearLayout view = new LinearLayout(context);
+            view.setLayoutParams(new ListView.LayoutParams(ListView.LayoutParams.MATCH_PARENT,
+                    ListView.LayoutParams.WRAP_CONTENT));
+            view.setBackgroundColor(Color.BLACK);
+            view.setOrientation(LinearLayout.VERTICAL);
+            return view;
         }
 
         @Override
@@ -177,17 +178,15 @@ public class StatisticsActivity extends Activity    {
             sum = 0;
             for (int i =0; i<distance.series.size()-distance.series.size()%2;i+=2)
             {
-                LinearLayout statisticsBlock = (LinearLayout) infalInflater.inflate(R.layout.statistics_block, null);
+                LinearLayout statisticsBlock = (LinearLayout) infalInflater.inflate(R.layout.statistics_block, (LinearLayout)view);
                 fillStatisticsBlockView(statisticsBlock, new CShot[][]{distance.series.get(i).toArray(new CShot[0]),
                         distance.series.get(i + 1).toArray(new CShot[0])});
-                ((LinearLayout)view).addView(statisticsBlock);
             }
             if (distance.series.size()%2!=0)
             {
-                LinearLayout statisticsBlock = (LinearLayout) infalInflater.inflate(R.layout.statistics_block, null);
+                LinearLayout statisticsBlock = (LinearLayout) infalInflater.inflate(R.layout.statistics_block, (LinearLayout)view);
                 fillStatisticsBlockView(statisticsBlock, new CShot[][]{distance.series.lastElement().toArray(new CShot[0]),
                         null});
-                ((LinearLayout)view).addView(statisticsBlock);
             }
         }
     }
