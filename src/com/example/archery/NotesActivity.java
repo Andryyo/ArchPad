@@ -1,6 +1,5 @@
 package com.example.archery;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ExpandableListActivity;
 import android.content.Context;
@@ -39,7 +38,7 @@ public class NotesActivity extends ExpandableListActivity implements DialogInter
                             new String[]{"text"},
                             new int[]{R.id.text1});
         getExpandableListView().
-                addFooterView(inflater.inflate(R.layout.add_note,null));
+                addFooterView(inflater.inflate(R.layout.add_note_button,null));
         setListAdapter(adapter);
         registerForContextMenu(findViewById(android.R.id.list));
         getExpandableListView().setBackgroundColor(Color.BLACK);

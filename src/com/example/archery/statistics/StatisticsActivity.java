@@ -3,13 +3,17 @@ package com.example.archery.statistics;
 import java.util.Arrays;
 import java.util.Calendar;
 
+import android.app.AlertDialog;
 import android.app.ExpandableListActivity;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.content.Context;
 import android.view.*;
 import android.widget.*;
+import com.example.archery.CArrow;
 import com.example.archery.CShot;
 import com.example.archery.R;
 import com.example.archery.archeryView.CDistance;
@@ -77,11 +81,24 @@ public class StatisticsActivity extends ExpandableListActivity {
     }
     @Override
     public boolean onContextItemSelected(MenuItem menuItem) {
-        if (menuItem.getItemId()==R.id.delete_record)
+        switch (menuItem.getItemId())
         {
-            ExpandableListView.ExpandableListContextMenuInfo info =
+            case R.id.delete_record:
+            {
+                ExpandableListView.ExpandableListContextMenuInfo info =
                     (ExpandableListView.ExpandableListContextMenuInfo)menuItem.getMenuInfo();
-            adapter.deleteRecord(info.id);
+                adapter.deleteRecord(info.id);
+                break;
+            }
+            case  R.id.view_record:
+            {
+                Intent intent = new Intent(this, CRecordView.class);
+                ExpandableListView.ExpandableListContextMenuInfo info =
+                        (ExpandableListView.ExpandableListContextMenuInfo)menuItem.getMenuInfo();
+                intent.putExtra("record_id",info.id);
+                startActivity(intent);
+                break;
+            }
         }
         return true;
     }
@@ -154,7 +171,7 @@ public class StatisticsActivity extends ExpandableListActivity {
             calendar.setTimeInMillis(cursor.getLong(cursor.getColumnIndex("timemark")));
             ((TextView)view.findViewById(R.id.text1)).setText(
                     calendar.get(Calendar.DATE) + ":" +
-                    calendar.get(Calendar.MONTH) + ":" +
+                    Integer.toString(calendar.get(Calendar.MONTH)+1) + ":" +
                     calendar.get(Calendar.YEAR) + " " +
                     calendar.get(Calendar.HOUR_OF_DAY) + ":" +
                     calendar.get(Calendar.MINUTE));
@@ -176,17 +193,20 @@ public class StatisticsActivity extends ExpandableListActivity {
             LayoutInflater infalInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             CDistance distance = new CDistance(cursor);
             sum = 0;
-            for (int i =0; i<distance.series.size()-distance.series.size()%2;i+=2)
+            LinearLayout statisticsBlock;
+            for (int i =0; i<distance.series.size()/2;i++)
             {
-                LinearLayout statisticsBlock = (LinearLayout) infalInflater.inflate(R.layout.statistics_block, (LinearLayout)view);
-                fillStatisticsBlockView(statisticsBlock, new CShot[][]{distance.series.get(i).toArray(new CShot[0]),
-                        distance.series.get(i + 1).toArray(new CShot[0])});
+                statisticsBlock = (LinearLayout) infalInflater.inflate(R.layout.statistics_block,null);
+                fillStatisticsBlockView(statisticsBlock, new CShot[][]{distance.series.get(i*2).toArray(new CShot[0]),
+                        distance.series.get(i*2 + 1).toArray(new CShot[0])});
+                ((LinearLayout) view).addView(statisticsBlock);
             }
             if (distance.series.size()%2!=0)
             {
-                LinearLayout statisticsBlock = (LinearLayout) infalInflater.inflate(R.layout.statistics_block, (LinearLayout)view);
+                statisticsBlock = (LinearLayout) infalInflater.inflate(R.layout.statistics_block,null);
                 fillStatisticsBlockView(statisticsBlock, new CShot[][]{distance.series.lastElement().toArray(new CShot[0]),
                         null});
+                ((LinearLayout) view).addView(statisticsBlock);
             }
         }
     }

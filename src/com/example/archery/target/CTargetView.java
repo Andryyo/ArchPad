@@ -25,6 +25,7 @@ public class CTargetView extends View {
     Context context;
     CTarget target;
     CArrow arrow;
+    CDistance distance;
     int maxr;
     int screenWidth;
     int screenHeight;
@@ -35,18 +36,33 @@ public class CTargetView extends View {
     Rect zoomDestRect;
     Rect zoomSrcRect;
     Paint arrowPaint = new Paint();
-    CArcheryView mArcheryView;
+    CArcheryView mArcheryView = null;
+    boolean IsEditable;
 
     public CTargetView(Context context,CArcheryView mArcheryView) {
         super(context);
         this.context = context;
         this.mArcheryView = mArcheryView;
+        IsEditable = true;
         CMySQLiteOpenHelper helper = CMySQLiteOpenHelper.getHelper(context);
         target = helper.getTarget(mArcheryView.getCurrentDistance().targetId);
         arrow = helper.getArrow(mArcheryView.getCurrentDistance().arrowId);
         arrowPaint.setStyle(Paint.Style.STROKE);
         arrowPaint.setColor(Color.GREEN);
     }
+
+    public CTargetView(Context context,long distanceId) {
+        super(context);
+        this.context = context;
+        IsEditable = false;
+        CMySQLiteOpenHelper helper = CMySQLiteOpenHelper.getHelper(context);
+        distance = helper.getDistance(distanceId);
+        target = helper.getTarget(distance.targetId);
+        arrow = helper.getArrow(distance.arrowId);
+        arrowPaint.setStyle(Paint.Style.STROKE);
+        arrowPaint.setColor(Color.GREEN);
+    }
+
 
     @Override
     public void onSizeChanged(int w,int h, int oldw, int oldh)
@@ -64,15 +80,18 @@ public class CTargetView extends View {
         Bitmap bitmap = Bitmap.createBitmap(maxr*2,maxr*2,Bitmap.Config.RGB_565);
         Canvas canvas = new Canvas(bitmap);
         target.draw(canvas, maxr, maxr);
-        CDistance distance = mArcheryView.getCurrentDistance();
+        if (IsEditable)
+            distance = mArcheryView.getCurrentDistance();
         for (Vector<CShot> series : distance.series)
             for (CShot shot : series)
                 canvas.drawCircle((shot.x+1)*maxr,(shot.y+1)*maxr,arrow.radius*maxr,arrowPaint);
-
         if (haveZoom)
         {
+            if (IsEditable)
+            {
                 canvas.drawPoint(x,y,arrowPaint);
                 canvas.drawCircle(x,y,arrow.radius*maxr,arrowPaint);
+            }
                 canvas.drawBitmap(bitmap,zoomSrcRect,zoomDestRect,null);
         }
         screenCanvas.drawBitmap(bitmap,0,0,null);
@@ -104,12 +123,16 @@ public class CTargetView extends View {
         }
 		if (event.getAction() == MotionEvent.ACTION_UP)
         {
-            haveZoom = false;
-            mArcheryView.addShot(new CShot(target.rings, x / maxr - 1, y / maxr - 1,
-                    arrow.radius));
-            MainActivity.vibrator.vibrate(100);
-			mArcheryView.invalidate();
-            return true;
+            if (IsEditable)
+            {
+                mArcheryView.addShot(new CShot(target.rings, x / maxr - 1, y / maxr - 1,
+                        arrow.radius));
+                MainActivity.vibrator.vibrate(100);
+                mArcheryView.invalidate();
+            }
+                invalidate();
+                haveZoom = false;
+                return true;
         }
 		return false;
 	}

@@ -132,6 +132,23 @@ public class CMySQLiteOpenHelper extends SQLiteOpenHelper {
         database.close();
     }
 
+    public CDistance getDistance(long id){
+        SQLiteDatabase database = this.getReadableDatabase();
+        Cursor cursor = database.query("distances", new String[]{"_id","series", "numberOfSeries", "numberOfArrows",
+                "isFinished", "timemark","targetId","arrowID"},
+                "_id=?", new String[]{Long.toString(id)}, null, null, null,null);
+        if (cursor.moveToFirst()==false)
+        {
+            cursor.close();
+            database.close();
+            return null;
+        }
+        CDistance distance = new CDistance(cursor);
+        cursor.close();
+        database.close();
+        return distance;
+    }
+
     public Cursor getDistancesCursor()  {
         if (readableDatabase == null)
             readableDatabase = this.getReadableDatabase();
