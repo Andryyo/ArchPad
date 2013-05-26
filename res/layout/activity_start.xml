@@ -1,6 +1,98 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" 
+    android:layout_height="match_parent"
     android:background="#ff000000">
-</RelativeLayout>
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+	android:orientation="vertical">
+    
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/Number_of_series" 
+        android:textColor="#ffffffff"/>
+
+    <Spinner
+        android:id="@+id/spinner1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/Arrows_in_series"
+        android:textColor="#ffffffff" />
+
+    <Spinner
+        android:id="@+id/spinner2"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" />
+
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+
+        <com.example.archery.start.CTargetSelectView
+                android:id = "@+id/targetSelectView"
+                android:layout_height="100dp"
+                android:layout_width="0dp"
+                android:gravity="center_horizontal"
+                android:unselectedAlpha="0.5"
+                android:layout_weight="1">
+        </com.example.archery.start.CTargetSelectView>
+
+        <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:src="@android:drawable/ic_input_add"
+                android:onClick="onClick"
+                android:id="@+id/addTarget"/>
+
+        <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:onClick="onClick"
+                android:src="@android:drawable/ic_delete"
+                android:id="@+id/deleteTarget"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+
+        <com.example.archery.start.CArrowSelectView
+                android:id="@+id/arrowSelectView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
+
+        <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:src="@android:drawable/ic_input_add"
+                android:onClick="onClick"
+                android:id="@+id/addArrow"/>
+
+        <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:onClick="onClick"
+                android:src="@android:drawable/ic_delete"
+                android:id="@+id/deleteArrow"/>
+    </LinearLayout>
+
+    <Button
+            android:id="@+id/button1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/Start"
+            android:onClick="Start"/>
+
+
+</LinearLayout>
+</ScrollView>

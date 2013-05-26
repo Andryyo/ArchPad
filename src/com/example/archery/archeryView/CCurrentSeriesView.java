@@ -7,6 +7,8 @@ import android.graphics.Paint;
 import android.view.View;
 import com.example.archery.CShot;
 
+import java.util.Vector;
+
 /**
  * Created with IntelliJ IDEA.
  * User: Андрей
@@ -42,11 +44,11 @@ public class CCurrentSeriesView extends View {
         int i=0;
         distance = mArcheryView.getCurrentDistance();
         textWidth = screenWidth/(distance.numberOfArrows+1);
-        CShot buf[];
-        if ((distance.currentSeries.size()==0)&&(!distance.finishedSeries.isEmpty()))
-            buf = distance.finishedSeries.lastElement();
+        Vector<CShot> buf;
+        if ((distance.series.lastElement().isEmpty())&&(distance.series.size()>1))
+            buf = distance.series.get(distance.series.size()-2);
         else
-            buf = distance.currentSeries.toArray(new CShot[0]);
+            buf = distance.series.lastElement();
         for (CShot shot : buf)
         {
             canvas.drawText(shot.toString(), i*textWidth+textWidth/2, textHeight, paint);

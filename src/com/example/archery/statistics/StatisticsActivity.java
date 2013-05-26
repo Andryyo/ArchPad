@@ -1,20 +1,25 @@
 package com.example.archery.statistics;
 
-import java.io.*;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Vector;
 
+import android.app.AlertDialog;
+import android.app.ExpandableListActivity;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.app.Activity;
 import android.content.Context;
 import android.view.*;
 import android.widget.*;
+import com.example.archery.CArrow;
 import com.example.archery.CShot;
 import com.example.archery.R;
 import com.example.archery.archeryView.CDistance;
+import com.example.archery.database.CMySQLiteOpenHelper;
 
-public class StatisticsActivity extends Activity    {
+public class StatisticsActivity extends ExpandableListActivity {
 
 	private ExpandListAdapter adapter;
 	private ExpandableListView expandableListView;
@@ -24,30 +29,21 @@ public class StatisticsActivity extends Activity    {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_display);
-        Vector<CDistance> distances = new Vector<CDistance>();
-        try
-        {
-        ObjectInputStream ois = new ObjectInputStream(this.openFileInput("Archery"));
-        distances = (Vector<CDistance>) ois.readObject();
-        ois.close();
-        }
-        catch (Exception e)
-        {
-            Toast toast = Toast.makeText(this, e.getMessage(), 3000);
-            toast.show();
-        }
-
-        adapter = new ExpandListAdapter(this, distances);
-        expandableListView = (ExpandableListView) findViewById(R.id.expandableListView1);
-        expandableListView.setAdapter(adapter);
+        Cursor cursor = CMySQLiteOpenHelper.getHelper(this).getDistancesCursor();
+        startManagingCursor(cursor);
+        adapter = new ExpandListAdapter(cursor,this,true);
+        setListAdapter(adapter);
+        expandableListView = (ExpandableListView) findViewById(android.R.id.list);
+        expandableListView.setBackgroundColor(Color.BLACK);
         registerForContextMenu(expandableListView);
     }
+
     @Override
-    public void onPause()    {
-        super.onPause();
-        adapter.saveDistances();
+    public void onDestroy() {
+        CMySQLiteOpenHelper.getHelper(this).close();
+        super.onDestroy();
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_display, menu);
@@ -59,8 +55,7 @@ public class StatisticsActivity extends Activity    {
     	{
     	case R.id.clear:
     	{
-    		this.deleteFile("Archery");
-			adapter.Clean();
+			adapter.deleteAll();
 	    	break;
     	}
     	case R.id.expand:
@@ -86,160 +81,133 @@ public class StatisticsActivity extends Activity    {
     }
     @Override
     public boolean onContextItemSelected(MenuItem menuItem) {
-        if (menuItem.getItemId()==R.id.delete_record)
+        switch (menuItem.getItemId())
         {
-            ExpandableListView.ExpandableListContextMenuInfo info =
+            case R.id.delete_record:
+            {
+                ExpandableListView.ExpandableListContextMenuInfo info =
                     (ExpandableListView.ExpandableListContextMenuInfo)menuItem.getMenuInfo();
-            adapter.delete_record(ExpandableListView.getPackedPositionGroup(info.packedPosition));
+                adapter.deleteRecord(info.id);
+                break;
+            }
+            case  R.id.view_record:
+            {
+                Intent intent = new Intent(this, CRecordView.class);
+                ExpandableListView.ExpandableListContextMenuInfo info =
+                        (ExpandableListView.ExpandableListContextMenuInfo)menuItem.getMenuInfo();
+                intent.putExtra("record_id",info.id);
+                startActivity(intent);
+                break;
+            }
         }
         return true;
     }
 
-    private class ExpandListAdapter extends BaseExpandableListAdapter   {
-	Context context;
-	Vector<CDistance> distances;
+    private class ExpandListAdapter extends CursorTreeAdapter   {
+    CMySQLiteOpenHelper helper;
+    int sum;
 
-    public void delete_record(int n)
-    {
-        distances.remove(n);
-        notifyDataSetChanged();
-    }
+        public ExpandListAdapter(Cursor cursor, Context context,boolean autoRequery) {
+            super(cursor, context, autoRequery);
+            helper = CMySQLiteOpenHelper.getHelper(context);
+        }
 
-	public void Clean()
+        public void deleteRecord(long id)
+        {
+            helper.deleteDistance(id);
+            adapter.changeCursor(helper.getDistancesCursor());
+        }
+
+	public void deleteAll()
 	{
-		if (distances.lastElement().isFinished)
-            distances.clear();
-        else
-        {
-            CDistance buf = distances.lastElement();
-            distances.clear();
-            distances.add(buf);
-        }
-        notifyDataSetChanged();
-	}
-	
-	public ExpandListAdapter(Context context, Vector<CDistance> distances)
-	{
-		this.context=context;
-		this.distances=distances;
-
-	}
-	
-	public Object getChild(int groupPosition, int childPosition) {
-        CShot shots [][] = new CShot[2][];
-        shots[0] = distances.get(groupPosition).finishedSeries.get(childPosition*2);
-        if (childPosition*2+1==distances.get(groupPosition).finishedSeries.size())
-            shots[1] = null;
-        else
-            shots[1] = distances.get(groupPosition).finishedSeries.get(childPosition*2+1);
-        return shots;
-	}
-
-	public long getChildId(int groupPosition, int childPosition) {
-		return childPosition;
-	}
-
-	public View getChildView(int groupPosition, int childPosition,
-			boolean isLastChild, View convertView, ViewGroup parent) {
-        LayoutInflater infalInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        convertView = infalInflater.inflate(R.layout.statistics_block, null);
-        int sum = 0;
-        for (int i=0;i<childPosition;i++)
-            sum+=getChildSum(groupPosition,i);
-        createStatisticsBlockView((LinearLayout) convertView,(CShot[][]) getChild(groupPosition,childPosition),sum);
-        return convertView;
-	}
-
-	public int getChildrenCount(int groupPosition) {
-		return (distances.get(groupPosition).finishedSeries.size()+1)/2;
-	}
-
-	public Object getGroup(int groupPosition) {
-		return distances.get(groupPosition);
-	}
-
-	public int getGroupCount() {
-		return distances.size();
-	}
-
-	public long getGroupId(int groupPosition) {
-		return groupPosition;
-	}
-
-	public View getGroupView(int groupPosition, boolean isExpanded,
-			View convertView, ViewGroup parent) {
-		if (convertView == null){
-			LayoutInflater infalInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			convertView = infalInflater.inflate(R.layout.expandlistgroup, null);
-		}
-		TextView textview = (TextView) convertView.findViewById(R.id.group);
-        Calendar calendar = distances.get(groupPosition).timemark;
-		textview.setText(calendar.get(Calendar.DATE)+":"+
-                         calendar.get(Calendar.MONTH)+":"+
-                         calendar.get(Calendar.YEAR)+" "+
-                         calendar.get(Calendar.HOUR_OF_DAY)+":"+
-                         calendar.get(Calendar.MINUTE));
-		return convertView;
-	}
-
-    public void saveDistances()
-    {
-        try
-        {
-        ObjectOutputStream oos = new ObjectOutputStream(openFileOutput("Archery",MODE_PRIVATE));
-        oos.writeObject(distances);
-        oos.close();
-        }
-        catch (IOException e)
-        {
-            Toast toast = Toast.makeText(context, e.getMessage(), 3000);
-            toast.show();
-        }
+        helper.deleteAllDistances();
+        adapter.changeCursor(helper.getDistancesCursor());
     }
 
-	public boolean hasStableIds() {
-		return false;
-	}
-
-	public boolean isChildSelectable(int groupPosition, int childPosition) {
-		return false;
-	}
-
-    private int getChildSum(int groupPosition,int childPosition)
-    {
-        int sum = 0;
-        CShot series[][] = (CShot[][]) getChild(groupPosition,childPosition);
-        for (CShot shot : series[0])
-            sum+=shot.getPoints();
-        if (series[1]!=null)
-            for (CShot shot : series[1])
-                sum+=shot.getPoints();
-        return sum;
-    }
-        private void createStatisticsBlockView(LinearLayout layout, CShot[][] series, int sum)  {
+        private void fillStatisticsBlockView(LinearLayout layout, CShot[][] series)  {
             int first_series_sum = 0;
             int second_series_sum = 0;
             for (CShot shot : series[0])
-                first_series_sum+=shot.getPoints();
+                if (shot!=null)
+                    first_series_sum+=shot.getPoints();
             if (series[1]!=null)
                 for (CShot shot : series[1])
-                    second_series_sum+=shot.getPoints();
-            BorderedTextView tv = (BorderedTextView)layout.findViewById(R.id.first_series);
+                    if (shot!=null)
+                        second_series_sum+=shot.getPoints();
+            CBorderedTextView tv = (CBorderedTextView)layout.findViewById(R.id.first_series);
             tv.setText(Arrays.deepToString(series[0]));
             if (series[1]!=null)
                 {
-                tv = (BorderedTextView)layout.findViewById(R.id.second_series);
+                tv = (CBorderedTextView)layout.findViewById(R.id.second_series);
                 tv.setText(Arrays.deepToString(series[1]));
-                tv = (BorderedTextView)layout.findViewById(R.id.second_series_sum);
+                tv = (CBorderedTextView)layout.findViewById(R.id.second_series_sum);
                 tv.setText(Integer.toString(second_series_sum));
                 }
-            tv = (BorderedTextView)layout.findViewById(R.id.first_series_sum);
+            tv = (CBorderedTextView)layout.findViewById(R.id.first_series_sum);
             tv.setText(Integer.toString(first_series_sum));
-            tv = (BorderedTextView)layout.findViewById(R.id.two_series);
+            tv = (CBorderedTextView)layout.findViewById(R.id.two_series);
             tv.setText(Integer.toString((first_series_sum+second_series_sum)));
-            tv = (BorderedTextView)layout.findViewById(R.id.all_series);
+            tv = (CBorderedTextView)layout.findViewById(R.id.all_series);
             sum+=first_series_sum+second_series_sum;
             tv.setText(Integer.toString(sum));
+        }
+
+        @Override
+        protected Cursor getChildrenCursor(Cursor groupCursor) {
+            Cursor cursor = helper.getDistanceCursor(groupCursor.getLong(groupCursor.getColumnIndex("_id")));
+            startManagingCursor(cursor);
+            return cursor;
+        }
+
+        @Override
+        protected View newGroupView(Context context, Cursor cursor, boolean b, ViewGroup viewGroup) {
+            LayoutInflater infalInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            return infalInflater.inflate(R.layout.expand_list_group, null);
+        }
+
+        @Override
+        protected void bindGroupView(View view, Context context, Cursor cursor, boolean b) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(cursor.getLong(cursor.getColumnIndex("timemark")));
+            ((TextView)view.findViewById(R.id.text1)).setText(
+                    calendar.get(Calendar.DATE) + ":" +
+                    Integer.toString(calendar.get(Calendar.MONTH)+1) + ":" +
+                    calendar.get(Calendar.YEAR) + " " +
+                    calendar.get(Calendar.HOUR_OF_DAY) + ":" +
+                    calendar.get(Calendar.MINUTE));
+        }
+
+        @Override
+        protected View newChildView(Context context, Cursor cursor, boolean b, ViewGroup viewGroup) {
+            LinearLayout view = new LinearLayout(context);
+            view.setLayoutParams(new ListView.LayoutParams(ListView.LayoutParams.MATCH_PARENT,
+                    ListView.LayoutParams.WRAP_CONTENT));
+            view.setBackgroundColor(Color.BLACK);
+            view.setOrientation(LinearLayout.VERTICAL);
+            return view;
+        }
+
+        @Override
+        protected void bindChildView(View view, Context context, Cursor cursor, boolean b) {
+            ((LinearLayout)view).removeAllViews();
+            LayoutInflater infalInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            CDistance distance = new CDistance(cursor);
+            sum = 0;
+            LinearLayout statisticsBlock;
+            for (int i =0; i<distance.series.size()/2;i++)
+            {
+                statisticsBlock = (LinearLayout) infalInflater.inflate(R.layout.statistics_block,null);
+                fillStatisticsBlockView(statisticsBlock, new CShot[][]{distance.series.get(i*2).toArray(new CShot[0]),
+                        distance.series.get(i*2 + 1).toArray(new CShot[0])});
+                ((LinearLayout) view).addView(statisticsBlock);
+            }
+            if (distance.series.size()%2!=0)
+            {
+                statisticsBlock = (LinearLayout) infalInflater.inflate(R.layout.statistics_block,null);
+                fillStatisticsBlockView(statisticsBlock, new CShot[][]{distance.series.lastElement().toArray(new CShot[0]),
+                        null});
+                ((LinearLayout) view).addView(statisticsBlock);
+            }
         }
     }
 

@@ -1,5 +1,6 @@
 package com.example.archery;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -7,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.os.Vibrator;
+import android.preference.PreferenceManager;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,19 +16,23 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import com.example.archery.archeryView.CArcheryView;
+import com.example.archery.sight.CSightPropertiesActivity;
+import com.example.archery.start.StartActivity;
 import com.example.archery.statistics.StatisticsActivity;
 
 public class MainActivity extends Activity {
+    public static final int SIGHT_REQUEST = 1;
     public CArcheryView mArcheryView = null;
     public static Vibrator vibrator;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        RelativeLayout content=(RelativeLayout) getLayoutInflater().inflate(R.layout.activity_start, null);
+        RelativeLayout content=(RelativeLayout) getLayoutInflater().inflate(R.layout.activity_main, null);
         setContentView(content);
         Intent intent = getIntent();
         mArcheryView = new CArcheryView(this, intent.getIntExtra(StartActivity.NUMBER_OF_SERIES,1)
-				  ,intent.getIntExtra(StartActivity.ARROWS_IN_SERIES,1));
+				  ,intent.getIntExtra(StartActivity.ARROWS_IN_SERIES,1),intent.getLongExtra(StartActivity.TARGET_ID,1),
+                intent.getLongExtra(StartActivity.ARROW_ID,1));
         mArcheryView.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT));
         content.addView(mArcheryView);
     }
@@ -61,15 +67,36 @@ public class MainActivity extends Activity {
     		break;
     	}
         case R.id.save:
-            {
-             mArcheryView.endCurrentDistance();
-             Intent intent=new Intent(this, StartActivity.class);
-             startActivity(intent);
-             mArcheryView.invalidate();
-             break;
-            }
+        {
+            mArcheryView.endCurrentDistance();
+            finish();
+            break;
+        }
+        case R.id.sight:
+        {
+            Intent intent = new Intent(this, CSightPropertiesActivity.class);
+            startActivityForResult(intent, SIGHT_REQUEST);
+            break;
+        }
+        case R.id.notes:
+        {
+            Intent intent = new Intent(this, NotesActivity.class);
+            startActivity(intent);
+            break;
+        }
     	}
     	return true;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data)  {
+        if (requestCode==SIGHT_REQUEST)
+            if (resultCode!=RESULT_CANCELED)
+            {
+                SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
+                editor.putLong("sightId",data.getLongExtra("sightId",0));
+                editor.commit();
+            }
     }
 
     @Override
@@ -83,6 +110,7 @@ public class MainActivity extends Activity {
     public void onResume()  {
         super.onResume();
         mArcheryView.loadDistances();
+        mArcheryView.invalidate();
         vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
     }
 
@@ -101,11 +129,5 @@ public class MainActivity extends Activity {
     public void onBackPressed() {
         mArcheryView.deleteLastShot();
         mArcheryView.invalidate();
-    }
-
-    @Override
-    public void onStop()    {
-        mArcheryView.endCurrentDistance();
-        super.onStop();
     }
 }

@@ -1,11 +1,17 @@
 package com.example.archery.archeryView;
 
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.preference.PreferenceManager;
 import com.example.archery.CArrow;
 import com.example.archery.CShot;
+import com.example.archery.database.CMySQLiteOpenHelper;
 
 import java.io.*;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.Vector;
 
 /**
@@ -16,34 +22,55 @@ import java.util.Vector;
  * To change this template use File | Settings | File Templates.
  */
 public class CDistance implements Serializable{
+    long _id;
     public Calendar timemark;
     public boolean isFinished;
     int numberOfArrows;
     int numberOfSeries;
-    public CArrow arrow;
-    public Vector<CShot[]> finishedSeries;
-    public Vector<CShot> currentSeries;
+    public long targetId;
+    public Vector<Vector<CShot>> series;
+    public long arrowId;
 
-    public CDistance(int numberOfSeries, int numberOfArrows, CArrow arrow)  {
+    public CDistance(int numberOfSeries, int numberOfArrows, long targetId, long arrowId)  {
         timemark = Calendar.getInstance();
         this.numberOfSeries = numberOfSeries;
         this.numberOfArrows = numberOfArrows;
-        this.arrow = arrow;
+        this.targetId = targetId;
+        this.arrowId = arrowId;
         isFinished = false;
-        finishedSeries = new Vector<CShot[]>();
-        currentSeries = new Vector<CShot>();
+        series = new Vector<Vector<CShot>>();
+        series.add(new Vector<CShot>());
+    }
+
+    public CDistance(Cursor cursor)
+    {
+        //"series" "numberOfSeries" "numberOfArrows" "isFinished" "timemark"
+        try
+        {
+            series = (Vector<Vector<CShot>>) CMySQLiteOpenHelper.setObjectBytes(cursor.getBlob(cursor.getColumnIndex("series")));
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        timemark = Calendar.getInstance();
+        timemark.setTimeInMillis(cursor.getLong(cursor.getColumnIndex("timemark")));
+        _id = cursor.getLong(cursor.getColumnIndex("_id"));
+        numberOfSeries = cursor.getInt(cursor.getColumnIndex("numberOfSeries"));
+        numberOfArrows = cursor.getInt(cursor.getColumnIndex("numberOfArrows"));
+        isFinished = (cursor.getInt(cursor.getColumnIndex("isFinished"))!=0);
+        targetId = cursor.getLong(cursor.getColumnIndex("targetId"));
+        arrowId = cursor.getLong(cursor.getColumnIndex("arrowId"));
     }
 
     public int addShot(CShot shot)   {
-        currentSeries.add(shot);
-        if (currentSeries.size() == numberOfArrows)
+        series.lastElement().add(shot);
+        if (series.lastElement().size() == numberOfArrows)
         {
-            finishedSeries.add(currentSeries.toArray(new CShot[0]));
-            currentSeries = new Vector<CShot>();
+            series.add(new Vector<CShot>());
         }
-        if (finishedSeries.size() ==  numberOfSeries)
+        if (series.size() ==  numberOfSeries+1)
         {
-            currentSeries.clear();
+            series.remove(series.lastElement());
             isFinished = true;
             return 0;
         }
@@ -52,24 +79,50 @@ public class CDistance implements Serializable{
     }
 
     public void deleteLastShot()    {
-        if (currentSeries.size()>0)
+        if (series.lastElement().size()>0)
         {
-            currentSeries.remove(currentSeries.lastElement());
+            series.lastElement().remove(series.lastElement().lastElement());
         }
         else
-            if (finishedSeries.size()>0)
+        if (series.size()>1)
             {
-                currentSeries = new Vector<CShot>(Arrays.asList(finishedSeries.lastElement()));
-                currentSeries.remove(currentSeries.lastElement());
-                finishedSeries.remove(finishedSeries.lastElement());
+                series.remove(series.lastElement());
+                series.lastElement().remove(series.lastElement().lastElement());
             }
     }
 
     public boolean isEmpty()    {
-        if (finishedSeries.isEmpty()&&currentSeries.isEmpty())
+        if (series.isEmpty())
             return true;
         else
-            return false;
+        if ((series.size()==1)&&(series.lastElement().isEmpty()))
+            return true;
+        else
+        return false;
     }
+
+    public void writeToDatabase(SQLiteDatabase database)
+    {
+        try
+        {
+        ContentValues values = new ContentValues();
+        values.put("series", CMySQLiteOpenHelper.getObjectBytes(series));
+        values.put("numberOfSeries",numberOfSeries);
+        values.put("numberOfArrows",numberOfArrows);
+        values.put("isFinished",isFinished);
+        values.put("timemark",timemark.getTimeInMillis());
+        values.put("targetId",targetId);
+        values.put("arrowId",arrowId);
+        database.insert("distances",null,values);
+        }
+        catch (Exception e)
+        {
+        }
+    }
+
+    public long getId()  {
+        return _id;
+    }
+
 
 }
