@@ -62,6 +62,23 @@ public class CTarget implements Serializable   {
             bufring.distanceFromCenter/=maxr;
     }
 
+    public void removeRing()    {
+        if (!rings.isEmpty())
+        {
+            for (CRing bufring : rings)
+                bufring.distanceFromCenter*=maxr;
+            rings.remove(rings.lastElement());
+            if (!rings.isEmpty())
+            {
+                maxr = rings.lastElement().distanceFromCenter;
+                for (CRing bufring : rings)
+                    bufring.distanceFromCenter/=maxr;
+            }
+            else
+                maxr = 0;
+        }
+    }
+
     public void draw(Canvas canvas, int center, int r) {
         for (int i=rings.size()-1;i>=0;i--)
         {

@@ -13,10 +13,6 @@ import com.example.archery.CArrow;
 import com.example.archery.MainActivity;
 import com.example.archery.R;
 import com.example.archery.database.CMySQLiteOpenHelper;
-import com.example.archery.target.CRing;
-import com.example.archery.target.CTarget;
-
-import java.util.Vector;
 
 public class StartActivity extends Activity implements OnItemSelectedListener,DialogInterface.OnDismissListener{
 	
@@ -84,7 +80,7 @@ public class StartActivity extends Activity implements OnItemSelectedListener,Di
         switch (view.getId())
         {
             case R.id.addTarget: {
-                Intent intent = new Intent(this, TargetAddActivity.class);
+                Intent intent = new Intent(this, TargetCreateActivity.class);
                 startActivity(intent);
                 break;
             }

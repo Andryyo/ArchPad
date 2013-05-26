@@ -43,7 +43,7 @@
                 />
         <activity android:name=".NotesActivity"
                   />
-        <activity android:name=".start.TargetAddActivity"/>
+        <activity android:name=".start.TargetCreateActivity"/>
         <activity android:name=".statistics.CRecordView"
                   android:label=""
                   android:theme="@android:style/Theme.Dialog"

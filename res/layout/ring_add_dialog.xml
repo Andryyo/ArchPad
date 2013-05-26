@@ -42,10 +42,11 @@
             android:text="Цвет кольца:"
             />
 
-    <EditText
+    <com.example.archery.start.CColoredSeekBar
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/color"
+            android:id="@+id/ringColor"
             />
+
 </LinearLayout>
 </ScrollView>
