@@ -35,7 +35,13 @@ public class TargetCreateActivity extends Activity implements DialogInterface.On
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_target);
-        target = new CTarget("",new Vector<CRing>(),0);
+        if (savedInstanceState==null)
+            target = new CTarget("",new Vector<CRing>(),0);
+        else
+        {
+            distanceFromCenter = savedInstanceState.getFloat("distanceFromCenter");
+            target = (CTarget) savedInstanceState.getSerializable("target");
+        }
         ((CTargetPreview)findViewById(R.id.targetPreview)).setTarget(target);
     }
 
@@ -53,8 +59,11 @@ public class TargetCreateActivity extends Activity implements DialogInterface.On
     public boolean onKeyLongPress(int keyCode, KeyEvent event)   {
         if (keyCode == KeyEvent.KEYCODE_BACK)
         {
-            target.addClosingRing();
-            CMySQLiteOpenHelper.getHelper(getBaseContext()).addTarget(target);
+            if (!target.isEmpty())
+            {
+                target.addClosingRing();
+                CMySQLiteOpenHelper.getHelper(getBaseContext()).addTarget(target);
+            }
             finish();
             return true;
         }
@@ -101,5 +110,12 @@ public class TargetCreateActivity extends Activity implements DialogInterface.On
     @Override
     public void onDismiss(DialogInterface dialogInterface) {
         findViewById(R.id.targetPreview).invalidate();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle state)   {
+        state.putFloat("distanceFromCenter",distanceFromCenter);
+        state.putSerializable("target",target);
+        super.onSaveInstanceState(state);
     }
 }

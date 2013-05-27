@@ -74,7 +74,7 @@ public class NotesActivity extends ExpandableListActivity implements DialogInter
                                     ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.context_menu, menu);
+        inflater.inflate(R.menu.notes_context_menu, menu);
     }
 
     @Override

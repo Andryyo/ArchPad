@@ -35,9 +35,9 @@ public class CTargetPreview extends View {
     }
 
     @Override
-    public void onSizeChanged(int w,int h,int oldw,int oldh)    {
-        maxr = Math.min(w,h)/2;
-        super.onSizeChanged(w,h,oldw,oldh);
+    public void onMeasure(int w, int h) {
+        maxr = Math.min(MeasureSpec.getSize(w),MeasureSpec.getSize(h))/2;
+        this.setMeasuredDimension(maxr*2, maxr*2);
     }
 
     @Override

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.LinearLayout;
 import com.example.archery.R;
 import com.example.archery.start.CTargetPreview;
@@ -19,6 +20,7 @@ import com.example.archery.target.CTargetView;
 public class CRecordView extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         LinearLayout content = (LinearLayout) getLayoutInflater().inflate(R.layout.activity_record_view,null);
         setContentView(content);
         Intent intent = getIntent();

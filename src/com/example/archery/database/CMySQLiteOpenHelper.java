@@ -104,6 +104,7 @@ public class CMySQLiteOpenHelper extends SQLiteOpenHelper {
     public void deleteTarget(long _id) {
         SQLiteDatabase database = this.getWritableDatabase();
         database.delete("targets", "_id = ?", new String[]{Long.toString(_id)});
+        int i = database.delete("distances", "targetId=?", new String[]{Long.toString(_id)});
         database.close();
     }
 
@@ -207,6 +208,7 @@ public class CMySQLiteOpenHelper extends SQLiteOpenHelper {
     public void deleteArrow(long _id)    {
         SQLiteDatabase database = this.getWritableDatabase();
         database.delete("arrows", "_id = ?", new String[]{Long.toString(_id)});
+        database.delete("distances", "arrowId=?", new String[]{Long.toString(_id)});
         database.close();
     }
 

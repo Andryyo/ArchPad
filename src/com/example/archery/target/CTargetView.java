@@ -63,13 +63,12 @@ public class CTargetView extends View {
         arrowPaint.setColor(Color.GREEN);
     }
 
-
     @Override
-    public void onSizeChanged(int w,int h, int oldw, int oldh)
-    {
-        maxr = Math.min(w,h)/2;
-        screenWidth = w;
-        screenHeight = h;
+    public void onMeasure(int w, int h) {
+        maxr = Math.min(MeasureSpec.getSize(w),MeasureSpec.getSize(h))/2;
+        screenWidth = MeasureSpec.getSize(w);
+        screenHeight = MeasureSpec.getSize(h);
+        this.setMeasuredDimension(maxr*2, maxr*2);
     }
 
     @Override

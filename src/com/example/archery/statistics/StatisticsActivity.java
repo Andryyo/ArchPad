@@ -3,9 +3,7 @@ package com.example.archery.statistics;
 import java.util.Arrays;
 import java.util.Calendar;
 
-import android.app.AlertDialog;
 import android.app.ExpandableListActivity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -13,7 +11,6 @@ import android.os.Bundle;
 import android.content.Context;
 import android.view.*;
 import android.widget.*;
-import com.example.archery.CArrow;
 import com.example.archery.CShot;
 import com.example.archery.R;
 import com.example.archery.archeryView.CDistance;
@@ -77,7 +74,7 @@ public class StatisticsActivity extends ExpandableListActivity {
     public void onCreateContextMenu(ContextMenu contextMenu,View view,ContextMenu.ContextMenuInfo contextMenuInfo)   {
         super.onCreateContextMenu(contextMenu,view,contextMenuInfo);
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.context_menu,contextMenu);
+        inflater.inflate(R.menu.records_context_menu,contextMenu);
     }
     @Override
     public boolean onContextItemSelected(MenuItem menuItem) {
