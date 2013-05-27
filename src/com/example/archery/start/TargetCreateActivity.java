@@ -28,6 +28,7 @@ import java.util.Vector;
  */
 public class TargetCreateActivity extends Activity implements DialogInterface.OnDismissListener{
 
+    float prevDistanceFromCenter;
     float distanceFromCenter;
     CTarget target;
     private final int RING_ADD_DIALOG=1;
@@ -51,6 +52,7 @@ public class TargetCreateActivity extends Activity implements DialogInterface.On
 
     @Override
     public void onBackPressed()  {
+        distanceFromCenter = prevDistanceFromCenter;
         target.removeRing();
         findViewById(R.id.targetPreview).invalidate();
     }
@@ -87,6 +89,7 @@ public class TargetCreateActivity extends Activity implements DialogInterface.On
                     public void onClick(DialogInterface dialog, int id) {
                         AlertDialog alertDialog = (AlertDialog) dialog;
                         try {
+                            prevDistanceFromCenter = distanceFromCenter;
                             distanceFromCenter += Float.parseFloat(((EditText) alertDialog.findViewById(R.id.distanceFromCenter)).getText().toString());
                         }   catch (NumberFormatException e)   {
                         }

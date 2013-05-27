@@ -57,7 +57,7 @@ public class MainActivity extends Activity {
     	{
     		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
             dialog.setTitle("Information" );
-            dialog.setMessage("Created by Andryyo.\r\nEmail : Androyyo@ukr.net\r\n2012");
+            dialog.setMessage("Created by Andryyo.\r\nEmail : Andryyo@ukr.net\r\n2012");
             dialog.setPositiveButton("Ок", new OnClickListener() {
     									       	public void onClick(DialogInterface dialog, int arg1) {
     									       		dialog.cancel();
