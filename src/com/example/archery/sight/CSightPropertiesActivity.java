@@ -12,9 +12,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.*;
-import com.example.archery.MainActivity;
 import com.example.archery.R;
-import com.example.archery.database.CMySQLiteOpenHelper;
+import com.example.archery.archeryView.CArcheryView;
+import com.example.archery.database.CSQLiteOpenHelper;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -96,7 +96,7 @@ public class CSightPropertiesActivity extends Activity implements Spinner.OnItem
         builder.setPositiveButton("Создать", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int id) {
-                CMySQLiteOpenHelper.getHelper(getApplicationContext()).addSight(
+                CSQLiteOpenHelper.getHelper(getApplicationContext()).addSight(
                         ((EditText) ((AlertDialog) dialog).findViewById(R.id.text1)).getText().toString(),
                         ((EditText) ((AlertDialog) dialog).findViewById(R.id.text2)).getText().toString()
                 );
@@ -114,12 +114,12 @@ public class CSightPropertiesActivity extends Activity implements Spinner.OnItem
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long id) {
         if (currentSightId!=0)
-            CMySQLiteOpenHelper.getHelper(this).updateSight(currentSightId,
+            CSQLiteOpenHelper.getHelper(this).updateSight(currentSightId,
                     ((EditText)findViewById(R.id.sight_x)).getText().toString(),
                     ((EditText)findViewById(R.id.sight_y)).getText().toString()
                     );
         currentSightId = id;
-        String[] strings = CMySQLiteOpenHelper.getHelper(this).getSight(id);
+        String[] strings = CSQLiteOpenHelper.getHelper(this).getSight(id);
         ((EditText)findViewById(R.id.sight_x)).setText(strings[0]);
         ((EditText)findViewById(R.id.sight_y)).setText(strings[1]);
 
@@ -138,7 +138,7 @@ public class CSightPropertiesActivity extends Activity implements Spinner.OnItem
     @Override
     public void onPause()   {
         super.onPause();
-        CMySQLiteOpenHelper.getHelper(this).updateSight(currentSightId,
+        CSQLiteOpenHelper.getHelper(this).updateSight(currentSightId,
                 ((EditText)findViewById(R.id.sight_x)).getText().toString(),
                 ((EditText)findViewById(R.id.sight_y)).getText().toString()
         );
@@ -150,7 +150,7 @@ public class CSightPropertiesActivity extends Activity implements Spinner.OnItem
         {
             Intent intent = new Intent();
             intent.putExtra("sightId",currentSightId);
-            setResult(MainActivity.SIGHT_REQUEST,intent);
+            setResult(CArcheryView.SIGHT_REQUEST,intent);
             finish();
         }
         else
@@ -178,11 +178,12 @@ public class CSightPropertiesActivity extends Activity implements Spinner.OnItem
 
         public CSightSelectView(Context context, AttributeSet attrs) {
             super(context, attrs);
-            adapter = new SimpleCursorAdapter(context,
+            //TODO:откомментировать, когда проверю
+            /*adapter = new SimpleCursorAdapter(context,
                     R.layout.spinner_child_2,
-                    CMySQLiteOpenHelper.getHelper(context).getSightsCursor(),
+                    CSQLiteOpenHelper.getHelper(context).getSightsCursor(),
                     new String[]{"name","description"},
-                    new int[]{R.id.text1,R.id.text2});
+                    new int[]{R.id.text1,R.id.text2});    */
             setAdapter(adapter);
         }
 
@@ -191,7 +192,8 @@ public class CSightPropertiesActivity extends Activity implements Spinner.OnItem
         }
 
         public void update()    {
-            adapter.changeCursor(CMySQLiteOpenHelper.getHelper(getContext()).getSightsCursor());
+            //TODO:откомментировать, когда проверю
+           // adapter.changeCursor(CSQLiteOpenHelper.getHelper(getContext()).getSightsCursor());
         }
 
         public void setSelection(long sightId) {
@@ -201,7 +203,8 @@ public class CSightPropertiesActivity extends Activity implements Spinner.OnItem
         }
 
         public void deleteSigth() {
-            CMySQLiteOpenHelper.getHelper(getContext()).deleteSight(getSelectedItemId());
+            //TODO:откомментировать, когда проверю
+            //CSQLiteOpenHelper.getHelper(getContext()).deleteSight(getSelectedItemId());
             update();
         }
     }

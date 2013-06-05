@@ -43,11 +43,6 @@ public class CTargetPreview extends View {
     @Override
     public void onDraw(Canvas canvas)   {
         if (target!=null)
-            if (!target.isEmpty())
-                target.draw(canvas, maxr, maxr);
-    }
-
-    public long getTargetId()    {
-        return target.id;
+            target.draw(canvas, maxr, maxr);
     }
 }

@@ -3,15 +3,11 @@ package com.example.archery.archeryView;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.preference.PreferenceManager;
-import com.example.archery.CArrow;
 import com.example.archery.CShot;
-import com.example.archery.database.CMySQLiteOpenHelper;
+import com.example.archery.database.CSQLiteOpenHelper;
 
 import java.io.*;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.Vector;
 
 /**
@@ -47,7 +43,7 @@ public class CDistance implements Serializable{
         //"series" "numberOfSeries" "numberOfArrows" "isFinished" "timemark"
         try
         {
-            series = (Vector<Vector<CShot>>) CMySQLiteOpenHelper.setObjectBytes(cursor.getBlob(cursor.getColumnIndex("series")));
+            series = (Vector<Vector<CShot>>) CSQLiteOpenHelper.setObjectBytes(cursor.getBlob(cursor.getColumnIndex("series")));
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -106,7 +102,7 @@ public class CDistance implements Serializable{
         try
         {
         ContentValues values = new ContentValues();
-        values.put("series", CMySQLiteOpenHelper.getObjectBytes(series));
+        values.put("series", CSQLiteOpenHelper.getObjectBytes(series));
         values.put("numberOfSeries",numberOfSeries);
         values.put("numberOfArrows",numberOfArrows);
         values.put("isFinished",isFinished);

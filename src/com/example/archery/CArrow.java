@@ -2,7 +2,6 @@ package com.example.archery;
 
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
-import com.example.archery.database.CMySQLiteOpenHelper;
 
 import java.io.Serializable;
 

@@ -9,7 +9,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.view.*;
 import android.widget.*;
-import com.example.archery.database.CMySQLiteOpenHelper;
+import com.example.archery.database.CSQLiteOpenHelper;
 
 import java.util.Calendar;
 
@@ -29,14 +29,15 @@ public class NotesActivity extends ExpandableListActivity implements DialogInter
     public void onCreate(Bundle savedInstanceState)  {
         super.onCreate(savedInstanceState);
         inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
-        adapter = new CMySimpleCursorTreeAdapter(this,
-                            CMySQLiteOpenHelper.getHelper(this).getNotesCursor(),
+        //TODO:откомментировать, когда проверю
+        /*adapter = new CMySimpleCursorTreeAdapter(this,
+                            CSQLiteOpenHelper.getHelper(this).getNotesCursor(),
                             R.layout.expand_list_group,
                             new String[]{"timemark"},
                             new int[]{R.id.text1},
                             R.layout.expand_list_child,
                             new String[]{"text"},
-                            new int[]{R.id.text1});
+                            new int[]{R.id.text1});        */
         getExpandableListView().
                 addFooterView(inflater.inflate(R.layout.add_note_button,null));
         setListAdapter(adapter);
@@ -52,7 +53,7 @@ public class NotesActivity extends ExpandableListActivity implements DialogInter
         builder.setPositiveButton("Создать", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int id) {
-                CMySQLiteOpenHelper.getHelper(getApplicationContext()).addNote(
+                CSQLiteOpenHelper.getHelper(getApplicationContext()).addNote(
                         ((EditText) ((AlertDialog) dialog).findViewById(R.id.text1)).getText().toString(),
                         ((EditText) ((AlertDialog) dialog).findViewById(R.id.text2)).getText().toString(),
                         Calendar.getInstance().getTimeInMillis()
@@ -99,20 +100,23 @@ public class NotesActivity extends ExpandableListActivity implements DialogInter
         }
 
         public void deleteRecord(long _id)  {
-            CMySQLiteOpenHelper helper = CMySQLiteOpenHelper.getHelper(context);
-            helper.deleteNote(_id);
+            CSQLiteOpenHelper helper = CSQLiteOpenHelper.getHelper(context);
+            helper.delete(CSQLiteOpenHelper.TABLE_NOTES,_id);
             update();
         }
 
         @Override
         protected Cursor getChildrenCursor(Cursor cursor) {
-            return CMySQLiteOpenHelper.getHelper(context).
-                    getNoteCursor(cursor.getLong(cursor.getColumnIndex("_id")));
+            //TODO:откомментировать, когда проверю
+            //return CSQLiteOpenHelper.getHelper(context).
+            //        getNoteCursor(cursor.getLong(cursor.getColumnIndex("_id")));
+            return null;
         }
 
         public void update()    {
-            CMySQLiteOpenHelper helper = CMySQLiteOpenHelper.getHelper(context);
-            adapter.changeCursor(helper.getNotesCursor());
+            //TODO:откомментировать, когда проверю
+            //CSQLiteOpenHelper helper = CSQLiteOpenHelper.getHelper(context);
+            //adapter.changeCursor(helper.getNotesCursor());
         }
 
         class CMyViewBinder implements ViewBinder {

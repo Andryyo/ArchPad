@@ -6,11 +6,10 @@ import android.graphics.*;
 import android.view.MotionEvent;
 import android.view.View;
 import com.example.archery.CArrow;
-import com.example.archery.MainActivity;
 import com.example.archery.archeryView.CArcheryView;
 import com.example.archery.CShot;
 import com.example.archery.archeryView.CDistance;
-import com.example.archery.database.CMySQLiteOpenHelper;
+import com.example.archery.database.CSQLiteOpenHelper;
 
 import java.util.Vector;
 
@@ -44,7 +43,7 @@ public class CTargetView extends View {
         this.context = context;
         this.mArcheryView = mArcheryView;
         IsEditable = true;
-        CMySQLiteOpenHelper helper = CMySQLiteOpenHelper.getHelper(context);
+        CSQLiteOpenHelper helper = CSQLiteOpenHelper.getHelper(context);
         target = helper.getTarget(mArcheryView.getCurrentDistance().targetId);
         arrow = helper.getArrow(mArcheryView.getCurrentDistance().arrowId);
         arrowPaint.setStyle(Paint.Style.STROKE);
@@ -55,7 +54,7 @@ public class CTargetView extends View {
         super(context);
         this.context = context;
         IsEditable = false;
-        CMySQLiteOpenHelper helper = CMySQLiteOpenHelper.getHelper(context);
+        CSQLiteOpenHelper helper = CSQLiteOpenHelper.getHelper(context);
         distance = helper.getDistance(distanceId);
         target = helper.getTarget(distance.targetId);
         arrow = helper.getArrow(distance.arrowId);
@@ -126,8 +125,8 @@ public class CTargetView extends View {
             {
                 mArcheryView.addShot(new CShot(target.rings, x / maxr - 1, y / maxr - 1,
                         arrow.radius));
-                MainActivity.vibrator.vibrate(100);
-                mArcheryView.invalidate();
+                //MainActivity.vibrator.vibrate(100);
+                //mArcheryView.invalidate();
             }
                 invalidate();
                 haveZoom = false;

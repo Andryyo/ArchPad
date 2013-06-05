@@ -17,16 +17,15 @@
             android:name=".start.StartActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".MainActivity"
             android:screenOrientation="portrait">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.archery.MainActivity" />
+                <meta-data
+                    android:name="android.support.PARENT_ACTIVITY"
+                    android:value="com.example.archery.Start" />
         </activity>
         <activity
             android:name=".statistics.StatisticsActivity">
@@ -40,7 +39,6 @@
                 />
         <activity android:name=".NotesActivity"
                   />
-        <activity android:name=".start.TargetCreateActivity"/>
         <activity android:name=".statistics.CRecordView"
                   android:theme="@android:style/Theme.Dialog"
                 />

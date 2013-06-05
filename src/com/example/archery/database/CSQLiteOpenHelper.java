@@ -5,13 +5,12 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.support.v4.content.AsyncTaskLoader;
 import com.example.archery.CArrow;
 import com.example.archery.archeryView.CDistance;
-import com.example.archery.target.CRing;
 import com.example.archery.target.CTarget;
 
 import java.io.*;
-import java.util.Vector;
 
 /**
  * Created with IntelliJ IDEA.
@@ -20,22 +19,27 @@ import java.util.Vector;
  * Time: 11:10
  * To change this template use File | Settings | File Templates.
  */
-public class CMySQLiteOpenHelper extends SQLiteOpenHelper {
+public class CSQLiteOpenHelper extends SQLiteOpenHelper {
 
-    private static CMySQLiteOpenHelper mInstance;
-    public SQLiteDatabase readableDatabase;
-    public SQLiteDatabase writeableDatabase;
+    private static CSQLiteOpenHelper helper = null;
+    private Context context;
+    public static final String TABLE_DISTANCES = "distances";
+    public static final String TABLE_ARROWS = "arrows";
+    public static final String TABLE_SIGHTS = "sights";
+    public static final String TABLE_NOTES = "notes";
+    public static final String TABLE_TARGETS = "targets";
 
-    public static CMySQLiteOpenHelper getHelper(Context context)    {
-        if (mInstance == null)
-            mInstance = new CMySQLiteOpenHelper(context);
-        return mInstance;
+    private CSQLiteOpenHelper(Context context) {
+        super(context, "Archery", null, 1);
+        this.context = context;
     }
 
-    private CMySQLiteOpenHelper(Context context) {
-        super(context, "Archery", null, 1);
-        readableDatabase = null;
-        writeableDatabase = null;
+    public static CSQLiteOpenHelper getHelper(Context context) {
+        if (helper==null)
+        {
+            helper = new CSQLiteOpenHelper(context);
+        }
+        return helper;
     }
 
     @Override
@@ -62,6 +66,75 @@ public class CMySQLiteOpenHelper extends SQLiteOpenHelper {
         database.execSQL("DROP TABLE IF EXISTS arrows");
         database.execSQL("DROP TABLE IF EXISTS notes");
         onCreate(database);
+    }
+
+    private Cursor getCursor(String table)   {
+        return this.getReadableDatabase().query(table,null, null, null, null, null, null);
+    }
+
+    private Cursor getCursor(String table, long _id) {
+        return this.getReadableDatabase().query(table, null,
+                "_id=?", new String[]{Long.toString(_id)}, null, null, null, null);
+    }
+
+    public static CSQLiteCursorLoader getCursorLoader(Context context, String table)   {
+        return new CSQLiteCursorLoader(context, table);
+    }
+
+    public static CSQLiteCursorLoader getCursorLoader(Context context, String table, long _id)   {
+        return new CSQLiteCursorLoader(context, table, _id);
+    }
+
+    private static class CSQLiteCursorLoader extends AsyncTaskLoader<Cursor> {
+
+        private String table;
+        private long _id;
+        private Context context;
+
+        public CSQLiteCursorLoader(Context context, String table, long _id) {
+            super(context);
+            this.context = context;
+            this.table = table;
+            this._id = _id;
+        }
+
+        public CSQLiteCursorLoader(Context context, String table) {
+            super(context);
+            this.context = context;
+            this.table = table;
+            this._id = -1;
+        }
+
+        @Override
+        public void onStartLoading()    {
+            forceLoad();
+        }
+
+        @Override
+        public void onCanceled(Cursor cursor)  {
+            super.onCanceled(cursor);
+            cursor.close();
+        }
+
+        @Override
+        public Cursor loadInBackground() {
+            if (_id == -1)
+                return getHelper(context).getCursor(table);
+            else
+                return getHelper(context).getCursor(table, _id);
+        }
+    }
+
+    public void delete(String table)  {
+        SQLiteDatabase database = this.getWritableDatabase();
+        database.delete(table, null, null);
+        database.close();
+    }
+
+    public void delete(String table, long _id)  {
+        SQLiteDatabase database = this.getWritableDatabase();
+        database.delete(table, "_id = ?", new String[]{Long.toString(_id)});
+        database.close();
     }
 
     public CTarget getTarget(long _id) {
@@ -101,29 +174,10 @@ public class CMySQLiteOpenHelper extends SQLiteOpenHelper {
         database.close();
     }
 
-    public void deleteTarget(long _id) {
+    public void deleteTarget(long _id)    {
         SQLiteDatabase database = this.getWritableDatabase();
-        database.delete("targets", "_id = ?", new String[]{Long.toString(_id)});
-        int i = database.delete("distances", "targetId=?", new String[]{Long.toString(_id)});
-        database.close();
-    }
-
-    public Cursor getTargetsCursor()
-    {
-        if (readableDatabase == null)
-            readableDatabase = this.getReadableDatabase();
-        else
-        if (!readableDatabase.isOpen())
-            readableDatabase = this.getReadableDatabase();
-        Cursor cursor = readableDatabase.rawQuery("SELECT * FROM targets",null);
-        int i = cursor.getCount();
-        return cursor;
-    }
-
-
-    public void deleteAllDistances() {
-        SQLiteDatabase database = this.getWritableDatabase();
-        database.execSQL("DELETE FROM distances");
+        database.delete(TABLE_TARGETS, "_id = ?", new String[]{Long.toString(_id)});
+        database.delete(TABLE_DISTANCES, "arrowId=?", new String[]{Long.toString(_id)});
         database.close();
     }
 
@@ -150,30 +204,6 @@ public class CMySQLiteOpenHelper extends SQLiteOpenHelper {
         return distance;
     }
 
-    public Cursor getDistancesCursor()  {
-        if (readableDatabase == null)
-            readableDatabase = this.getReadableDatabase();
-        else
-        if (!readableDatabase.isOpen())
-            readableDatabase = this.getReadableDatabase();
-        return readableDatabase.query("distances",new String[]{"_id","timemark"},null,null,null,null,null);
-    }
-
-    public Cursor getDistanceCursor(long _id)   {
-        if (readableDatabase == null)
-            readableDatabase = this.getReadableDatabase();
-        else
-        if (!readableDatabase.isOpen())
-            readableDatabase = this.getReadableDatabase();
-        Cursor cursor = readableDatabase.query("distances", new String[]{"_id","series", "numberOfSeries", "numberOfArrows",
-                "isFinished", "timemark","targetId","arrowID"},
-                "_id=?", new String[]{Long.toString(_id)}, null, null, null,null);
-        if (!cursor.moveToFirst())
-            return null;
-        else
-            return cursor;
-    }
-
     public CDistance getUnfinishedDistance()    {
         SQLiteDatabase database = this.getReadableDatabase();
         Cursor cursor = database.query("distances", new String[]{"_id","series", "numberOfSeries", "numberOfArrows",
@@ -186,18 +216,11 @@ public class CMySQLiteOpenHelper extends SQLiteOpenHelper {
             return null;
         }
         CDistance distance = new CDistance(cursor);
-        deleteDistance(distance.getId());
+        delete(TABLE_DISTANCES, distance.getId());
         cursor.close();
         database.close();
         return distance;
     }
-
-    public void deleteDistance(long _id)  {
-        SQLiteDatabase database = this.getWritableDatabase();
-        database.delete("distances", "_id = ?", new String[]{Long.toString(_id)});
-        database.close();
-    }
-
 
     public void addArrow(CArrow arrow)  {
         SQLiteDatabase database = this.getWritableDatabase();
@@ -232,28 +255,6 @@ public class CMySQLiteOpenHelper extends SQLiteOpenHelper {
                               cursor.getInt(cursor.getColumnIndex("_id")));
             cursor.close();
             return arrow;
-        }
-    }
-
-    public Cursor getArrowsCursor()  {
-        if (readableDatabase == null)
-            readableDatabase = this.getReadableDatabase();
-        else
-        if (!readableDatabase.isOpen())
-            readableDatabase = this.getReadableDatabase();
-        return readableDatabase.rawQuery("SELECT * FROM arrows",null);
-    }
-
-    public void close()    {
-        if (readableDatabase!=null)
-        {
-            readableDatabase.close();
-            readableDatabase = null;
-        }
-        if (writeableDatabase!=null)
-        {
-            writeableDatabase.close();
-            writeableDatabase = null;
         }
     }
 
@@ -311,40 +312,6 @@ public class CMySQLiteOpenHelper extends SQLiteOpenHelper {
         }
     }
 
-    public void deleteSight(long _id) {
-        SQLiteDatabase database = this.getWritableDatabase();
-        database.delete("sights", "_id = ?", new String[]{Long.toString(_id)});
-        database.close();
-    }
-
-
-    public Cursor getSightsCursor() {
-        if (readableDatabase == null)
-            readableDatabase = this.getReadableDatabase();
-        else if (!readableDatabase.isOpen())
-            readableDatabase = this.getReadableDatabase();
-        return readableDatabase.rawQuery("SELECT * FROM sights",null);
-    }
-
-    public Cursor getNotesCursor()  {
-        if (readableDatabase == null)
-            readableDatabase = this.getReadableDatabase();
-        else if (!readableDatabase.isOpen())
-            readableDatabase = this.getReadableDatabase();
-        return readableDatabase.query("notes", new String[]{"_id", "name", "timemark"}, null, null, null, null, null);
-    }
-
-    public Cursor getNoteCursor(long _id) {
-        if (readableDatabase == null)
-            readableDatabase = this.getReadableDatabase();
-        Cursor cursor = readableDatabase.query("notes", new String[]{"_id","text","name"},
-                "_id=?", new String[]{Long.toString(_id)}, null, null, null,null);
-        if (!cursor.moveToFirst())
-            return null;
-        else
-            return cursor;
-    }
-
     public void addNote(String name,String text, long timemark)   {
         SQLiteDatabase database = this.getWritableDatabase();
         try
@@ -358,12 +325,6 @@ public class CMySQLiteOpenHelper extends SQLiteOpenHelper {
         catch (Exception e)
         {
         }
-        database.close();
-    }
-
-    public void deleteNote(long _id)  {
-        SQLiteDatabase database = this.getWritableDatabase();
-        database.delete("notes", "_id = ?", new String[]{Long.toString(_id)});
         database.close();
     }
 

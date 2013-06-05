@@ -5,7 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import com.example.archery.database.CMySQLiteOpenHelper;
+import com.example.archery.database.CSQLiteOpenHelper;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -31,7 +31,7 @@ public class CTarget implements Serializable   {
     public CTarget(Cursor cursor) throws IOException, ClassNotFoundException {
         this.name = cursor.getString(cursor.getColumnIndex("name"));
         this.id = cursor.getLong(cursor.getColumnIndex("_id"));
-        this.rings = (Vector<CRing>) CMySQLiteOpenHelper.setObjectBytes(cursor.getBlob(cursor.getColumnIndex("rings")));
+        this.rings = (Vector<CRing>) CSQLiteOpenHelper.setObjectBytes(cursor.getBlob(cursor.getColumnIndex("rings")));
         maxr = rings.lastElement().distanceFromCenter;
         fillPaint.setStyle(Paint.Style.FILL);
         strokePaint.setStyle(Paint.Style.STROKE);
@@ -93,7 +93,7 @@ public class CTarget implements Serializable   {
         try
         {
             ContentValues values = new ContentValues();
-            values.put("rings", CMySQLiteOpenHelper.getObjectBytes(rings));
+            values.put("rings", CSQLiteOpenHelper.getObjectBytes(rings));
             values.put("name",name);
             values.put("distance",distance);
             database.insert("targets",null,values);

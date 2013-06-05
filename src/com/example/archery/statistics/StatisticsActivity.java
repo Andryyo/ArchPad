@@ -3,49 +3,56 @@ package com.example.archery.statistics;
 import java.util.Arrays;
 import java.util.Calendar;
 
-import android.app.ExpandableListActivity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.content.Context;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.view.*;
 import android.widget.*;
 import com.example.archery.CShot;
 import com.example.archery.R;
 import com.example.archery.archeryView.CDistance;
-import com.example.archery.database.CMySQLiteOpenHelper;
+import com.example.archery.database.CSQLiteOpenHelper;
 
-public class StatisticsActivity extends ExpandableListActivity {
+public class StatisticsActivity extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
 
 	private ExpandListAdapter adapter;
 	private ExpandableListView expandableListView;
+    private Context context;
 
     //TODO:Поработать над статистикой:подсчёт очков, графики т.д.
+
+    public StatisticsActivity(Context context)  {
+        this.context = context;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Cursor cursor = CMySQLiteOpenHelper.getHelper(this).getDistancesCursor();
-        startManagingCursor(cursor);
-        adapter = new ExpandListAdapter(cursor,this,true);
-        setListAdapter(adapter);
-        expandableListView = (ExpandableListView) findViewById(android.R.id.list);
-        expandableListView.setBackgroundColor(Color.BLACK);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState)  {
+        //TODO:откомментировать, когда проверю
+        //Cursor cursor = CSQLiteOpenHelper.getHelper(context).getCursor(CSQLiteOpenHelper.TABLE_DISTANCES);
+        ExpandableListView parent = new ExpandableListView(context);
+        //adapter = new ExpandListAdapter(cursor,context,true);
+        parent.setAdapter(adapter);
+        parent.setBackgroundColor(Color.BLACK);
         registerForContextMenu(expandableListView);
+        return parent;
     }
 
     @Override
-    public void onDestroy() {
-        CMySQLiteOpenHelper.getHelper(this).close();
-        super.onDestroy();
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.activity_display, menu);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.activity_display, menu);
-        return true;
-    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
     	switch (item.getItemId())
@@ -73,7 +80,7 @@ public class StatisticsActivity extends ExpandableListActivity {
     @Override
     public void onCreateContextMenu(ContextMenu contextMenu,View view,ContextMenu.ContextMenuInfo contextMenuInfo)   {
         super.onCreateContextMenu(contextMenu,view,contextMenuInfo);
-        MenuInflater inflater = getMenuInflater();
+        MenuInflater inflater = getActivity().getMenuInflater();
         inflater.inflate(R.menu.records_context_menu,contextMenu);
     }
     @Override
@@ -89,7 +96,7 @@ public class StatisticsActivity extends ExpandableListActivity {
             }
             case  R.id.view_record:
             {
-                Intent intent = new Intent(this, CRecordView.class);
+                Intent intent = new Intent(getActivity(), CRecordView.class);
                 ExpandableListView.ExpandableListContextMenuInfo info =
                         (ExpandableListView.ExpandableListContextMenuInfo)menuItem.getMenuInfo();
                 intent.putExtra("record_id",info.id);
@@ -100,25 +107,43 @@ public class StatisticsActivity extends ExpandableListActivity {
         return true;
     }
 
-    private class ExpandListAdapter extends CursorTreeAdapter   {
-    CMySQLiteOpenHelper helper;
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+        //cursorLoader = new CursorLoader(context, );
+        return null;
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
+        adapter.changeCursor(cursor);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> cursorLoader) {
+        adapter.changeCursor(null);
+    }
+
+    private class ExpandListAdapter extends CursorTreeAdapter {
+    CSQLiteOpenHelper helper;
     int sum;
 
         public ExpandListAdapter(Cursor cursor, Context context,boolean autoRequery) {
             super(cursor, context, autoRequery);
-            helper = CMySQLiteOpenHelper.getHelper(context);
+            helper = CSQLiteOpenHelper.getHelper(context);
         }
 
         public void deleteRecord(long id)
         {
-            helper.deleteDistance(id);
-            adapter.changeCursor(helper.getDistancesCursor());
+            //TODO:откомментировать, когда проверю
+            helper.delete(CSQLiteOpenHelper.TABLE_DISTANCES,id);
+            //adapter.changeCursor(helper.getDistancesCursor());
         }
 
 	public void deleteAll()
 	{
-        helper.deleteAllDistances();
-        adapter.changeCursor(helper.getDistancesCursor());
+        //TODO:откомментировать, когда проверю
+        helper.delete(CSQLiteOpenHelper.TABLE_DISTANCES);
+        //adapter.changeCursor(helper.getDistancesCursor());
     }
 
         private void fillStatisticsBlockView(LinearLayout layout, CShot[][] series)  {
@@ -151,9 +176,11 @@ public class StatisticsActivity extends ExpandableListActivity {
 
         @Override
         protected Cursor getChildrenCursor(Cursor groupCursor) {
-            Cursor cursor = helper.getDistanceCursor(groupCursor.getLong(groupCursor.getColumnIndex("_id")));
-            startManagingCursor(cursor);
-            return cursor;
+            //TODO:откомментировать, когда проверю
+            //Cursor cursor = helper.getDistanceCursor(groupCursor.getLong(groupCursor.getColumnIndex("_id")));
+            //startManagingCursor(cursor);
+            //return cursor;
+            return null;
         }
 
         @Override
