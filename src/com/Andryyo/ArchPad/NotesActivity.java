@@ -1,4 +1,4 @@
-package com.example.archery;
+package com.Andryyo.ArchPad;
 
 import android.app.AlertDialog;
 import android.app.ExpandableListActivity;
@@ -9,7 +9,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.view.*;
 import android.widget.*;
-import com.example.archery.database.CSQLiteOpenHelper;
+import com.Andryyo.ArchPad.database.CSQLiteOpenHelper;
 
 import java.util.Calendar;
 

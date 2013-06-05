@@ -1,4 +1,4 @@
-package com.example.archery.statistics;
+package com.Andryyo.ArchPad.statistics;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -6,9 +6,8 @@ import android.os.Bundle;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.LinearLayout;
-import com.example.archery.R;
-import com.example.archery.start.CTargetPreview;
-import com.example.archery.target.CTargetView;
+import com.Andryyo.ArchPad.R;
+import com.Andryyo.ArchPad.target.CTargetView;
 
 /**
  * Created with IntelliJ IDEA.

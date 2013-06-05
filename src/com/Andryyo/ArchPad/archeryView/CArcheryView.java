@@ -1,4 +1,4 @@
-package com.example.archery.archeryView;
+package com.Andryyo.ArchPad.archeryView;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -14,13 +14,13 @@ import android.view.*;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.Toast;
-import com.example.archery.CShot;
-import com.example.archery.NotesActivity;
-import com.example.archery.R;
-import com.example.archery.database.CSQLiteOpenHelper;
-import com.example.archery.sight.CSightPropertiesActivity;
-import com.example.archery.statistics.StatisticsActivity;
-import com.example.archery.target.CTargetView;
+import com.Andryyo.ArchPad.CShot;
+import com.Andryyo.ArchPad.NotesActivity;
+import com.Andryyo.ArchPad.R;
+import com.Andryyo.ArchPad.database.CSQLiteOpenHelper;
+import com.Andryyo.ArchPad.sight.CSightPropertiesActivity;
+import com.Andryyo.ArchPad.statistics.StatisticsActivity;
+import com.Andryyo.ArchPad.target.CTargetView;
 
 public class CArcheryView extends Fragment {
     public static final int SIGHT_REQUEST = 1;

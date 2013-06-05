@@ -1,15 +1,15 @@
-package com.example.archery.target;
+package com.Andryyo.ArchPad.target;
 
 import android.content.Context;
 
 import android.graphics.*;
 import android.view.MotionEvent;
 import android.view.View;
-import com.example.archery.CArrow;
-import com.example.archery.archeryView.CArcheryView;
-import com.example.archery.CShot;
-import com.example.archery.archeryView.CDistance;
-import com.example.archery.database.CSQLiteOpenHelper;
+import com.Andryyo.ArchPad.CArrow;
+import com.Andryyo.ArchPad.archeryView.CArcheryView;
+import com.Andryyo.ArchPad.CShot;
+import com.Andryyo.ArchPad.archeryView.CDistance;
+import com.Andryyo.ArchPad.database.CSQLiteOpenHelper;
 
 import java.util.Vector;
 

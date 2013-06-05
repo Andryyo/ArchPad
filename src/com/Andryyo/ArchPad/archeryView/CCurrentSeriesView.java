@@ -1,11 +1,11 @@
-package com.example.archery.archeryView;
+package com.Andryyo.ArchPad.archeryView;
 
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.view.View;
-import com.example.archery.CShot;
+import com.Andryyo.ArchPad.CShot;
 
 import java.util.Vector;
 

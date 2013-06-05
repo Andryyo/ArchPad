@@ -1,4 +1,4 @@
-package com.example.archery;
+package com.Andryyo.ArchPad;
 
 import android.os.Bundle;
 import android.content.Intent;
@@ -8,8 +8,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.KeyEvent;
-import com.example.archery.archeryView.CArcheryView;
-import com.example.archery.start.StartActivity;
+import com.Andryyo.ArchPad.archeryView.CArcheryView;
+import com.Andryyo.ArchPad.start.StartActivity;
 
 public class MainActivity extends FragmentActivity {
 

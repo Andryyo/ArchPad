@@ -1,12 +1,12 @@
-package com.example.archery.start;
+package com.Andryyo.ArchPad.start;
 
 import android.content.Context;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.Gallery;
-import com.example.archery.R;
-import com.example.archery.target.CTarget;
+import com.Andryyo.ArchPad.R;
+import com.Andryyo.ArchPad.target.CTarget;
 
 /**
  * Created with IntelliJ IDEA.

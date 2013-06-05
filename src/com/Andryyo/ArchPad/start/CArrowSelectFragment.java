@@ -1,24 +1,21 @@
-package com.example.archery.start;
+package com.Andryyo.ArchPad.start;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
-import com.example.archery.CArrow;
-import com.example.archery.R;
-import com.example.archery.database.CSQLiteOpenHelper;
+import com.Andryyo.ArchPad.CArrow;
+import com.Andryyo.ArchPad.R;
+import com.Andryyo.ArchPad.database.CSQLiteOpenHelper;
 
 /**
  * Created with IntelliJ IDEA.

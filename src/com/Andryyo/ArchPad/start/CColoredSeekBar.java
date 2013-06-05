@@ -1,4 +1,4 @@
-package com.example.archery.start;
+package com.Andryyo.ArchPad.start;
 
 import android.content.Context;
 import android.graphics.Color;

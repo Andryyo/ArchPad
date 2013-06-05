@@ -1,4 +1,4 @@
-package com.example.archery.statistics;
+package com.Andryyo.ArchPad.statistics;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -8,7 +8,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.widget.TextView;
-import com.example.archery.R;
+import com.Andryyo.ArchPad.R;
 
 /**
 * Created with IntelliJ IDEA.

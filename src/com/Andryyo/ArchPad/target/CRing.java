@@ -1,4 +1,4 @@
-package com.example.archery.target;
+package com.Andryyo.ArchPad.target;
 
 import java.io.Serializable;
 

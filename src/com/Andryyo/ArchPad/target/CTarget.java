@@ -1,11 +1,11 @@
-package com.example.archery.target;
+package com.Andryyo.ArchPad.target;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import com.example.archery.database.CSQLiteOpenHelper;
+import com.Andryyo.ArchPad.database.CSQLiteOpenHelper;
 
 import java.io.IOException;
 import java.io.Serializable;

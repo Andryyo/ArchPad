@@ -84,7 +84,7 @@
         <view
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                class="com.example.archery.sight.CSightPropertiesActivity$CSightSelectView"
+                class="com.Andryyo.ArchPad.sight.CSightPropertiesActivity$CSightSelectView"
                 android:id="@+id/sight_select_view"
                 android:layout_weight="1"/>
 

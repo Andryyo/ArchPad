@@ -1,4 +1,4 @@
-package com.example.archery.statistics;
+package com.Andryyo.ArchPad.statistics;
 
 import java.util.Arrays;
 import java.util.Calendar;
@@ -13,10 +13,10 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.view.*;
 import android.widget.*;
-import com.example.archery.CShot;
-import com.example.archery.R;
-import com.example.archery.archeryView.CDistance;
-import com.example.archery.database.CSQLiteOpenHelper;
+import com.Andryyo.ArchPad.CShot;
+import com.Andryyo.ArchPad.R;
+import com.Andryyo.ArchPad.archeryView.CDistance;
+import com.Andryyo.ArchPad.database.CSQLiteOpenHelper;
 
 public class StatisticsActivity extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
 

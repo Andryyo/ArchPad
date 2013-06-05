@@ -1,24 +1,23 @@
-package com.example.archery.start;
+package com.Andryyo.ArchPad.start;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.widget.*;
 import android.content.Intent;
-import com.example.archery.CArrow;
-import com.example.archery.MainActivity;
-import com.example.archery.R;
-import com.example.archery.target.CRing;
-import com.example.archery.target.CTarget;
+import com.Andryyo.ArchPad.CArrow;
+import com.Andryyo.ArchPad.MainActivity;
+import com.Andryyo.ArchPad.R;
+import com.Andryyo.ArchPad.target.CTarget;
 
 public class StartActivity extends FragmentActivity{
 	
 	public Spinner Number_of_series_spinner;
     public Spinner Arrows_in_series_spinner;
-    public final static String NUMBER_OF_SERIES="com.example.Archery.NUMBER_OF_SERIES";
-    public final static String ARROWS_IN_SERIES="com.example.Archery.ARROWS_IN_SERIES";
-    public final static String TARGET_ID="com.example.Archery.TARGET_ID";
-    public final static String ARROW_ID="com.example.Archery.ARROW_ID";
+    public final static String NUMBER_OF_SERIES="com.Andryyo.Archery.NUMBER_OF_SERIES";
+    public final static String ARROWS_IN_SERIES="com.Andryyo.Archery.ARROWS_IN_SERIES";
+    public final static String TARGET_ID="com.Andryyo.Archery.TARGET_ID";
+    public final static String ARROW_ID="com.Andryyo.Archery.ARROW_ID";
     
     @Override
     public void onCreate(Bundle savedInstanceState) {

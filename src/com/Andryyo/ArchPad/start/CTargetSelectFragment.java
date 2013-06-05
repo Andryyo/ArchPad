@@ -1,4 +1,4 @@
-package com.example.archery.start;
+package com.Andryyo.ArchPad.start;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -14,10 +14,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
-import com.example.archery.R;
-import com.example.archery.database.CSQLiteOpenHelper;
-import com.example.archery.target.CRing;
-import com.example.archery.target.CTarget;
+import com.Andryyo.ArchPad.R;
+import com.Andryyo.ArchPad.database.CSQLiteOpenHelper;
+import com.Andryyo.ArchPad.target.CRing;
+import com.Andryyo.ArchPad.target.CTarget;
 
 import java.io.IOException;
 import java.util.Vector;

@@ -1,7 +1,7 @@
 <resources>
 
-    <string name="app_name">Archery</string>
-    <string name="title_activity_main">Archery</string>
+    <string name="app_name">ArchPad</string>
+    <string name="title_activity_main">ArchPad</string>
     <string name="Number_of_series">Количество серий</string>
     <string name="Arrows_in_series">Количество стрел в серии</string>
     <string-array name="Number_of_series_array">

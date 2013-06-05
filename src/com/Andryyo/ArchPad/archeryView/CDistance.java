@@ -1,10 +1,10 @@
-package com.example.archery.archeryView;
+package com.Andryyo.ArchPad.archeryView;
 
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import com.example.archery.CShot;
-import com.example.archery.database.CSQLiteOpenHelper;
+import com.Andryyo.ArchPad.CShot;
+import com.Andryyo.ArchPad.database.CSQLiteOpenHelper;
 
 import java.io.*;
 import java.util.Calendar;

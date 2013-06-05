@@ -1,4 +1,4 @@
-package com.example.archery.archeryView;
+package com.Andryyo.ArchPad.archeryView;
 
 import android.content.Context;
 import android.graphics.Canvas;

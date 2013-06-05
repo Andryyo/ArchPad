@@ -1,9 +1,8 @@
-package com.example.archery;
+package com.Andryyo.ArchPad;
 
-import com.example.archery.target.CRing;
+import com.Andryyo.ArchPad.target.CRing;
 
 import java.io.Serializable;
-import java.sql.Blob;
 import java.util.Vector;
 
 /**

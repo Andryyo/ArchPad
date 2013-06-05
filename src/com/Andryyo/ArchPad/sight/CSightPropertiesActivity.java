@@ -1,4 +1,4 @@
-package com.example.archery.sight;
+package com.Andryyo.ArchPad.sight;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -12,9 +12,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.*;
-import com.example.archery.R;
-import com.example.archery.archeryView.CArcheryView;
-import com.example.archery.database.CSQLiteOpenHelper;
+import com.Andryyo.ArchPad.R;
+import com.Andryyo.ArchPad.archeryView.CArcheryView;
+import com.Andryyo.ArchPad.database.CSQLiteOpenHelper;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

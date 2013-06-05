@@ -1,4 +1,4 @@
-package com.example.archery.database;
+package com.Andryyo.ArchPad.database;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -6,9 +6,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.support.v4.content.AsyncTaskLoader;
-import com.example.archery.CArrow;
-import com.example.archery.archeryView.CDistance;
-import com.example.archery.target.CTarget;
+import com.Andryyo.ArchPad.CArrow;
+import com.Andryyo.ArchPad.archeryView.CDistance;
+import com.Andryyo.ArchPad.target.CTarget;
 
 import java.io.*;
 

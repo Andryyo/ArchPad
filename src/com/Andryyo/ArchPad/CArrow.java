@@ -1,4 +1,4 @@
-package com.example.archery;
+package com.Andryyo.ArchPad;
 
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
