@@ -13,7 +13,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.*;
 import com.Andryyo.ArchPad.R;
-import com.Andryyo.ArchPad.archeryView.CArcheryView;
+import com.Andryyo.ArchPad.archeryView.CArcheryFragment;
 import com.Andryyo.ArchPad.database.CSQLiteOpenHelper;
 
 import java.math.BigDecimal;
@@ -150,7 +150,7 @@ public class CSightPropertiesActivity extends Activity implements Spinner.OnItem
         {
             Intent intent = new Intent();
             intent.putExtra("sightId",currentSightId);
-            setResult(CArcheryView.SIGHT_REQUEST,intent);
+            setResult(CArcheryFragment.SIGHT_REQUEST,intent);
             finish();
         }
         else

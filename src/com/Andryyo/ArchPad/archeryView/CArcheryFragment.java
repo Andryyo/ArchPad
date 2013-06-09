@@ -19,10 +19,11 @@ import com.Andryyo.ArchPad.NotesActivity;
 import com.Andryyo.ArchPad.R;
 import com.Andryyo.ArchPad.database.CSQLiteOpenHelper;
 import com.Andryyo.ArchPad.sight.CSightPropertiesActivity;
-import com.Andryyo.ArchPad.statistics.StatisticsActivity;
+import com.Andryyo.ArchPad.statistics.CStatisticsFragment;
+import com.Andryyo.ArchPad.statistics.IOnUpdateListener;
 import com.Andryyo.ArchPad.target.CTargetView;
 
-public class CArcheryView extends Fragment {
+public class CArcheryFragment extends Fragment {
     public static final int SIGHT_REQUEST = 1;
     public static Vibrator vibrator;
 
@@ -33,8 +34,9 @@ public class CArcheryView extends Fragment {
     private long targetId;
     private long arrowId;
     private Context context;
+    private IOnUpdateListener listener;
     
-	public CArcheryView(Context context, int numberOfSeries, int arrowsInSeries, long targetId, long arrowId) {
+	public CArcheryFragment(Context context, int numberOfSeries, int arrowsInSeries, long targetId, long arrowId) {
 		this.numberOfSeries = numberOfSeries;
 		this.arrowsInSeries = arrowsInSeries;
         this.targetId = targetId;
@@ -42,6 +44,10 @@ public class CArcheryView extends Fragment {
         this.context = context;
         setHasOptionsMenu(true);
     	}
+
+    public void setOnUpdateListener(IOnUpdateListener listener)  {
+        this.listener = listener;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -66,7 +72,7 @@ public class CArcheryView extends Fragment {
         return parentLayout;
     }
 
-    public void saveCurrentDistance()  {
+    public void saveCurrentDistance(boolean isPaused)  {
         if (currentDistance!=null)
         {
         if (!currentDistance.isEmpty())
@@ -74,13 +80,15 @@ public class CArcheryView extends Fragment {
             CSQLiteOpenHelper helper = CSQLiteOpenHelper.getHelper(context);
             try
             {
-            helper.addDistance(currentDistance);
+                helper.addDistance(currentDistance);
             }
             catch (Exception e)
             {
                 Toast toast = Toast.makeText(context, e.getMessage(), 3000);
                 toast.show();
             }
+            if (!isPaused)
+                listener.update();
         }
         }
     }
@@ -127,10 +135,11 @@ public class CArcheryView extends Fragment {
         if (currentDistance.addShot(shot) == 0)
         {
             endCurrentDistance();
-            saveCurrentDistance();
+            saveCurrentDistance(false);
             previousDistance = currentDistance;
             currentDistance = null;
         }
+        getView().invalidate();
     }
 
     public CDistance getCurrentDistance()   {
@@ -153,12 +162,6 @@ public class CArcheryView extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId())
         {
-            case R.id.show_statistics:
-            {
-                Intent intent = new Intent(context, StatisticsActivity.class);
-                startActivity(intent);
-                break;
-            }
             case R.id.info:
             {
                 AlertDialog.Builder dialog = new AlertDialog.Builder(context);
@@ -184,12 +187,6 @@ public class CArcheryView extends Fragment {
                 startActivityForResult(intent, SIGHT_REQUEST);
                 break;
             }
-            case R.id.notes:
-            {
-                Intent intent = new Intent(context, NotesActivity.class);
-                startActivity(intent);
-                break;
-            }
         }
         return true;
     }
@@ -208,14 +205,13 @@ public class CArcheryView extends Fragment {
     @Override
     public void onPause()   {
         super.onPause();
-        saveCurrentDistance();
+        saveCurrentDistance(true);
         vibrator.cancel();
     }
 
     @Override
     public void onResume()  {
         loadDistances();
-        //postInvalidate();
         vibrator = (Vibrator) context.getSystemService(context.VIBRATOR_SERVICE);
         super.onResume();
     }

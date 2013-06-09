@@ -28,7 +28,7 @@
                     android:value="com.example.archery.Start" />
         </activity>
         <activity
-            android:name=".statistics.StatisticsActivity">
+            android:name=".statistics.CStatisticsFragment">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.archery.Start" />

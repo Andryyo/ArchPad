@@ -6,7 +6,7 @@ import android.graphics.*;
 import android.view.MotionEvent;
 import android.view.View;
 import com.Andryyo.ArchPad.CArrow;
-import com.Andryyo.ArchPad.archeryView.CArcheryView;
+import com.Andryyo.ArchPad.archeryView.CArcheryFragment;
 import com.Andryyo.ArchPad.CShot;
 import com.Andryyo.ArchPad.archeryView.CDistance;
 import com.Andryyo.ArchPad.database.CSQLiteOpenHelper;
@@ -35,10 +35,10 @@ public class CTargetView extends View {
     Rect zoomDestRect;
     Rect zoomSrcRect;
     Paint arrowPaint = new Paint();
-    CArcheryView mArcheryView = null;
+    CArcheryFragment mArcheryView = null;
     boolean IsEditable;
 
-    public CTargetView(Context context,CArcheryView mArcheryView) {
+    public CTargetView(Context context,CArcheryFragment mArcheryView) {
         super(context);
         this.context = context;
         this.mArcheryView = mArcheryView;

@@ -7,35 +7,37 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.view.KeyEvent;
-import com.Andryyo.ArchPad.archeryView.CArcheryView;
+import com.Andryyo.ArchPad.archeryView.CArcheryFragment;
 import com.Andryyo.ArchPad.start.StartActivity;
+import com.Andryyo.ArchPad.statistics.CStatisticsFragment;
+import com.Andryyo.ArchPad.statistics.IOnUpdateListener;
 
-public class MainActivity extends FragmentActivity {
+import java.util.Vector;
+
+public class MainActivity extends FragmentActivity implements IOnUpdateListener{
+
+    ViewPager pager;
+    Vector<Fragment> fragments = new Vector<Fragment>();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ViewPager pager = (ViewPager) findViewById(R.id.pager);
+        Intent intent = getIntent();
+        fragments.add(new CArcheryFragment(getApplication()
+                ,intent.getIntExtra(StartActivity.NUMBER_OF_SERIES,1)
+                ,intent.getIntExtra(StartActivity.ARROWS_IN_SERIES,1)
+                ,intent.getLongExtra(StartActivity.TARGET_ID,1)
+                ,intent.getLongExtra(StartActivity.ARROW_ID,1)));
+        fragments.add(new CStatisticsFragment(getApplication()));
+        pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(new PagerAdapter(getSupportFragmentManager()));
+        ((CArcheryFragment)fragments.elementAt(0)).setOnUpdateListener(this);
     }
 
     @Override
-    public boolean onKeyLongPress(int keyCode, KeyEvent event)   {
-        if (keyCode == KeyEvent.KEYCODE_BACK)
-        {
-            //mArcheryView.endCurrentDistance();
-            //getActivity().finish();
-            return true;
-        }
-        return super.onKeyLongPress(keyCode, event);
-    }
-
-    @Override
-    public void onBackPressed() {
-        //deleteLastShot();
-        //postInvalidate();
+    public void update() {
+        ((CStatisticsFragment)fragments.elementAt(1)).update();
     }
 
     private class PagerAdapter extends FragmentPagerAdapter {
@@ -46,15 +48,12 @@ public class MainActivity extends FragmentActivity {
 
         @Override
         public Fragment getItem(int i) {
-                    Intent intent = getIntent();
-                    return new CArcheryView(getApplication(),intent.getIntExtra(StartActivity.NUMBER_OF_SERIES,1)
-                            ,intent.getIntExtra(StartActivity.ARROWS_IN_SERIES,1),intent.getLongExtra(StartActivity.TARGET_ID,1),
-                            intent.getLongExtra(StartActivity.ARROW_ID,1));
+            return fragments.elementAt(i);
         }
 
         @Override
         public int getCount() {
-            return 1;
+            return 2;
         }
     }
 }

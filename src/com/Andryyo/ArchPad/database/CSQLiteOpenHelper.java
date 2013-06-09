@@ -2,9 +2,11 @@ package com.Andryyo.ArchPad.database;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.ContentObserver;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Bundle;
 import android.support.v4.content.AsyncTaskLoader;
 import com.Andryyo.ArchPad.CArrow;
 import com.Andryyo.ArchPad.archeryView.CDistance;
@@ -68,11 +70,11 @@ public class CSQLiteOpenHelper extends SQLiteOpenHelper {
         onCreate(database);
     }
 
-    private Cursor getCursor(String table)   {
+    private synchronized Cursor getCursor(String table)   {
         return this.getReadableDatabase().query(table,null, null, null, null, null, null);
     }
 
-    private Cursor getCursor(String table, long _id) {
+    private synchronized Cursor getCursor(String table, long _id) {
         return this.getReadableDatabase().query(table, null,
                 "_id=?", new String[]{Long.toString(_id)}, null, null, null, null);
     }
@@ -81,21 +83,25 @@ public class CSQLiteOpenHelper extends SQLiteOpenHelper {
         return new CSQLiteCursorLoader(context, table);
     }
 
-    public static CSQLiteCursorLoader getCursorLoader(Context context, String table, long _id)   {
-        return new CSQLiteCursorLoader(context, table, _id);
+    public static CSQLiteCursorLoader getCursorLoader(Context context, String table, long _id, Bundle data)   {
+        return new CSQLiteCursorLoader(context, table, _id, data);
     }
 
-    private static class CSQLiteCursorLoader extends AsyncTaskLoader<Cursor> {
+    public static class CSQLiteCursorLoader extends AsyncTaskLoader<Cursor> {
 
         private String table;
         private long _id;
         private Context context;
+        private Bundle data;
+        private final ForceLoadContentObserver observer = new ForceLoadContentObserver();
+        private Cursor mCursor;
 
-        public CSQLiteCursorLoader(Context context, String table, long _id) {
+        public CSQLiteCursorLoader(Context context, String table, long _id, Bundle data) {
             super(context);
             this.context = context;
             this.table = table;
             this._id = _id;
+            this.data = data;
         }
 
         public CSQLiteCursorLoader(Context context, String table) {
@@ -105,24 +111,82 @@ public class CSQLiteOpenHelper extends SQLiteOpenHelper {
             this._id = -1;
         }
 
-        @Override
-        public void onStartLoading()    {
-            forceLoad();
+        public Bundle getData()   {
+            return data;
         }
 
-        @Override
-        public void onCanceled(Cursor cursor)  {
-            super.onCanceled(cursor);
-            cursor.close();
-        }
-
+        /* Runs on a worker thread */
         @Override
         public Cursor loadInBackground() {
             if (_id == -1)
-                return getHelper(context).getCursor(table);
+                mCursor = getHelper(context).getCursor(table);
             else
-                return getHelper(context).getCursor(table, _id);
+                mCursor =  getHelper(context).getCursor(table, _id);
+            if (mCursor != null) {
+                // Ensure the cursor window is filled
+                mCursor.registerContentObserver(observer);
+            }
+            return mCursor;
         }
+
+        /* Runs on the UI thread */
+        @Override
+        public void deliverResult(Cursor cursor) {
+            if (isReset()) {
+                // An async query came in while the loader is stopped
+                if (cursor != null) {
+                    cursor.close();
+                }
+                return;
+            }
+            Cursor oldCursor = mCursor;
+            mCursor = cursor;
+
+            if (isStarted()) {
+                super.deliverResult(cursor);
+            }
+
+            if (oldCursor != null && oldCursor != cursor && !oldCursor.isClosed()) {
+                oldCursor.close();
+            }
+        }
+
+        @Override
+        protected void onStartLoading() {
+            if (mCursor != null) {
+                deliverResult(mCursor);
+            }
+            if (takeContentChanged() || mCursor == null) {
+                forceLoad();
+            }
+        }
+
+        @Override
+        protected void onStopLoading() {
+            // Attempt to cancel the current load task if possible.
+            cancelLoad();
+        }
+
+        @Override
+        public void onCanceled(Cursor cursor) {
+            if (cursor != null && !cursor.isClosed()) {
+                cursor.close();
+            }
+        }
+
+        @Override
+        protected void onReset() {
+            super.onReset();
+
+            // Ensure the loader is stopped
+            onStopLoading();
+
+            if (mCursor != null && !mCursor.isClosed()) {
+                mCursor.close();
+            }
+            mCursor = null;
+        }
+
     }
 
     public void delete(String table)  {

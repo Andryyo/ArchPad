@@ -18,10 +18,10 @@ public class СSeriesCounterView extends View {
     int offset;
     int screenWidth;
     int screenHeight;
-    CArcheryView mArcheryView;
+    CArcheryFragment mArcheryView;
     Paint paint = new Paint();
 
-    public СSeriesCounterView(Context context, CArcheryView mArcheryView)   {
+    public СSeriesCounterView(Context context, CArcheryFragment mArcheryView)   {
         super(context);
         this.mArcheryView = mArcheryView;
         paint.setColor(Color.WHITE);

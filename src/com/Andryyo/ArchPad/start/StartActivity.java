@@ -47,6 +47,7 @@ public class StartActivity extends FragmentActivity{
         {
             Toast.makeText(getBaseContext(),"Необходимо выбрать тип мишени и стрел",3000).show();
         }
+        else
         {
             Intent intent = new Intent(this, MainActivity.class);
             intent.putExtra(NUMBER_OF_SERIES, Integer.parseInt(Number_of_series_spinner.getSelectedItem().toString()));

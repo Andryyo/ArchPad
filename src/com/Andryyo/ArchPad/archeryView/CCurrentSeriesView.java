@@ -22,10 +22,10 @@ public class CCurrentSeriesView extends View {
     int textHeight;
     int textWidth;
     int screenWidth;
-    CArcheryView mArcheryView;
+    CArcheryFragment mArcheryView;
     Paint paint = new Paint();
 
-    public CCurrentSeriesView(Context context, CArcheryView mArcheryView)   {
+    public CCurrentSeriesView(Context context, CArcheryFragment mArcheryView)   {
         super(context);
         this.mArcheryView = mArcheryView;
         paint.setColor(Color.WHITE);

@@ -18,7 +18,7 @@ import com.Andryyo.ArchPad.R;
 import com.Andryyo.ArchPad.archeryView.CDistance;
 import com.Andryyo.ArchPad.database.CSQLiteOpenHelper;
 
-public class StatisticsActivity extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
+public class CStatisticsFragment extends Fragment {
 
 	private ExpandListAdapter adapter;
 	private ExpandableListView expandableListView;
@@ -26,26 +26,23 @@ public class StatisticsActivity extends Fragment implements LoaderManager.Loader
 
     //TODO:Поработать над статистикой:подсчёт очков, графики т.д.
 
-    public StatisticsActivity(Context context)  {
+    public CStatisticsFragment(Context context)  {
         this.context = context;
+        setHasOptionsMenu(true);
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void update()    {
+        adapter.update();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)  {
-        //TODO:откомментировать, когда проверю
-        //Cursor cursor = CSQLiteOpenHelper.getHelper(context).getCursor(CSQLiteOpenHelper.TABLE_DISTANCES);
-        ExpandableListView parent = new ExpandableListView(context);
-        //adapter = new ExpandListAdapter(cursor,context,true);
-        parent.setAdapter(adapter);
-        parent.setBackgroundColor(Color.BLACK);
+        expandableListView = new ExpandableListView(context);
+        adapter = new ExpandListAdapter(getLoaderManager(),context);
+        expandableListView.setAdapter(adapter);
         registerForContextMenu(expandableListView);
-        return parent;
+        return expandableListView;
     }
 
     @Override
@@ -59,7 +56,7 @@ public class StatisticsActivity extends Fragment implements LoaderManager.Loader
     	{
     	case R.id.clear:
     	{
-			adapter.deleteAll();
+			adapter.deleteAllDistances();
 	    	break;
     	}
     	case R.id.expand:
@@ -69,7 +66,7 @@ public class StatisticsActivity extends Fragment implements LoaderManager.Loader
     		break;
     	}
     	case R.id.hide:
-    	{
+        {
     		for (int i=0;i<adapter.getGroupCount();i++)
     			expandableListView.collapseGroup(i);
     		break;
@@ -91,7 +88,7 @@ public class StatisticsActivity extends Fragment implements LoaderManager.Loader
             {
                 ExpandableListView.ExpandableListContextMenuInfo info =
                     (ExpandableListView.ExpandableListContextMenuInfo)menuItem.getMenuInfo();
-                adapter.deleteRecord(info.id);
+                adapter.deleteDistance(info.id);
                 break;
             }
             case  R.id.view_record:
@@ -107,44 +104,23 @@ public class StatisticsActivity extends Fragment implements LoaderManager.Loader
         return true;
     }
 
-    @Override
-    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        //cursorLoader = new CursorLoader(context, );
-        return null;
-    }
+    private class ExpandListAdapter extends CursorTreeAdapter implements LoaderManager.LoaderCallbacks<Cursor>{
 
-    @Override
-    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-        adapter.changeCursor(cursor);
-    }
+        private static final String GROUP_POS = "groupNum";
+        CSQLiteOpenHelper helper;
+        int sum;
+        LoaderManager loaderManager;
 
-    @Override
-    public void onLoaderReset(Loader<Cursor> cursorLoader) {
-        adapter.changeCursor(null);
-    }
-
-    private class ExpandListAdapter extends CursorTreeAdapter {
-    CSQLiteOpenHelper helper;
-    int sum;
-
-        public ExpandListAdapter(Cursor cursor, Context context,boolean autoRequery) {
-            super(cursor, context, autoRequery);
+        public ExpandListAdapter(LoaderManager loaderManager, Context context) {
+            super(null, context, true);
             helper = CSQLiteOpenHelper.getHelper(context);
+            this.loaderManager = loaderManager;
+            update();
         }
 
-        public void deleteRecord(long id)
-        {
-            //TODO:откомментировать, когда проверю
-            helper.delete(CSQLiteOpenHelper.TABLE_DISTANCES,id);
-            //adapter.changeCursor(helper.getDistancesCursor());
+        public void update()    {
+            loaderManager.restartLoader(0, null, this);
         }
-
-	public void deleteAll()
-	{
-        //TODO:откомментировать, когда проверю
-        helper.delete(CSQLiteOpenHelper.TABLE_DISTANCES);
-        //adapter.changeCursor(helper.getDistancesCursor());
-    }
 
         private void fillStatisticsBlockView(LinearLayout layout, CShot[][] series)  {
             int first_series_sum = 0;
@@ -174,22 +150,54 @@ public class StatisticsActivity extends Fragment implements LoaderManager.Loader
             tv.setText(Integer.toString(sum));
         }
 
-        @Override
+        public void deleteDistance(long _id)    {
+            CSQLiteOpenHelper.getHelper(context).delete(CSQLiteOpenHelper.TABLE_DISTANCES, _id);
+            update();
+        }
+
+        public void deleteAllDistances()    {
+            CSQLiteOpenHelper.getHelper(context).delete(CSQLiteOpenHelper.TABLE_DISTANCES);
+            update();
+        }
+
         protected Cursor getChildrenCursor(Cursor groupCursor) {
-            //TODO:откомментировать, когда проверю
-            //Cursor cursor = helper.getDistanceCursor(groupCursor.getLong(groupCursor.getColumnIndex("_id")));
-            //startManagingCursor(cursor);
-            //return cursor;
+            Bundle bundle = new Bundle();
+            bundle.putInt(GROUP_POS, groupCursor.getPosition());
+            loaderManager.restartLoader((int) groupCursor.getLong(groupCursor.getColumnIndex("_id")), bundle, this);
             return null;
         }
 
         @Override
+        public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+            if (i==0)
+                return CSQLiteOpenHelper.getCursorLoader(context, CSQLiteOpenHelper.TABLE_DISTANCES);
+            else
+                return CSQLiteOpenHelper.getCursorLoader(context, CSQLiteOpenHelper.TABLE_DISTANCES, i, bundle);
+
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
+            if (cursorLoader.getId()==0)
+            {
+                changeCursor(cursor);
+                expandableListView.setSelection(adapter.getGroupCount()-1);
+            }
+            else
+                setChildrenCursor(((CSQLiteOpenHelper.CSQLiteCursorLoader)cursorLoader)
+                        .getData().getInt(GROUP_POS), cursor);
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Cursor> cursorLoader) {
+                changeCursor(null);
+        }
+
         protected View newGroupView(Context context, Cursor cursor, boolean b, ViewGroup viewGroup) {
             LayoutInflater infalInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             return infalInflater.inflate(R.layout.expand_list_group, null);
         }
 
-        @Override
         protected void bindGroupView(View view, Context context, Cursor cursor, boolean b) {
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis(cursor.getLong(cursor.getColumnIndex("timemark")));
@@ -201,7 +209,6 @@ public class StatisticsActivity extends Fragment implements LoaderManager.Loader
                     calendar.get(Calendar.MINUTE));
         }
 
-        @Override
         protected View newChildView(Context context, Cursor cursor, boolean b, ViewGroup viewGroup) {
             LinearLayout view = new LinearLayout(context);
             view.setLayoutParams(new ListView.LayoutParams(ListView.LayoutParams.MATCH_PARENT,
@@ -211,7 +218,6 @@ public class StatisticsActivity extends Fragment implements LoaderManager.Loader
             return view;
         }
 
-        @Override
         protected void bindChildView(View view, Context context, Cursor cursor, boolean b) {
             ((LinearLayout)view).removeAllViews();
             LayoutInflater infalInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
