@@ -1,5 +1,6 @@
 package com.Andryyo.ArchPad;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
@@ -7,6 +8,8 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.AttributeSet;
+import android.view.View;
 import com.Andryyo.ArchPad.archeryView.CArcheryFragment;
 import com.Andryyo.ArchPad.start.StartActivity;
 import com.Andryyo.ArchPad.statistics.CStatisticsFragment;
@@ -24,6 +27,7 @@ public class MainActivity extends FragmentActivity implements IOnUpdateListener{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Intent intent = getIntent();
+        fragments.add(new CNotesFragment());
         fragments.add(new CArcheryFragment(getApplication()
                 ,intent.getIntExtra(StartActivity.NUMBER_OF_SERIES,1)
                 ,intent.getIntExtra(StartActivity.ARROWS_IN_SERIES,1)
@@ -32,12 +36,14 @@ public class MainActivity extends FragmentActivity implements IOnUpdateListener{
         fragments.add(new CStatisticsFragment(getApplication()));
         pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(new PagerAdapter(getSupportFragmentManager()));
-        ((CArcheryFragment)fragments.elementAt(0)).setOnUpdateListener(this);
+        ((CArcheryFragment)fragments.elementAt(1)).setOnUpdateListener(this);
+        pager.setCurrentItem(1,false);
     }
 
     @Override
     public void update() {
-        ((CStatisticsFragment)fragments.elementAt(1)).update();
+        ((CStatisticsFragment)fragments.elementAt(2)).update();
+        ((CNotesFragment)fragments.elementAt(0)).update();
     }
 
     private class PagerAdapter extends FragmentPagerAdapter {
@@ -53,7 +59,7 @@ public class MainActivity extends FragmentActivity implements IOnUpdateListener{
 
         @Override
         public int getCount() {
-            return 2;
+            return 3;
         }
     }
 }

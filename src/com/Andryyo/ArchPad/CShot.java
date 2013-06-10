@@ -1,5 +1,9 @@
 package com.Andryyo.ArchPad;
 
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import com.Andryyo.ArchPad.target.CRing;
 
 import java.io.Serializable;

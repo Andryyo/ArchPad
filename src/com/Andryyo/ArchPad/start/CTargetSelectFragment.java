@@ -18,6 +18,7 @@ import com.Andryyo.ArchPad.R;
 import com.Andryyo.ArchPad.database.CSQLiteOpenHelper;
 import com.Andryyo.ArchPad.target.CRing;
 import com.Andryyo.ArchPad.target.CTarget;
+import com.Andryyo.ArchPad.target.CTargetView;
 
 import java.io.IOException;
 import java.util.Vector;
@@ -102,13 +103,13 @@ public class CTargetSelectFragment extends Fragment implements LoaderManager.Loa
 
         @Override
         public View newView(Context context, Cursor cursor, ViewGroup viewGroup) {
-            return new CTargetPreview(context, (CTarget) null);
+            return new CTargetView(context);
         }
 
         @Override
         public void bindView(View view, Context context, Cursor cursor) {
             try {
-                ((CTargetPreview)view).setTarget(new CTarget(cursor));
+                ((CTargetView)view).setTarget(new CTarget(cursor));
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (ClassNotFoundException e) {
@@ -122,7 +123,7 @@ public class CTargetSelectFragment extends Fragment implements LoaderManager.Loa
         float prevDistanceFromCenter;
         float distanceFromCenter;
         CTarget target;
-        CTargetPreview targetPreview;
+        CTargetView targetPreview;
 
         public static CTargetCreateDialog newInstance() {
             CTargetCreateDialog dialog = new CTargetCreateDialog();
@@ -139,7 +140,7 @@ public class CTargetSelectFragment extends Fragment implements LoaderManager.Loa
                 distanceFromCenter = savedInstanceState.getFloat("distanceFromCenter");
                 target = (CTarget) savedInstanceState.getSerializable("target");
             }
-            targetPreview = ((CTargetPreview)view.findViewById(R.id.targetPreview));
+            targetPreview = ((CTargetView)view.findViewById(R.id.targetPreview));
             targetPreview.setTarget(target);
             (view.findViewById(R.id.addRing)).setOnClickListener(this);
             (view.findViewById(R.id.deleteRing)).setOnClickListener(this);

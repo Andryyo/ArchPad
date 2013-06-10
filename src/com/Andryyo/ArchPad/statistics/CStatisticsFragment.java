@@ -74,12 +74,14 @@ public class CStatisticsFragment extends Fragment {
     	}
     	return true;
     }
+
     @Override
     public void onCreateContextMenu(ContextMenu contextMenu,View view,ContextMenu.ContextMenuInfo contextMenuInfo)   {
         super.onCreateContextMenu(contextMenu,view,contextMenuInfo);
         MenuInflater inflater = getActivity().getMenuInflater();
         inflater.inflate(R.menu.records_context_menu,contextMenu);
     }
+
     @Override
     public boolean onContextItemSelected(MenuItem menuItem) {
         switch (menuItem.getItemId())
@@ -89,19 +91,18 @@ public class CStatisticsFragment extends Fragment {
                 ExpandableListView.ExpandableListContextMenuInfo info =
                     (ExpandableListView.ExpandableListContextMenuInfo)menuItem.getMenuInfo();
                 adapter.deleteDistance(info.id);
-                break;
+                return true;
             }
             case  R.id.view_record:
             {
-                Intent intent = new Intent(getActivity(), CRecordView.class);
                 ExpandableListView.ExpandableListContextMenuInfo info =
                         (ExpandableListView.ExpandableListContextMenuInfo)menuItem.getMenuInfo();
-                intent.putExtra("record_id",info.id);
-                startActivity(intent);
-                break;
+                CRecordViewFragment fragment = new CRecordViewFragment(info.id);
+                fragment.show(getFragmentManager().beginTransaction(), "recordViewDialog");
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
     private class ExpandListAdapter extends CursorTreeAdapter implements LoaderManager.LoaderCallbacks<Cursor>{
@@ -181,7 +182,8 @@ public class CStatisticsFragment extends Fragment {
             if (cursorLoader.getId()==0)
             {
                 changeCursor(cursor);
-                expandableListView.setSelection(adapter.getGroupCount()-1);
+                if (adapter.getGroupCount()!=0)
+                    expandableListView.setSelection(adapter.getGroupCount()-1);
             }
             else
                 setChildrenCursor(((CSQLiteOpenHelper.CSQLiteCursorLoader)cursorLoader)

@@ -5,6 +5,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
+import com.Andryyo.ArchPad.CShot;
 import com.Andryyo.ArchPad.database.CSQLiteOpenHelper;
 
 import java.io.IOException;
@@ -26,7 +28,6 @@ public class CTarget implements Serializable   {
     float maxr;
     static Paint fillPaint = new Paint();
     static Paint strokePaint = new Paint();
-    static Paint zoomPaint = new Paint();
 
     public CTarget(Cursor cursor) throws IOException, ClassNotFoundException {
         this.name = cursor.getString(cursor.getColumnIndex("name"));
@@ -79,14 +80,18 @@ public class CTarget implements Serializable   {
         }
     }
 
-    public void draw(Canvas canvas, int center, int r) {
+    public void draw(Canvas canvas, int maxr) {
         for (int i=rings.size()-1;i>=0;i--)
         {
             fillPaint.setColor(rings.get(i).color);
             strokePaint.setColor(Color.BLACK);
-            canvas.drawCircle(center,center,r*rings.get(i).distanceFromCenter,fillPaint);
-            canvas.drawCircle(center,center,r*rings.get(i).distanceFromCenter,strokePaint);
+            canvas.drawCircle(maxr,maxr,maxr*rings.get(i).distanceFromCenter,fillPaint);
+            canvas.drawCircle(maxr,maxr,maxr*rings.get(i).distanceFromCenter,strokePaint);
         }
+    }
+
+    public void drawShot(Canvas canvas, int maxr, float arrowRadius, Paint arrowPaint, CShot shot)    {
+        canvas.drawCircle((shot.x+1)*maxr,(shot.y+1)*maxr,arrowRadius*maxr,arrowPaint);
     }
 
     public void writeToDatabase(SQLiteDatabase database) {
@@ -98,9 +103,7 @@ public class CTarget implements Serializable   {
             values.put("distance",distance);
             database.insert("targets",null,values);
         }
-        catch (Exception e)
-        {
-        }
+        catch (Exception e){    }
     }
 
     public boolean isEmpty()    {

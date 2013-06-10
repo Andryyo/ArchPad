@@ -15,15 +15,13 @@ import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.Toast;
 import com.Andryyo.ArchPad.CShot;
-import com.Andryyo.ArchPad.NotesActivity;
 import com.Andryyo.ArchPad.R;
 import com.Andryyo.ArchPad.database.CSQLiteOpenHelper;
 import com.Andryyo.ArchPad.sight.CSightPropertiesActivity;
-import com.Andryyo.ArchPad.statistics.CStatisticsFragment;
 import com.Andryyo.ArchPad.statistics.IOnUpdateListener;
-import com.Andryyo.ArchPad.target.CTargetView;
+import com.Andryyo.ArchPad.target.CEditableTargetView;
 
-public class CArcheryFragment extends Fragment {
+public class CArcheryFragment extends Fragment implements IOnShotAddListener{
     public static final int SIGHT_REQUEST = 1;
     public static Vibrator vibrator;
 
@@ -35,6 +33,7 @@ public class CArcheryFragment extends Fragment {
     private long arrowId;
     private Context context;
     private IOnUpdateListener listener;
+    private CEditableTargetView mTargetView;
     
 	public CArcheryFragment(Context context, int numberOfSeries, int arrowsInSeries, long targetId, long arrowId) {
 		this.numberOfSeries = numberOfSeries;
@@ -59,7 +58,10 @@ public class CArcheryFragment extends Fragment {
         LinearLayout layout = new LinearLayout(context);
         layout.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, 0,0.9f));
         layout.setOrientation(LinearLayout.HORIZONTAL);
-        CTargetView mTargetView = new CTargetView(getActivity(),this);
+        mTargetView = new CEditableTargetView(getActivity());
+        mTargetView.setOnShotAddListener(this);
+        mTargetView.setTarget(targetId);
+        mTargetView.setArrow(arrowId);
         mTargetView.setLayoutParams(new LayoutParams(0, LayoutParams.MATCH_PARENT,15f));
         layout.addView(mTargetView);
         СSeriesCounterView mSeriesCounterView = new СSeriesCounterView(context,this);
@@ -98,6 +100,7 @@ public class CArcheryFragment extends Fragment {
         try
         {
             currentDistance = helper.getUnfinishedDistance();
+            mTargetView.setDistance(currentDistance);
         }
         catch (Exception e)
         {
@@ -130,6 +133,7 @@ public class CArcheryFragment extends Fragment {
         {
             currentDistance = new CDistance(numberOfSeries, arrowsInSeries,targetId,arrowId);
             currentDistance.addShot(shot);
+            mTargetView.setDistance(currentDistance);
         }
         else
         if (currentDistance.addShot(shot) == 0)
@@ -138,6 +142,7 @@ public class CArcheryFragment extends Fragment {
             saveCurrentDistance(false);
             previousDistance = currentDistance;
             currentDistance = null;
+            mTargetView.setDistance(previousDistance);
         }
         getView().invalidate();
     }

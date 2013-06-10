@@ -1,137 +1,74 @@
 package com.Andryyo.ArchPad.target;
 
 import android.content.Context;
-
-import android.graphics.*;
+import android.graphics.Canvas;
+import android.graphics.Rect;
+import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
-import com.Andryyo.ArchPad.CArrow;
-import com.Andryyo.ArchPad.archeryView.CArcheryFragment;
 import com.Andryyo.ArchPad.CShot;
-import com.Andryyo.ArchPad.archeryView.CDistance;
 import com.Andryyo.ArchPad.database.CSQLiteOpenHelper;
-
-import java.util.Vector;
 
 /**
  * Created with IntelliJ IDEA.
  * User: Андрей
- * Date: 23.04.13
- * Time: 21:00
+ * Date: 09.06.13
+ * Time: 21:41
  * To change this template use File | Settings | File Templates.
  */
-public class CTargetView extends View {
-    Context context;
-    CTarget target;
-    CArrow arrow;
-    CDistance distance;
-    int maxr;
-    int screenWidth;
-    int screenHeight;
-    boolean haveZoom;
-    float zoom = 0.1f;
-    float x;
-    float y;
-    Rect zoomDestRect;
-    Rect zoomSrcRect;
-    Paint arrowPaint = new Paint();
-    CArcheryFragment mArcheryView = null;
-    boolean IsEditable;
+public class CTargetView extends View{
 
-    public CTargetView(Context context,CArcheryFragment mArcheryView) {
+    private Context context;
+    private CTarget target = null;
+    private int center;
+
+    public CTargetView(Context context, long _id)    {
         super(context);
+        target = CSQLiteOpenHelper.getHelper(context).getTarget(_id);
         this.context = context;
-        this.mArcheryView = mArcheryView;
-        IsEditable = true;
-        CSQLiteOpenHelper helper = CSQLiteOpenHelper.getHelper(context);
-        target = helper.getTarget(mArcheryView.getCurrentDistance().targetId);
-        arrow = helper.getArrow(mArcheryView.getCurrentDistance().arrowId);
-        arrowPaint.setStyle(Paint.Style.STROKE);
-        arrowPaint.setColor(Color.GREEN);
     }
 
-    public CTargetView(Context context,long distanceId) {
+    public CTargetView(Context context, CTarget target)    {
+        super(context);
+        this.target = target;
+        this.context = context;
+    }
+
+    public CTargetView(Context context)    {
         super(context);
         this.context = context;
-        IsEditable = false;
-        CSQLiteOpenHelper helper = CSQLiteOpenHelper.getHelper(context);
-        distance = helper.getDistance(distanceId);
-        target = helper.getTarget(distance.targetId);
-        arrow = helper.getArrow(distance.arrowId);
-        arrowPaint.setStyle(Paint.Style.STROKE);
-        arrowPaint.setColor(Color.GREEN);
+    }
+
+    public CTargetView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        this.context = context;
+    }
+
+    public void setTarget(long _id) {
+        target = CSQLiteOpenHelper.getHelper(context).getTarget(_id);
+    }
+
+    public void setTarget(CTarget target)   {
+        this.target = target;
+    }
+
+    public CTarget getTarget() {
+        return target;
+    }
+
+    public int getCenter()  {
+        return center;
     }
 
     @Override
     public void onMeasure(int w, int h) {
-        maxr = Math.min(MeasureSpec.getSize(w),MeasureSpec.getSize(h))/2;
-        screenWidth = MeasureSpec.getSize(w);
-        screenHeight = MeasureSpec.getSize(h);
-        this.setMeasuredDimension(maxr*2, maxr*2);
+        center = Math.min(MeasureSpec.getSize(w),MeasureSpec.getSize(h))/2;
+        this.setMeasuredDimension(center*2, center*2);
     }
 
     @Override
-    public void onDraw(Canvas screenCanvas)
-    {
-        if (target == null)
-            return;
-        Bitmap bitmap = Bitmap.createBitmap(maxr*2,maxr*2,Bitmap.Config.RGB_565);
-        Canvas canvas = new Canvas(bitmap);
-        target.draw(canvas, maxr, maxr);
-        if (IsEditable)
-            distance = mArcheryView.getCurrentDistance();
-        for (Vector<CShot> series : distance.series)
-            for (CShot shot : series)
-                canvas.drawCircle((shot.x+1)*maxr,(shot.y+1)*maxr,arrow.radius*maxr,arrowPaint);
-        if (haveZoom)
-        {
-            if (IsEditable)
-            {
-                canvas.drawPoint(x,y,arrowPaint);
-                canvas.drawCircle(x,y,arrow.radius*maxr,arrowPaint);
-            }
-                canvas.drawBitmap(bitmap,zoomSrcRect,zoomDestRect,null);
-        }
-        screenCanvas.drawBitmap(bitmap,0,0,null);
+    public void onDraw(Canvas canvas)   {
+        if (target!=null)
+            target.draw(canvas, center);
     }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event)
-	{
-        if (event.getAction() == MotionEvent.ACTION_DOWN)
-        {
-            haveZoom = true;
-            return true;
-        }
-        if (event.getAction() == MotionEvent.ACTION_MOVE)
-        {
-            x = (int) event.getX();
-            y = (int) event.getY();
-            if (x>maxr)
-                zoomDestRect = new Rect(0,0, (int) (maxr*4/5), (int) (maxr*4/5));
-            else
-                zoomDestRect = new Rect(maxr*6/5,0,maxr*2,maxr*4/5);
-            int left = (int) (x - zoom*maxr);
-            int top = (int) (y - zoom*maxr);
-            int right = (int) (x + zoom*maxr);
-            int bottom = (int) (y + zoom*maxr);
-            zoomSrcRect = new Rect(left,top,right,bottom);
-            invalidate();
-            return true;
-        }
-		if (event.getAction() == MotionEvent.ACTION_UP)
-        {
-            if (IsEditable)
-            {
-                mArcheryView.addShot(new CShot(target.rings, x / maxr - 1, y / maxr - 1,
-                        arrow.radius));
-                //MainActivity.vibrator.vibrate(100);
-                //mArcheryView.invalidate();
-            }
-                invalidate();
-                haveZoom = false;
-                return true;
-        }
-		return false;
-	}
 }

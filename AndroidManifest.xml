@@ -37,9 +37,9 @@
                 android:theme="@android:style/Theme.Dialog"
                 android:label="@string/title_activity_sight"
                 />
-        <activity android:name=".NotesActivity"
+        <activity android:name=".CNotesFragment"
                   />
-        <activity android:name=".statistics.CRecordView"
+        <activity android:name=".statistics.CRecordViewFragment"
                   android:theme="@android:style/Theme.Dialog"
                 />
     </application>
