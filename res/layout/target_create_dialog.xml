@@ -5,11 +5,10 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
-    <view
+    <com.Andryyo.ArchPad.target.CTargetView
             android:layout_width="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_height="0dp"
-            class="com.Andryyo.ArchPad.start.CTargetPreview"
             android:id="@+id/targetPreview"
             android:layout_weight="1"/>
 

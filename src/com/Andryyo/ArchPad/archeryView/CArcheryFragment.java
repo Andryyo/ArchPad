@@ -17,12 +17,11 @@ import android.widget.Toast;
 import com.Andryyo.ArchPad.CShot;
 import com.Andryyo.ArchPad.R;
 import com.Andryyo.ArchPad.database.CSQLiteOpenHelper;
-import com.Andryyo.ArchPad.sight.CSightPropertiesActivity;
+import com.Andryyo.ArchPad.sight.ActivitySightProperties;
 import com.Andryyo.ArchPad.statistics.IOnUpdateListener;
 import com.Andryyo.ArchPad.target.CEditableTargetView;
 
 public class CArcheryFragment extends Fragment implements IOnShotAddListener{
-    public static final int SIGHT_REQUEST = 1;
     public static Vibrator vibrator;
 
 	public int numberOfSeries;
@@ -169,15 +168,15 @@ public class CArcheryFragment extends Fragment implements IOnShotAddListener{
         {
             case R.id.info:
             {
-                AlertDialog.Builder dialog = new AlertDialog.Builder(context);
-                dialog.setTitle("Information" );
-                dialog.setMessage("Created by Andryyo.\r\nEmail : Andryyo@ukr.net\r\n2012");
-                dialog.setPositiveButton("Ок", new DialogInterface.OnClickListener() {
+                new AlertDialog.Builder(getActivity())
+                .setTitle("Information" )
+                .setMessage("Created by Andryyo.\r\nEmail : Andryyo@ukr.net\r\n2012")
+                .setPositiveButton("Ок", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int arg1) {
                         dialog.cancel();
                     }
-                });
-                dialog.show();
+                })
+                .create().show();
                 break;
             }
             case R.id.save:
@@ -188,23 +187,12 @@ public class CArcheryFragment extends Fragment implements IOnShotAddListener{
             }
             case R.id.sight:
             {
-                Intent intent = new Intent(context, CSightPropertiesActivity.class);
-                startActivityForResult(intent, SIGHT_REQUEST);
+                Intent intent = new Intent(getActivity(), ActivitySightProperties.class);
+                startActivity(intent);
                 break;
             }
         }
         return true;
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data)  {
-        if (requestCode==SIGHT_REQUEST)
-            if (resultCode!= Activity.RESULT_CANCELED)
-            {
-                SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
-                editor.putLong("sightId",data.getLongExtra("sightId",0));
-                editor.commit();
-            }
     }
 
     @Override

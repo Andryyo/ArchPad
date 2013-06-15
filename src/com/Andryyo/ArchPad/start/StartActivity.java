@@ -58,11 +58,6 @@ public class StartActivity extends FragmentActivity{
         }
     }
 
-    public void saveArrow(CArrow arrow) {
-        ((CArrowSelectFragment)getSupportFragmentManager().
-                findFragmentById(R.id.arrowSelectFragment)).saveArrow(arrow);
-    }
-
     public void saveRing(float ringWidth, int points, int color)    {
         ((CTargetSelectFragment.CTargetCreateDialog)getSupportFragmentManager().
                 findFragmentByTag("targetCreateDialog")).saveRing(ringWidth, points, color);

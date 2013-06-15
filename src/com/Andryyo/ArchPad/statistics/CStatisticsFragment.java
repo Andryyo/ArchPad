@@ -182,12 +182,16 @@ public class CStatisticsFragment extends Fragment {
             if (cursorLoader.getId()==0)
             {
                 changeCursor(cursor);
-                if (adapter.getGroupCount()!=0)
+                if ((adapter.getGroupCount()!=0))
                     expandableListView.setSelection(adapter.getGroupCount()-1);
             }
             else
+            try {
                 setChildrenCursor(((CSQLiteOpenHelper.CSQLiteCursorLoader)cursorLoader)
                         .getData().getInt(GROUP_POS), cursor);
+            } catch (NullPointerException e)  {
+                e.printStackTrace();
+            }
         }
 
         @Override

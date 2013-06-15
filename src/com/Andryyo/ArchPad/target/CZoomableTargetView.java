@@ -58,7 +58,10 @@ public class CZoomableTargetView extends CTargetView{
     public void setDistance(CDistance distance) {
         this.distance = distance;
         if (distance!=null)
+        {
             setTarget(distance.targetId);
+            setArrow(distance.arrowId);
+        }
     }
 
     public void setArrow(long id)   {
@@ -75,6 +78,7 @@ public class CZoomableTargetView extends CTargetView{
 
     @Override
     public void onDraw(Canvas canvas)    {
+        try {
         Bitmap bitmap = Bitmap.createBitmap(getCenter()*2,getCenter()*2,Bitmap.Config.RGB_565);
         Canvas buf = new Canvas(bitmap);
         super.onDraw(buf);
@@ -82,7 +86,7 @@ public class CZoomableTargetView extends CTargetView{
             for (Vector<CShot> shots : distance.series)
                 for (CShot shot : shots)
                     getTarget().drawShot(buf, getCenter(), arrow.radius, arrowPaint, shot);
-        if (haveZoom)
+        if ((haveZoom)&&(zoomSrcRect!=null))
         {
             if (haveSightMark)
             {
@@ -92,6 +96,9 @@ public class CZoomableTargetView extends CTargetView{
             buf.drawBitmap(bitmap,zoomSrcRect,zoomDestRect,null);
         }
         canvas.drawBitmap(bitmap, 0, 0, null);
+        } catch (NullPointerException e)    {
+            e.printStackTrace();
+        }
     }
 
     public void drawSightMark(float x, float y) {
@@ -107,15 +114,20 @@ public class CZoomableTargetView extends CTargetView{
     @Override
     public boolean onTouchEvent(MotionEvent event)
     {
+        int x = (int) event.getX();
+        int y = (int) event.getY();
         if (event.getAction() == MotionEvent.ACTION_DOWN)
         {
             haveZoom = true;
+            int left = (int) (x - zoom*getCenter());
+            int top = (int) (y - zoom*getCenter());
+            int right = (int) (x + zoom*getCenter());
+            int bottom = (int) (y + zoom*getCenter());
+            zoomSrcRect = new Rect(left,top,right,bottom);
             return true;
         }
         if (event.getAction() == MotionEvent.ACTION_MOVE)
         {
-            int x = (int) event.getX();
-            int y = (int) event.getY();
             if (x>getCenter())
                 zoomDestRect = new Rect(0,0, getCenter()*4/5, getCenter()*4/5);
             else

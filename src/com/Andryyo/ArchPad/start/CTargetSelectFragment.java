@@ -132,7 +132,7 @@ public class CTargetSelectFragment extends Fragment implements LoaderManager.Loa
 
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            View view = inflater.inflate(R.layout.target_add_dialog, null);
+            View view = inflater.inflate(R.layout.target_create_dialog, null);
             if (savedInstanceState==null)
                 target = new CTarget("",new Vector<CRing>(),0);
             else

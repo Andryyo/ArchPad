@@ -9,7 +9,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
-import android.view.View;
 import com.Andryyo.ArchPad.archeryView.CArcheryFragment;
 import com.Andryyo.ArchPad.start.StartActivity;
 import com.Andryyo.ArchPad.statistics.CStatisticsFragment;

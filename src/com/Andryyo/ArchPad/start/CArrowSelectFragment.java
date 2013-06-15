@@ -24,7 +24,7 @@ import com.Andryyo.ArchPad.database.CSQLiteOpenHelper;
  * Time: 20:43
  * To change this template use File | Settings | File Templates.
  */
-public class CArrowSelectFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, View.OnClickListener {
+public class CArrowSelectFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, View.OnClickListener, DialogInterface.OnClickListener {
     SimpleCursorAdapter adapter;
     Spinner spinner;
     LoaderManager loaderManager;
@@ -66,7 +66,17 @@ public class CArrowSelectFragment extends Fragment implements LoaderManager.Load
         switch (view.getId())   {
             case R.id.addArrow:
             {
-                ArrowAddDialog.newInstance().show(getFragmentManager().beginTransaction(), "dialog");
+                new AlertDialog.Builder(getActivity()).
+                        setTitle("Новый тип стрел").
+                        setView(getActivity().getLayoutInflater().inflate(R.layout.arrow_add_dialog,null)).
+                        setNegativeButton("Отменить", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.dismiss();
+                            }
+                        }).
+                        setPositiveButton("Сохранить", this)
+                        .create().show();
                 break;
             }
             case R.id.deleteArrow:
@@ -87,35 +97,14 @@ public class CArrowSelectFragment extends Fragment implements LoaderManager.Load
         return spinner.getSelectedItemId();
     }
 
-    private static class ArrowAddDialog extends DialogFragment {
-        static ArrowAddDialog newInstance() {
-            return new ArrowAddDialog();
-        }
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            return new AlertDialog.Builder(getActivity()).
-                    setTitle("Новый тип стрел").
-                    setView(getActivity().getLayoutInflater().inflate(R.layout.arrow_add_dialog,null)).
-                    setNegativeButton("Отменить", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            dismiss();
-                        }
-                    }).
-                    setPositiveButton("Сохранить", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            CArrow arrow = new CArrow(
-                                    ((EditText) ((AlertDialog)dialogInterface).findViewById(R.id.name)).getText().toString(),
-                                    ((EditText) ((AlertDialog)dialogInterface).findViewById(R.id.description)).getText().toString(),
-                                    Float.parseFloat(((EditText) ((AlertDialog)dialogInterface).findViewById(R.id.radius)).getText().toString()
-                                    ));
-                            ((StartActivity)getActivity()).saveArrow(arrow);
-                            dismiss();
-                        }
-                    }).create();
-        }
-
+    @Override
+    public void onClick(DialogInterface dialogInterface, int i) {
+            CArrow arrow = new CArrow(
+                    ((EditText) ((AlertDialog)dialogInterface).findViewById(R.id.name)).getText().toString(),
+                    ((EditText) ((AlertDialog)dialogInterface).findViewById(R.id.description)).getText().toString(),
+                    Float.parseFloat(((EditText) ((AlertDialog)dialogInterface).findViewById(R.id.radius)).getText().toString()
+                    ));
+            saveArrow(arrow);
+            dialogInterface.dismiss();
     }
 }
