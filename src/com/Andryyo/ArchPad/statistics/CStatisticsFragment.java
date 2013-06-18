@@ -3,7 +3,6 @@ package com.Andryyo.ArchPad.statistics;
 import java.util.Arrays;
 import java.util.Calendar;
 
-import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -171,9 +170,9 @@ public class CStatisticsFragment extends Fragment {
         @Override
         public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
             if (i==0)
-                return CSQLiteOpenHelper.getCursorLoader(context, CSQLiteOpenHelper.TABLE_DISTANCES);
+                return CSQLiteOpenHelper.getCursorLoader(getActivity(), CSQLiteOpenHelper.TABLE_DISTANCES);
             else
-                return CSQLiteOpenHelper.getCursorLoader(context, CSQLiteOpenHelper.TABLE_DISTANCES, i, bundle);
+                return CSQLiteOpenHelper.getCursorLoader(getActivity(), CSQLiteOpenHelper.TABLE_DISTANCES, i, bundle);
 
         }
 
@@ -181,6 +180,7 @@ public class CStatisticsFragment extends Fragment {
         public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
             if (cursorLoader.getId()==0)
             {
+                int i = cursor.getCount();
                 changeCursor(cursor);
                 if ((adapter.getGroupCount()!=0))
                     expandableListView.setSelection(adapter.getGroupCount()-1);
@@ -230,17 +230,17 @@ public class CStatisticsFragment extends Fragment {
             CDistance distance = new CDistance(cursor);
             sum = 0;
             LinearLayout statisticsBlock;
-            for (int i =0; i<distance.series.size()/2;i++)
+            for (int i =0; i<distance.rounds.size()/2;i++)
             {
                 statisticsBlock = (LinearLayout) infalInflater.inflate(R.layout.statistics_block,null);
-                fillStatisticsBlockView(statisticsBlock, new CShot[][]{distance.series.get(i*2).toArray(new CShot[0]),
-                        distance.series.get(i*2 + 1).toArray(new CShot[0])});
+                fillStatisticsBlockView(statisticsBlock, new CShot[][]{distance.rounds.get(i*2).toArray(new CShot[0]),
+                        distance.rounds.get(i*2 + 1).toArray(new CShot[0])});
                 ((LinearLayout) view).addView(statisticsBlock);
             }
-            if (distance.series.size()%2!=0)
+            if (distance.rounds.size()%2!=0)
             {
                 statisticsBlock = (LinearLayout) infalInflater.inflate(R.layout.statistics_block,null);
-                fillStatisticsBlockView(statisticsBlock, new CShot[][]{distance.series.lastElement().toArray(new CShot[0]),
+                fillStatisticsBlockView(statisticsBlock, new CShot[][]{distance.rounds.lastElement().toArray(new CShot[0]),
                         null});
                 ((LinearLayout) view).addView(statisticsBlock);
             }

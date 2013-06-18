@@ -20,11 +20,10 @@ import java.util.Vector;
 public class CDistance implements Serializable{
     long _id;
     public Calendar timemark;
-    public boolean isFinished;
     int numberOfArrows;
     int numberOfSeries;
     public long targetId;
-    public Vector<Vector<CShot>> series;
+    public Vector<Vector<CShot>> rounds;
     public long arrowId;
 
     public CDistance(int numberOfSeries, int numberOfArrows, long targetId, long arrowId)  {
@@ -33,17 +32,16 @@ public class CDistance implements Serializable{
         this.numberOfArrows = numberOfArrows;
         this.targetId = targetId;
         this.arrowId = arrowId;
-        isFinished = false;
-        series = new Vector<Vector<CShot>>();
-        series.add(new Vector<CShot>());
+        rounds = new Vector<Vector<CShot>>();
+        rounds.add(new Vector<CShot>());
     }
 
     public CDistance(Cursor cursor)
     {
-        //"series" "numberOfSeries" "numberOfArrows" "isFinished" "timemark"
+        //"rounds" "numberOfSeries" "numberOfArrows" "isFinished" "timemark"
         try
         {
-            series = (Vector<Vector<CShot>>) CSQLiteOpenHelper.setObjectBytes(cursor.getBlob(cursor.getColumnIndex("series")));
+            rounds = (Vector<Vector<CShot>>) CSQLiteOpenHelper.setObjectBytes(cursor.getBlob(cursor.getColumnIndex("rounds")));
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -53,21 +51,19 @@ public class CDistance implements Serializable{
         _id = cursor.getLong(cursor.getColumnIndex("_id"));
         numberOfSeries = cursor.getInt(cursor.getColumnIndex("numberOfSeries"));
         numberOfArrows = cursor.getInt(cursor.getColumnIndex("numberOfArrows"));
-        isFinished = (cursor.getInt(cursor.getColumnIndex("isFinished"))!=0);
         targetId = cursor.getLong(cursor.getColumnIndex("targetId"));
         arrowId = cursor.getLong(cursor.getColumnIndex("arrowId"));
     }
 
     public int addShot(CShot shot)   {
-        series.lastElement().add(shot);
-        if (series.lastElement().size() == numberOfArrows)
+        rounds.lastElement().add(shot);
+        if (rounds.lastElement().size() == numberOfArrows)
         {
-            series.add(new Vector<CShot>());
+            rounds.add(new Vector<CShot>());
         }
-        if (series.size() ==  numberOfSeries+1)
+        if (rounds.size() ==  numberOfSeries+1)
         {
-            series.remove(series.lastElement());
-            isFinished = true;
+            rounds.remove(rounds.lastElement());
             return 0;
         }
         else
@@ -75,23 +71,23 @@ public class CDistance implements Serializable{
     }
 
     public void deleteLastShot()    {
-        if (series.lastElement().size()>0)
+        if (rounds.lastElement().size()>0)
         {
-            series.lastElement().remove(series.lastElement().lastElement());
+            rounds.lastElement().remove(rounds.lastElement().lastElement());
         }
         else
-        if (series.size()>1)
+        if (rounds.size()>1)
             {
-                series.remove(series.lastElement());
-                series.lastElement().remove(series.lastElement().lastElement());
+                rounds.remove(rounds.lastElement());
+                rounds.lastElement().remove(rounds.lastElement().lastElement());
             }
     }
 
     public boolean isEmpty()    {
-        if (series.isEmpty())
+        if (rounds.isEmpty())
             return true;
         else
-        if ((series.size()==1)&&(series.lastElement().isEmpty()))
+        if ((rounds.size()==1)&&(rounds.lastElement().isEmpty()))
             return true;
         else
         return false;
@@ -102,10 +98,9 @@ public class CDistance implements Serializable{
         try
         {
         ContentValues values = new ContentValues();
-        values.put("series", CSQLiteOpenHelper.getObjectBytes(series));
+        values.put("rounds", CSQLiteOpenHelper.getObjectBytes(rounds));
         values.put("numberOfSeries",numberOfSeries);
         values.put("numberOfArrows",numberOfArrows);
-        values.put("isFinished",isFinished);
         values.put("timemark",timemark.getTimeInMillis());
         values.put("targetId",targetId);
         values.put("arrowId",arrowId);

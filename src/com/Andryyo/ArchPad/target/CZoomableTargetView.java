@@ -83,7 +83,7 @@ public class CZoomableTargetView extends CTargetView{
         Canvas buf = new Canvas(bitmap);
         super.onDraw(buf);
         if (distance!=null)
-            for (Vector<CShot> shots : distance.series)
+            for (Vector<CShot> shots : distance.rounds)
                 for (CShot shot : shots)
                     getTarget().drawShot(buf, getCenter(), arrow.radius, arrowPaint, shot);
         if ((haveZoom)&&(zoomSrcRect!=null))

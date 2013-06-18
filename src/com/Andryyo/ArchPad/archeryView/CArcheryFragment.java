@@ -1,14 +1,11 @@
 package com.Andryyo.ArchPad.archeryView;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Vibrator;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.view.*;
 import android.widget.LinearLayout;
@@ -43,6 +40,18 @@ public class CArcheryFragment extends Fragment implements IOnShotAddListener{
         setHasOptionsMenu(true);
     	}
 
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (savedInstanceState!=null)
+            restoreDistance(savedInstanceState);
+    }
+
+    private void restoreDistance(Bundle savedInstanceState) {
+        currentDistance = (CDistance) savedInstanceState.getSerializable("savedDistance");
+        mTargetView.setDistance(currentDistance);
+    }
+
     public void setOnUpdateListener(IOnUpdateListener listener)  {
         this.listener = listener;
     }
@@ -73,7 +82,7 @@ public class CArcheryFragment extends Fragment implements IOnShotAddListener{
         return parentLayout;
     }
 
-    public void saveCurrentDistance(boolean isPaused)  {
+    public void saveCurrentDistance()  {
         if (currentDistance!=null)
         {
         if (!currentDistance.isEmpty())
@@ -88,45 +97,17 @@ public class CArcheryFragment extends Fragment implements IOnShotAddListener{
                 Toast toast = Toast.makeText(context, e.getMessage(), 3000);
                 toast.show();
             }
-            if (!isPaused)
-                listener.update();
+            listener.update();
         }
         }
     }
-
-    public void loadDistances()  {
-        CSQLiteOpenHelper helper = CSQLiteOpenHelper.getHelper(context);
-        try
-        {
-            currentDistance = helper.getUnfinishedDistance();
-            mTargetView.setDistance(currentDistance);
-        }
-        catch (Exception e)
-        {
-            Toast toast = Toast.makeText(context, e.getMessage(), 3000);
-            toast.show();
-        }
-        }
 
 	public void deleteLastShot()    {
         if (currentDistance!=null)
 		    currentDistance.deleteLastShot();
 	}
 
-    public void endCurrentDistance() {
-        if (currentDistance!=null)
-        {
-            if (!currentDistance.isEmpty())
-            {
-                CSQLiteOpenHelper helper = CSQLiteOpenHelper.getHelper(context);
-                helper.delete(CSQLiteOpenHelper.TABLE_DISTANCES, currentDistance.getId());
-                currentDistance.isFinished = true;
-            }
-            else
-                currentDistance = null;
-        }
-    }
-
+    @Override
     public void addShot(CShot shot) {
         if (currentDistance == null)
         {
@@ -137,8 +118,7 @@ public class CArcheryFragment extends Fragment implements IOnShotAddListener{
         else
         if (currentDistance.addShot(shot) == 0)
         {
-            endCurrentDistance();
-            saveCurrentDistance(false);
+            saveCurrentDistance();
             previousDistance = currentDistance;
             currentDistance = null;
             mTargetView.setDistance(previousDistance);
@@ -181,7 +161,8 @@ public class CArcheryFragment extends Fragment implements IOnShotAddListener{
             }
             case R.id.save:
             {
-                endCurrentDistance();
+                //endCurrentDistance();
+                saveCurrentDistance();
                 getActivity().finish();
                 break;
             }
@@ -198,13 +179,18 @@ public class CArcheryFragment extends Fragment implements IOnShotAddListener{
     @Override
     public void onPause()   {
         super.onPause();
-        saveCurrentDistance(true);
         vibrator.cancel();
     }
 
     @Override
+    public void onSaveInstanceState(Bundle savedInstanceState)  {
+        super.onSaveInstanceState(savedInstanceState);
+        if (currentDistance!=null)
+            savedInstanceState.putSerializable("savedDistance", currentDistance);
+    }
+
+    @Override
     public void onResume()  {
-        loadDistances();
         vibrator = (Vibrator) context.getSystemService(context.VIBRATOR_SERVICE);
         super.onResume();
     }

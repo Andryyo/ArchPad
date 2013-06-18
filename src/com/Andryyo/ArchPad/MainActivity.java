@@ -42,7 +42,6 @@ public class MainActivity extends FragmentActivity implements IOnUpdateListener{
     @Override
     public void update() {
         ((CStatisticsFragment)fragments.elementAt(2)).update();
-        ((CNotesFragment)fragments.elementAt(0)).update();
     }
 
     private class PagerAdapter extends FragmentPagerAdapter {

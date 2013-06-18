@@ -41,10 +41,10 @@ public class СSeriesCounterView extends View {
         paint.setStyle(Paint.Style.FILL_AND_STROKE);
         CDistance distance;
         distance = mArcheryView.getCurrentDistance();
-        for (int i =0;i<distance.series.size();i++)
+        for (int i =0;i<distance.rounds.size();i++)
             canvas.drawCircle(radius,(i+1)*offset+2,radius,paint);
         paint.setStyle(Paint.Style.STROKE);
-        for (int i =distance.series.size();i<distance.numberOfSeries;i++)
+        for (int i =distance.rounds.size();i<distance.numberOfSeries;i++)
             canvas.drawCircle(radius,(i+1)*offset,radius,paint);
     }
 }

@@ -30,10 +30,18 @@ public class CSQLiteOpenHelper extends SQLiteOpenHelper {
     public static final String TABLE_SIGHTS = "sights";
     public static final String TABLE_NOTES = "notes";
     public static final String TABLE_TARGETS = "targets";
+    private SQLiteDatabase readableDatabase;
+    private SQLiteDatabase writableDatabase;
 
     private CSQLiteOpenHelper(Context context) {
         super(context, "Archery", null, 1);
         this.context = context;
+        readableDatabase = getReadableDatabase();
+    }
+
+    private void refresh()  {
+        if (!readableDatabase.isOpen())
+            readableDatabase = getReadableDatabase();
     }
 
     public static CSQLiteOpenHelper getHelper(Context context) {
@@ -54,8 +62,8 @@ public class CSQLiteOpenHelper extends SQLiteOpenHelper {
         database.execSQL(CREATE_SIGHTS_TABLE);
         String CREATE_NOTES_TABLE = "CREATE TABLE notes(_id INTEGER PRIMARY KEY, name TEXT, text TEXT, timemark INTEGER)";
         database.execSQL(CREATE_NOTES_TABLE);
-        String CREATE_DISTANCES_TABLE = "CREATE TABLE distances(_id INTEGER PRIMARY KEY,series BLOB,numberOfSeries INTEGER," +
-                "numberOfArrows INTEGER,isFinished INTEGER,timemark INTEGER,arrowId INTEGER," +
+        String CREATE_DISTANCES_TABLE = "CREATE TABLE distances(_id INTEGER PRIMARY KEY,rounds BLOB,numberOfSeries INTEGER," +
+                "numberOfArrows INTEGER,timemark INTEGER,arrowId INTEGER," +
                 "targetId INTEGER,FOREIGN KEY(targetId) REFERENCES targets(_id),FOREIGN KEY(arrowId) REFERENCES arrows(_id))";
         database.execSQL(CREATE_DISTANCES_TABLE);
     }
@@ -70,12 +78,14 @@ public class CSQLiteOpenHelper extends SQLiteOpenHelper {
         onCreate(database);
     }
 
-    private synchronized Cursor getCursor(String table)   {
-        return this.getReadableDatabase().query(table,null, null, null, null, null, null);
+    private Cursor getCursor(String table)   {
+        Cursor cursor =  readableDatabase.query(table,null, null, null, null, null, null);
+        int i = cursor.getCount();
+        return cursor;
     }
 
-    private synchronized Cursor getCursor(String table, long _id) {
-        return this.getReadableDatabase().query(table, null,
+    private Cursor getCursor(String table, long _id) {
+        return readableDatabase.query(table, null,
                 "_id=?", new String[]{Long.toString(_id)}, null, null, null, null);
     }
 
@@ -123,6 +133,7 @@ public class CSQLiteOpenHelper extends SQLiteOpenHelper {
             else
                 mCursor =  getHelper(context).getCursor(table, _id);
             if (mCursor != null) {
+                int i = mCursor.getCount();
                 // Ensure the cursor window is filled
                 mCursor.registerContentObserver(observer);
             }
@@ -189,130 +200,104 @@ public class CSQLiteOpenHelper extends SQLiteOpenHelper {
 
     }
 
-    public void delete(String table)  {
+    public synchronized void delete(String table)  {
         SQLiteDatabase database = this.getWritableDatabase();
         database.delete(table, null, null);
         database.close();
+        refresh();
     }
 
-    public void delete(String table, long _id)  {
+    public synchronized void delete(String table, long _id)  {
         SQLiteDatabase database = this.getWritableDatabase();
         database.delete(table, "_id = ?", new String[]{Long.toString(_id)});
         database.close();
+        refresh();
     }
 
     public CTarget getTarget(long _id) {
-        SQLiteDatabase database = this.getReadableDatabase();
-        Cursor cursor = database.query("targets",new String[]{"_id","name","distance","rings"},
-                "_id = ?",new String[]{Long.toString(_id)}
-        ,null,null,null);
+        Cursor cursor = readableDatabase.query("targets", new String[]{"_id", "name", "distance", "rings"},
+                "_id = ?", new String[]{Long.toString(_id)}
+                , null, null, null);
         if (!cursor.moveToFirst())
         {
             cursor.close();
-            database.close();
             return null;
         }
         else
         {
-            try
-            {
-            database.close();
+            try {
             return new CTarget(cursor);
-            }
-            catch (IOException e)
-            {
-                e.printStackTrace();
-                database.close();
-                return null;
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
-                database.close();
-                return null;
+            } catch (IOException e) {
+                e.printStackTrace();
             }
+            return null;
         }
     }
 
-    public void addTarget(CTarget target) {
+    public synchronized void addTarget(CTarget target) {
         SQLiteDatabase database = this.getWritableDatabase();
         target.writeToDatabase(database);
         database.close();
+        refresh();
     }
 
-    public void deleteTarget(long _id)    {
+    public synchronized void deleteTarget(long _id)    {
         SQLiteDatabase database = this.getWritableDatabase();
         database.delete(TABLE_TARGETS, "_id = ?", new String[]{Long.toString(_id)});
         database.delete(TABLE_DISTANCES, "arrowId=?", new String[]{Long.toString(_id)});
         database.close();
+        refresh();
     }
 
-    public void addDistance(CDistance distance) throws Exception{
+    public synchronized void addDistance(CDistance distance) throws Exception{
         SQLiteDatabase database = this.getWritableDatabase();
         distance.writeToDatabase(database);
         database.close();
+        refresh();
     }
 
     public CDistance getDistance(long id){
-        SQLiteDatabase database = this.getReadableDatabase();
-        Cursor cursor = database.query("distances", new String[]{"_id","series", "numberOfSeries", "numberOfArrows",
-                "isFinished", "timemark","targetId","arrowID"},
+        Cursor cursor = readableDatabase.query("distances", new String[]{"_id","rounds", "numberOfSeries", "numberOfArrows",
+                "timemark","targetId","arrowID"},
                 "_id=?", new String[]{Long.toString(id)}, null, null, null,null);
         if (cursor.moveToFirst()==false)
         {
             cursor.close();
-            database.close();
             return null;
         }
         CDistance distance = new CDistance(cursor);
         cursor.close();
-        database.close();
         return distance;
     }
 
-    public CDistance getUnfinishedDistance()    {
-        SQLiteDatabase database = this.getReadableDatabase();
-        Cursor cursor = database.query("distances", new String[]{"_id","series", "numberOfSeries", "numberOfArrows",
-                "isFinished", "timemark","targetId","arrowID"},
-                "isFinished=?", new String[]{String.valueOf(0)}, null, null, null,null);
-        if (cursor.moveToFirst()==false)
-        {
-            cursor.close();
-            database.close();
-            return null;
-        }
-        CDistance distance = new CDistance(cursor);
-        delete(TABLE_DISTANCES, distance.getId());
-        cursor.close();
-        database.close();
-        return distance;
-    }
-
-    public void addArrow(CArrow arrow)  {
+    public synchronized void addArrow(CArrow arrow)  {
         SQLiteDatabase database = this.getWritableDatabase();
         arrow.writeToDatabase(database);
         database.close();
+        refresh();
     }
 
-    public void deleteArrow(long _id)    {
+    public synchronized void deleteArrow(long _id)    {
         SQLiteDatabase database = this.getWritableDatabase();
         database.delete("arrows", "_id = ?", new String[]{Long.toString(_id)});
         database.delete("distances", "arrowId=?", new String[]{Long.toString(_id)});
         database.close();
+        refresh();
     }
 
     public CArrow getArrow(long _id)  {
-        SQLiteDatabase database = this.getReadableDatabase();
-        Cursor cursor = database.query("arrows",new String[]{"_id","name","description","radius"},
+        Cursor cursor = readableDatabase.query("arrows",new String[]{"_id","name","description","radius"},
                 "_id = ?",new String[]{Long.toString(_id)}
                 ,null,null,null);
         if (!cursor.moveToFirst())
         {
-            database.close();
             cursor.close();
             return null;
         }
         else
         {
-            database.close();
             CArrow arrow = new CArrow(cursor.getString(cursor.getColumnIndex("name")),
                               cursor.getString(cursor.getColumnIndex("description")),
                               cursor.getFloat(cursor.getColumnIndex("radius")),
@@ -322,35 +307,28 @@ public class CSQLiteOpenHelper extends SQLiteOpenHelper {
         }
     }
 
-    public String[] getSight(long id) {
-        SQLiteDatabase database = this.getReadableDatabase();
-        Cursor cursor = database.query("sights",new String[]{"_id","x","y"},
+    public synchronized String[] getSight(long id) {
+        Cursor cursor = readableDatabase.query("sights",new String[]{"_id","x","y"},
                 "_id = ?",new String[]{Long.toString(id)}
                 ,null,null,null);
         cursor.moveToFirst();
-        database.close();
         String[] strings = new String[]{Float.toString(cursor.getFloat(cursor.getColumnIndex("x"))),
                                            Float.toString(cursor.getFloat(cursor.getColumnIndex("y")))};
         cursor.close();
         return strings;
     }
 
-    public void addSight(String name, String description)   {
+    public synchronized void addSight(String name, String description)   {
         SQLiteDatabase database = this.getWritableDatabase();
-        try
-        {
-            ContentValues values = new ContentValues();
-            values.put("name", name);
-            values.put("description",description);
-            database.insert("sights",null,values);
-        }
-        catch (Exception e)
-        {
-        }
+        ContentValues values = new ContentValues();
+        values.put("name", name);
+        values.put("description",description);
+        database.insert("sights",null,values);
         database.close();
+        refresh();
     }
 
-    public void updateSight(long id, String x, String y) {
+    public synchronized void updateSight(long id, String x, String y) {
         SQLiteDatabase database = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         try {
@@ -365,31 +343,20 @@ public class CSQLiteOpenHelper extends SQLiteOpenHelper {
         catch (NumberFormatException e) {
             values.put("y", 0);
         }
-        try {
-            database.update("sights",values,"_id=?",new String[]{Long.toString(id)});
-        }
-        catch (Exception e)
-        {
-        }
-        finally {
-            database.close();
-        }
+        database.update("sights",values,"_id=?",new String[]{Long.toString(id)});
+        database.close();
+        refresh();
     }
 
-    public void addNote(String name,String text, long timemark)   {
+    public synchronized void addNote(String name,String text, long timemark)   {
         SQLiteDatabase database = this.getWritableDatabase();
-        try
-        {
-            ContentValues values = new ContentValues();
-            values.put("name", name);
-            values.put("text",text);
-            values.put("timemark",timemark);
-            database.insert("notes",null,values);
-        }
-        catch (Exception e)
-        {
-        }
+        ContentValues values = new ContentValues();
+        values.put("name", name);
+        values.put("text",text);
+        values.put("timemark",timemark);
+        database.insert("notes",null,values);
         database.close();
+        refresh();
     }
 
 

@@ -2,4 +2,5 @@
     <item android:id="@+id/sight" android:title="Прицелы"/>
     <item android:id="@+id/save" android:title="Закончить серию"/>
     <item android:id="@+id/info" android:title="О программе"/>
+    <item android:id="@+id/update" android:title="Обновить статистику"/>
 </menu>

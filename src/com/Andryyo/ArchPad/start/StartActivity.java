@@ -8,6 +8,7 @@ import android.content.Intent;
 import com.Andryyo.ArchPad.CArrow;
 import com.Andryyo.ArchPad.MainActivity;
 import com.Andryyo.ArchPad.R;
+import com.Andryyo.ArchPad.database.CSQLiteOpenHelper;
 import com.Andryyo.ArchPad.target.CTarget;
 
 public class StartActivity extends FragmentActivity{

@@ -45,10 +45,10 @@ public class CCurrentSeriesView extends View {
         distance = mArcheryView.getCurrentDistance();
         textWidth = screenWidth/(distance.numberOfArrows+1);
         Vector<CShot> buf;
-        if ((distance.series.lastElement().isEmpty())&&(distance.series.size()>1))
-            buf = distance.series.get(distance.series.size()-2);
+        if ((distance.rounds.lastElement().isEmpty())&&(distance.rounds.size()>1))
+            buf = distance.rounds.get(distance.rounds.size()-2);
         else
-            buf = distance.series.lastElement();
+            buf = distance.rounds.lastElement();
         for (CShot shot : buf)
         {
             canvas.drawText(shot.toString(), i*textWidth+textWidth/2, textHeight, paint);

@@ -27,11 +27,10 @@ import java.util.Calendar;
  * Time: 11:39
  * To change this template use File | Settings | File Templates.
  */
-public class CNotesFragment extends Fragment implements View.OnClickListener {
+public class CNotesFragment extends Fragment implements View.OnClickListener, DialogInterface.OnClickListener {
 
     CMySimpleCursorTreeAdapter adapter;
     ExpandableListView expandableListView;
-    LayoutInflater inflater;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -81,24 +80,21 @@ public class CNotesFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        LayoutInflater inflater = getActivity().getLayoutInflater();
-        builder.setTitle("Новая заметка");
-        builder.setView(inflater.inflate(R.layout.add_dialog, null));
-        builder.setPositiveButton("Создать", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int id) {
-                CSQLiteOpenHelper.getHelper(getActivity()).addNote(
-                        ((EditText) ((AlertDialog) dialog).findViewById(R.id.text1)).getText().toString(),
-                        ((EditText) ((AlertDialog) dialog).findViewById(R.id.text2)).getText().toString(),
-                        Calendar.getInstance().getTimeInMillis()
+        new AlertDialog.Builder(getActivity())
+        .setTitle("Новая заметка")
+        .setView(getActivity().getLayoutInflater().inflate(R.layout.add_dialog, null))
+        .setPositiveButton("Создать", this)
+        .create().show();
+    }
 
-                );
-                ((MainActivity)getActivity()).update();
-            }
-        });
-        AlertDialog dialog = builder.create();
-        dialog.show();
+    @Override
+    public void onClick(DialogInterface dialogInterface, int i) {
+        CSQLiteOpenHelper.getHelper(getActivity()).addNote(
+                ((EditText) ((AlertDialog) dialogInterface).findViewById(R.id.text1)).getText().toString(),
+                ((EditText) ((AlertDialog) dialogInterface).findViewById(R.id.text2)).getText().toString(),
+                Calendar.getInstance().getTimeInMillis()
+        );
+        update();
     }
 
     class CMySimpleCursorTreeAdapter extends SimpleCursorTreeAdapter implements LoaderManager.LoaderCallbacks<Cursor>{
