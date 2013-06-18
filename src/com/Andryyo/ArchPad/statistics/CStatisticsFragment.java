@@ -25,20 +25,22 @@ public class CStatisticsFragment extends Fragment {
 
     //TODO:Поработать над статистикой:подсчёт очков, графики т.д.
 
-    public CStatisticsFragment(Context context)  {
-        this.context = context;
-        setHasOptionsMenu(true);
-    }
-
     public void update()    {
         adapter.update();
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        context = getActivity();
+        setHasOptionsMenu(true);
+        adapter = new ExpandListAdapter(getLoaderManager(),context);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)  {
         expandableListView = new ExpandableListView(context);
-        adapter = new ExpandListAdapter(getLoaderManager(),context);
         expandableListView.setAdapter(adapter);
         registerForContextMenu(expandableListView);
         return expandableListView;
@@ -57,18 +59,6 @@ public class CStatisticsFragment extends Fragment {
     	{
 			adapter.deleteAllDistances();
 	    	break;
-    	}
-    	case R.id.expand:
-    	{
-    		for (int i=0;i<adapter.getGroupCount();i++)
-    			expandableListView.expandGroup(i);
-    		break;
-    	}
-    	case R.id.hide:
-        {
-    		for (int i=0;i<adapter.getGroupCount();i++)
-    			expandableListView.collapseGroup(i);
-    		break;
     	}
     	}
     	return true;
@@ -170,9 +160,9 @@ public class CStatisticsFragment extends Fragment {
         @Override
         public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
             if (i==0)
-                return CSQLiteOpenHelper.getCursorLoader(getActivity(), CSQLiteOpenHelper.TABLE_DISTANCES);
+                return CSQLiteOpenHelper.getCursorLoader(context, CSQLiteOpenHelper.TABLE_DISTANCES);
             else
-                return CSQLiteOpenHelper.getCursorLoader(getActivity(), CSQLiteOpenHelper.TABLE_DISTANCES, i, bundle);
+                return CSQLiteOpenHelper.getCursorLoader(context, CSQLiteOpenHelper.TABLE_DISTANCES, i, bundle);
 
         }
 
@@ -180,7 +170,6 @@ public class CStatisticsFragment extends Fragment {
         public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
             if (cursorLoader.getId()==0)
             {
-                int i = cursor.getCount();
                 changeCursor(cursor);
                 if ((adapter.getGroupCount()!=0))
                     expandableListView.setSelection(adapter.getGroupCount()-1);

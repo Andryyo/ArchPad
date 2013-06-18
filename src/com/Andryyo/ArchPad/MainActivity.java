@@ -32,7 +32,7 @@ public class MainActivity extends FragmentActivity implements IOnUpdateListener{
                 ,intent.getIntExtra(StartActivity.ARROWS_IN_SERIES,1)
                 ,intent.getLongExtra(StartActivity.TARGET_ID,1)
                 ,intent.getLongExtra(StartActivity.ARROW_ID,1)));
-        fragments.add(new CStatisticsFragment(getApplication()));
+        fragments.add(new CStatisticsFragment());
         pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(new PagerAdapter(getSupportFragmentManager()));
         ((CArcheryFragment)fragments.elementAt(1)).setOnUpdateListener(this);

@@ -47,15 +47,6 @@ public class CArcheryFragment extends Fragment implements IOnShotAddListener{
             restoreDistance(savedInstanceState);
     }
 
-    private void restoreDistance(Bundle savedInstanceState) {
-        currentDistance = (CDistance) savedInstanceState.getSerializable("savedDistance");
-        mTargetView.setDistance(currentDistance);
-    }
-
-    public void setOnUpdateListener(IOnUpdateListener listener)  {
-        this.listener = listener;
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)  {
@@ -80,6 +71,15 @@ public class CArcheryFragment extends Fragment implements IOnShotAddListener{
         mCurrentSeriesView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, 0, 0.1f));
         parentLayout.addView(mCurrentSeriesView);
         return parentLayout;
+    }
+
+    private void restoreDistance(Bundle savedInstanceState) {
+        currentDistance = (CDistance) savedInstanceState.getSerializable("savedDistance");
+        mTargetView.setDistance(currentDistance);
+    }
+
+    public void setOnUpdateListener(IOnUpdateListener listener)  {
+        this.listener = listener;
     }
 
     public void saveCurrentDistance()  {
