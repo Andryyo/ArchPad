@@ -8,6 +8,7 @@ import android.content.Intent;
 import com.Andryyo.ArchPad.CArrow;
 import com.Andryyo.ArchPad.MainActivity;
 import com.Andryyo.ArchPad.R;
+import com.Andryyo.ArchPad.archeryView.CArcheryFragment;
 import com.Andryyo.ArchPad.database.CSQLiteOpenHelper;
 import com.Andryyo.ArchPad.target.CTarget;
 
@@ -15,10 +16,6 @@ public class StartActivity extends FragmentActivity{
 	
 	public Spinner Number_of_series_spinner;
     public Spinner Arrows_in_series_spinner;
-    public final static String NUMBER_OF_SERIES="com.Andryyo.Archery.NUMBER_OF_SERIES";
-    public final static String ARROWS_IN_SERIES="com.Andryyo.Archery.ARROWS_IN_SERIES";
-    public final static String TARGET_ID="com.Andryyo.Archery.TARGET_ID";
-    public final static String ARROW_ID="com.Andryyo.Archery.ARROW_ID";
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -51,10 +48,10 @@ public class StartActivity extends FragmentActivity{
         else
         {
             Intent intent = new Intent(this, MainActivity.class);
-            intent.putExtra(NUMBER_OF_SERIES, Integer.parseInt(Number_of_series_spinner.getSelectedItem().toString()));
-            intent.putExtra(ARROWS_IN_SERIES, Integer.parseInt(Arrows_in_series_spinner.getSelectedItem().toString()));
-            intent.putExtra(TARGET_ID,targetId);
-            intent.putExtra(ARROW_ID,arrowId);
+            intent.putExtra(CArcheryFragment.NUMBER_OF_ROUNDS, Integer.parseInt(Number_of_series_spinner.getSelectedItem().toString()));
+            intent.putExtra(CArcheryFragment.ARROWS_IN_ROUND, Integer.parseInt(Arrows_in_series_spinner.getSelectedItem().toString()));
+            intent.putExtra(CArcheryFragment.TARGET_ID,targetId);
+            intent.putExtra(CArcheryFragment.ARROW_ID,arrowId);
     	    startActivity(intent);
         }
     }

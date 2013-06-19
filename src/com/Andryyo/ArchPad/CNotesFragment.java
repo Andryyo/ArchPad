@@ -148,8 +148,11 @@ public class CNotesFragment extends Fragment implements View.OnClickListener, Di
                     expandableListView.setSelection(getGroupCount()-1);
             }
             else
+            try {
                 setChildrenCursor(((CSQLiteOpenHelper.CSQLiteCursorLoader)cursorLoader)
                         .getData().getInt(GROUP_POS), cursor);
+            } catch (NullPointerException e)
+                {e.printStackTrace();}
         }
 
         @Override
