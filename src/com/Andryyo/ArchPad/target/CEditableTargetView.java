@@ -2,9 +2,11 @@ package com.Andryyo.ArchPad.target;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import com.Andryyo.ArchPad.CShot;
+import com.Andryyo.ArchPad.archeryView.CArcheryFragment;
 import com.Andryyo.ArchPad.archeryView.CDistance;
 import com.Andryyo.ArchPad.archeryView.IOnShotAddListener;
 
@@ -19,6 +21,7 @@ import com.Andryyo.ArchPad.archeryView.IOnShotAddListener;
 public class CEditableTargetView extends CZoomableTargetView {
 
     private IOnShotAddListener listener;
+    private ViewPager viewPager;
 
     public CEditableTargetView(Context context, CDistance distance) {
         super(context, distance);
@@ -32,6 +35,10 @@ public class CEditableTargetView extends CZoomableTargetView {
         super(context);
     }
 
+    public void setViewPager(ViewPager viewPager)  {
+        this.viewPager = viewPager;
+    }
+
     public void setOnShotAddListener(IOnShotAddListener listener)   {
         this.listener = listener;
     }
@@ -39,11 +46,19 @@ public class CEditableTargetView extends CZoomableTargetView {
     @Override
     public boolean onTouchEvent(MotionEvent me) {
         super.onTouchEvent(me);
+        if (me.getAction()==MotionEvent.ACTION_DOWN)
+        {
+            if (viewPager!=null)
+                viewPager.requestDisallowInterceptTouchEvent(true);
+        }
         if (me.getAction()==MotionEvent.ACTION_UP)
         {
             listener.addShot(new CShot(getTarget().rings, me.getX() / getCenter() - 1, me.getY() / getCenter() - 1,
                 getArrowRadius()));
             cancelDrawSightMark();
+            CArcheryFragment.vibrator.vibrate(50);
+            if (viewPager!=null)
+                viewPager.requestDisallowInterceptTouchEvent(false);
         }
         if (me.getAction()==MotionEvent.ACTION_MOVE)
         {

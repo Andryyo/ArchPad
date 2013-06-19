@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import com.Andryyo.ArchPad.archeryView.CArcheryFragment;
 import com.Andryyo.ArchPad.start.StartActivity;
 import com.Andryyo.ArchPad.statistics.CStatisticsFragment;
@@ -26,14 +27,14 @@ public class MainActivity extends FragmentActivity implements IOnUpdateListener{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Intent intent = getIntent();
+        pager = (ViewPager) findViewById(R.id.pager);
         fragments.add(new CNotesFragment());
         fragments.add(new CArcheryFragment(getApplication()
                 ,intent.getIntExtra(StartActivity.NUMBER_OF_SERIES,1)
                 ,intent.getIntExtra(StartActivity.ARROWS_IN_SERIES,1)
                 ,intent.getLongExtra(StartActivity.TARGET_ID,1)
-                ,intent.getLongExtra(StartActivity.ARROW_ID,1)));
+                ,intent.getLongExtra(StartActivity.ARROW_ID,1), pager));
         fragments.add(new CStatisticsFragment());
-        pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(new PagerAdapter(getSupportFragmentManager()));
         ((CArcheryFragment)fragments.elementAt(1)).setOnUpdateListener(this);
         pager.setCurrentItem(1,false);

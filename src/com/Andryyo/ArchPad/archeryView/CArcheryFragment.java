@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.view.*;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
@@ -30,13 +31,15 @@ public class CArcheryFragment extends Fragment implements IOnShotAddListener{
     private Context context;
     private IOnUpdateListener listener;
     private CEditableTargetView mTargetView;
+    private ViewPager viewPager;
     
-	public CArcheryFragment(Context context, int numberOfSeries, int arrowsInSeries, long targetId, long arrowId) {
+	public CArcheryFragment(Context context, int numberOfSeries, int arrowsInSeries, long targetId, long arrowId, ViewPager viewPager) {
 		this.numberOfSeries = numberOfSeries;
 		this.arrowsInSeries = arrowsInSeries;
         this.targetId = targetId;
         this.arrowId = arrowId;
         this.context = context;
+        this.viewPager = viewPager;
         setHasOptionsMenu(true);
     	}
 
@@ -61,7 +64,8 @@ public class CArcheryFragment extends Fragment implements IOnShotAddListener{
         mTargetView.setOnShotAddListener(this);
         mTargetView.setTarget(targetId);
         mTargetView.setArrow(arrowId);
-        mTargetView.setLayoutParams(new LayoutParams(0, LayoutParams.MATCH_PARENT,15f));
+        mTargetView.setLayoutParams(new LayoutParams(0, LayoutParams.MATCH_PARENT, 15f));
+        mTargetView.setViewPager(viewPager);
         layout.addView(mTargetView);
         СSeriesCounterView mSeriesCounterView = new СSeriesCounterView(context,this);
         mSeriesCounterView.setLayoutParams(new LayoutParams(0, LayoutParams.MATCH_PARENT,1f));
@@ -161,7 +165,6 @@ public class CArcheryFragment extends Fragment implements IOnShotAddListener{
             }
             case R.id.save:
             {
-                //endCurrentDistance();
                 saveCurrentDistance();
                 getActivity().finish();
                 break;
@@ -180,6 +183,13 @@ public class CArcheryFragment extends Fragment implements IOnShotAddListener{
     public void onPause()   {
         super.onPause();
         vibrator.cancel();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if ((currentDistance!=null)&&(!currentDistance.isEmpty()))
+            saveCurrentDistance();
     }
 
     @Override
