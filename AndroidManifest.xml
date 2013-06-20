@@ -35,8 +35,10 @@
                 android:theme="@android:style/Theme.Dialog"
                 android:label="@string/title_activity_sight"
                 />
-        <activity android:name=".CNotesFragment"
+        <activity android:name=".note.CNotesFragment"
                   />
+        <activity android:name=".note.CNoteCreateActivity"
+                />
         <activity android:name=".statistics.CRecordViewFragment"
                   android:theme="@android:style/Theme.Dialog"
                 />

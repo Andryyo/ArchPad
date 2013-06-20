@@ -1,10 +1,11 @@
-package com.Andryyo.ArchPad;
+package com.Andryyo.ArchPad.note;
 
 
 
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.SimpleCursorTreeAdapter;
 import android.widget.TextView;
+import com.Andryyo.ArchPad.R;
 import com.Andryyo.ArchPad.database.CSQLiteOpenHelper;
 
 import java.util.Calendar;
@@ -27,7 +29,7 @@ import java.util.Calendar;
  * Time: 11:39
  * To change this template use File | Settings | File Templates.
  */
-public class CNotesFragment extends Fragment implements View.OnClickListener, DialogInterface.OnClickListener {
+public class CNotesFragment extends Fragment implements View.OnClickListener {
 
     CMySimpleCursorTreeAdapter adapter;
     ExpandableListView expandableListView;
@@ -79,22 +81,15 @@ public class CNotesFragment extends Fragment implements View.OnClickListener, Di
     }
 
     @Override
-    public void onClick(View view) {
-        new AlertDialog.Builder(getActivity())
-        .setTitle("Новая заметка")
-        .setView(getActivity().getLayoutInflater().inflate(R.layout.add_dialog, null))
-        .setPositiveButton("Создать", this)
-        .create().show();
+    public void onResume()  {
+        super.onResume();
+        update();
     }
 
     @Override
-    public void onClick(DialogInterface dialogInterface, int i) {
-        CSQLiteOpenHelper.getHelper(getActivity()).addNote(
-                ((EditText) ((AlertDialog) dialogInterface).findViewById(R.id.text1)).getText().toString(),
-                ((EditText) ((AlertDialog) dialogInterface).findViewById(R.id.text2)).getText().toString(),
-                Calendar.getInstance().getTimeInMillis()
-        );
-        update();
+    public void onClick(View view) {
+        Intent intent = new Intent(getActivity(), CNoteCreateActivity.class);
+        startActivity(intent);
     }
 
     class CMySimpleCursorTreeAdapter extends SimpleCursorTreeAdapter implements LoaderManager.LoaderCallbacks<Cursor>{

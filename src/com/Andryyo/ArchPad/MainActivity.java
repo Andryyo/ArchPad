@@ -1,25 +1,19 @@
 package com.Andryyo.ArchPad;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import com.Andryyo.ArchPad.archeryView.CArcheryFragment;
-import com.Andryyo.ArchPad.start.StartActivity;
+import com.Andryyo.ArchPad.note.CNotesFragment;
 import com.Andryyo.ArchPad.statistics.CStatisticsFragment;
 import com.Andryyo.ArchPad.statistics.IOnUpdateListener;
-
-import java.util.Vector;
 
 public class MainActivity extends FragmentActivity implements DialogInterface.OnClickListener{
 
