@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="horizontal"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content">
+    <Gallery
+            android:id = "@+id/gallery"
+            android:layout_height="100dp"
+            android:layout_width="0dp"
+            android:gravity="center_horizontal"
+            android:unselectedAlpha="0.5"
+            android:layout_weight="1">
+    </Gallery>
+
+    <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:src="@android:drawable/ic_input_add"
+            android:id="@+id/addTarget"/>
+
+    <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:src="@android:drawable/ic_delete"
+            android:id="@+id/deleteTarget"/>
+</LinearLayout>

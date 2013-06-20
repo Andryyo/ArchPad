@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#ffffff"
+            android:text="Вертикаль прицела"
+            />
+
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+
+        <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:id="@+id/dec_y"
+                android:longClickable="false"
+                android:src="@android:drawable/ic_media_rew"
+                android:onClick="onClick"/>
+
+        <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/sight_y"
+                android:inputType="numberSigned|numberDecimal"
+                android:layout_weight="1"/>
+
+        <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:id="@+id/inc_y"
+                android:src="@android:drawable/ic_media_ff"
+                android:onClick="onClick"/>
+    </LinearLayout>
+
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Горизонт прицела"
+            android:textColor="#ffffff"
+            />
+
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+
+        <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:id="@+id/dec_x"
+                android:src="@android:drawable/ic_media_rew"
+                android:onClick="onClick"/>
+
+        <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/sight_x"
+                android:inputType="numberSigned|numberDecimal"
+                android:layout_weight="1"/>
+
+        <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:id="@+id/inc_x"
+                android:src="@android:drawable/ic_media_ff"
+                android:onClick="onClick"/>
+    </LinearLayout>
+
+    <fragment android:name="com.Andryyo.ArchPad.sight.CSightSelectFragment"
+              android:id = "@+id/sight_select_fragment"
+              android:layout_height="wrap_content"
+              android:layout_width="match_parent"/>
+
+</LinearLayout>

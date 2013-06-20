@@ -1,9 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.archery"
+    package="com.Andryyo.ArchPad"
     android:versionCode="1"
     android:versionName="1.0" >
 
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 	<uses-permission android:name="android.permission.VIBRATE" />
     <uses-sdk
         android:minSdkVersion="8"
@@ -17,31 +16,28 @@
             android:name=".start.StartActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".MainActivity"
-            android:screenOrientation="portrait">
+            android:name=".MainActivity">
             <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.archery.MainActivity" />
+                    android:name="android.support.PARENT_ACTIVITY"
+                    android:value="com.example.archery.Start" />
         </activity>
         <activity
-            android:name=".statistics.StatisticsActivity">
+            android:name=".statistics.CStatisticsFragment">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.archery.Start" />
         </activity>
-        <activity android:name=".sight.CSightPropertiesActivity"
+        <activity android:name=".sight.ActivitySightProperties"
                 android:theme="@android:style/Theme.Dialog"
                 android:label="@string/title_activity_sight"
                 />
-        <activity android:name=".NotesActivity"
+        <activity android:name=".CNotesFragment"
                   />
-        <activity android:name=".start.TargetCreateActivity"/>
-        <activity android:name=".statistics.CRecordView"
+        <activity android:name=".statistics.CRecordViewFragment"
                   android:theme="@android:style/Theme.Dialog"
                 />
     </application>
