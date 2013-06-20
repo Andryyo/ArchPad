@@ -62,6 +62,7 @@ public class CArcheryFragment extends Fragment implements IOnShotAddListener{
             targetId = savedInstanceState.getLong(TARGET_ID);
             arrowId = savedInstanceState.getLong(ARROW_ID);
         }
+        setHasOptionsMenu(true);
         LinearLayout parentLayout = new LinearLayout(context);
         parentLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
@@ -192,12 +193,6 @@ public class CArcheryFragment extends Fragment implements IOnShotAddListener{
                     }
                 })
                 .create().show();
-                break;
-            }
-            case R.id.save:
-            {
-                saveCurrentDistance();
-                getActivity().finish();
                 break;
             }
             case R.id.sight:

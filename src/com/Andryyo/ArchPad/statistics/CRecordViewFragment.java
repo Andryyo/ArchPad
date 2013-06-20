@@ -18,7 +18,10 @@ import com.Andryyo.ArchPad.target.CZoomableTargetView;
  */
 public class CRecordViewFragment extends DialogFragment {
 
+    public static final String RECORD_ID = "recordId";
     private long id;
+
+    public CRecordViewFragment()    {}
 
     public CRecordViewFragment(long id)  {
         super();
@@ -26,12 +29,25 @@ public class CRecordViewFragment extends DialogFragment {
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (savedInstanceState!=null)
+            id = savedInstanceState.getLong(RECORD_ID);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle out)   {
+        super.onSaveInstanceState(out);
+        out.putLong(RECORD_ID, id);
+    }
+
+    @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        LinearLayout view = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.activity_record_view,null);
+        LinearLayout view = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.record_view_fragment,null);
         CZoomableTargetView targetView = new CZoomableTargetView(getActivity(),id);
         targetView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT));
+                ViewGroup.LayoutParams.MATCH_PARENT));
         view.addView(targetView);
         builder.setView(view);
         return builder.create();

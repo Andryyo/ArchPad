@@ -1,5 +1,4 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/sight" android:title="Прицелы"/>
-    <item android:id="@+id/save" android:title="Закончить серию"/>
     <item android:id="@+id/info" android:title="О программе"/>
 </menu>

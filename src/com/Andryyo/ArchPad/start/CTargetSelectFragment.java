@@ -210,7 +210,7 @@ public class CTargetSelectFragment extends Fragment implements LoaderManager.Loa
                         try {
                             points = Integer.parseInt(((EditText) alertDialog.findViewById(R.id.points)).getText().toString());
                         } catch (NumberFormatException e) {}
-                        int color = ((CColoredSeekBar)((AlertDialog) dialog).findViewById(R.id.ringColor)).getSelectedColor();
+                        int color = ((CColorSelectView)((AlertDialog) dialog).findViewById(R.id.ringColor)).getSelectedColor();
                         ((StartActivity)getActivity()).saveRing(
                                                        ringWidth,
                                                        points,

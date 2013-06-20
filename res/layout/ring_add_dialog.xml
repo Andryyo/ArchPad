@@ -42,7 +42,7 @@
             android:text="Цвет кольца:"
             />
 
-    <com.Andryyo.ArchPad.start.CColoredSeekBar
+    <com.Andryyo.ArchPad.start.CColorSelectView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/ringColor"
