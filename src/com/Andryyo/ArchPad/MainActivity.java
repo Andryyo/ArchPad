@@ -1,6 +1,8 @@
 package com.Andryyo.ArchPad;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
@@ -19,7 +21,7 @@ import com.Andryyo.ArchPad.statistics.IOnUpdateListener;
 
 import java.util.Vector;
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends FragmentActivity implements DialogInterface.OnClickListener{
 
     ViewPager pager;
     PagerAdapter adapter;
@@ -38,6 +40,25 @@ public class MainActivity extends FragmentActivity {
             fragment.setOnTouchListener(adapter);
             fragment.setOnUpdateListener(adapter);
         }
+    }
+
+    @Override
+    public void onBackPressed()    {
+       new AlertDialog.Builder(this)
+               .setMessage("Вы уверены, что хотите завершить раунд?")
+               .setPositiveButton("Да", this)
+               .setNegativeButton("Нет", new DialogInterface.OnClickListener() {
+                   @Override
+                   public void onClick(DialogInterface dialogInterface, int i) {
+                       dialogInterface.dismiss();
+                   }
+               })
+               .create().show();
+    }
+
+    @Override
+    public void onClick(DialogInterface dialogInterface, int i) {
+        super.onBackPressed();
     }
 
     private class PagerAdapter extends FragmentPagerAdapter implements IOnUpdateListener, View.OnTouchListener {
