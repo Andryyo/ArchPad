@@ -86,6 +86,7 @@ public class CTargetSelectFragment extends Fragment implements LoaderManager.Loa
     }
 
     public void saveTarget(CTarget target) {
+        if (target!=null)
         if (!target.isEmpty())
         {
             target.addClosingRing();
@@ -130,9 +131,9 @@ public class CTargetSelectFragment extends Fragment implements LoaderManager.Loa
             return dialog;
         }
 
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View view = inflater.inflate(R.layout.target_create_dialog, null);
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState)    {
+            View view = getActivity().getLayoutInflater().inflate(R.layout.target_create_dialog, null);
             if (savedInstanceState==null)
                 target = new CTarget("",new Vector<CRing>(),0);
             else
@@ -144,7 +145,22 @@ public class CTargetSelectFragment extends Fragment implements LoaderManager.Loa
             targetPreview.setTarget(target);
             (view.findViewById(R.id.addRing)).setOnClickListener(this);
             (view.findViewById(R.id.deleteRing)).setOnClickListener(this);
-            return view;
+            return new AlertDialog.Builder(getActivity())
+                    .setView(view)
+                    .setPositiveButton("Сохранить", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            ((StartActivity)getActivity()).saveTarget(target);
+                            dialogInterface.dismiss();
+                        }
+                    })
+                    .setNegativeButton("Отменить", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    })
+                    .create();
         }
 
         public void saveRing(float ringWidth, int points, int color)    {
@@ -154,12 +170,6 @@ public class CTargetSelectFragment extends Fragment implements LoaderManager.Loa
                     distanceFromCenter,
                     color));
             targetPreview.invalidate();
-        }
-
-        @Override
-        public void onDismiss(DialogInterface dialog) {
-            ((StartActivity)getActivity()).saveTarget(target);
-            super.onDismiss(dialog);
         }
 
         @Override
