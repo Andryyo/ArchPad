@@ -29,7 +29,6 @@ public class CShot implements Serializable{
     public CShot(Vector<CRing> rings,float x,float y,float arrowRadius) {
         this.x = x;
         this.y = y;
-        this.calcPoints(rings,arrowRadius);
     }
 
     public int getPoints()  {
@@ -46,15 +45,7 @@ public class CShot implements Serializable{
         return (float) Math.hypot(x,y);
     }
 
-    public void calcPoints(Vector<CRing> rings,float arrowRadius)
-    {
-        float distance = getDistance();
-        for (int i = 0;i<rings.size();i++)
-            if (distance-arrowRadius<=rings.get(i).distanceFromCenter)
-            {
-                points = rings.get(i).points;
-                return;
-            }
-        points = 0;
+    public void setPoints(int points) {
+        this.points = points;
     }
 }

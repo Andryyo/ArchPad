@@ -99,12 +99,16 @@ public class CArrowSelectFragment extends Fragment implements LoaderManager.Load
 
     @Override
     public void onClick(DialogInterface dialogInterface, int i) {
+        try {
             CArrow arrow = new CArrow(
                     ((EditText) ((AlertDialog)dialogInterface).findViewById(R.id.name)).getText().toString(),
                     ((EditText) ((AlertDialog)dialogInterface).findViewById(R.id.description)).getText().toString(),
                     Float.parseFloat(((EditText) ((AlertDialog)dialogInterface).findViewById(R.id.radius)).getText().toString()
                     ));
             saveArrow(arrow);
+        } catch (Exception e)   {
+            e.printStackTrace();
+        }
             dialogInterface.dismiss();
     }
 }

@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import com.Andryyo.ArchPad.CShot;
 import com.Andryyo.ArchPad.database.CSQLiteOpenHelper;
+import com.Andryyo.ArchPad.target.CTarget;
 
 import java.io.*;
 import java.util.Calendar;

@@ -135,7 +135,7 @@ public class CTargetSelectFragment extends Fragment implements LoaderManager.Loa
         public Dialog onCreateDialog(Bundle savedInstanceState)    {
             View view = getActivity().getLayoutInflater().inflate(R.layout.target_create_dialog, null);
             if (savedInstanceState==null)
-                target = new CTarget("",new Vector<CRing>(),0);
+                target = new CTarget("",new Vector<CRing>(),0,0);
             else
             {
                 distanceFromCenter = savedInstanceState.getFloat("distanceFromCenter");

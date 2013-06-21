@@ -37,22 +37,26 @@ public class CZoomableTargetView extends CTargetView{
         this.distance = distance;
         arrow = helper.getArrow(distance.arrowId);
         arrowPaint.setColor(Color.GREEN);
+        arrowPaint.setStyle(Paint.Style.STROKE);
     }
 
     public CZoomableTargetView(Context context, long distanceId) {
         super(context);
         setDistance(CSQLiteOpenHelper.getHelper(context).getDistance(distanceId));
         arrowPaint.setColor(Color.GREEN);
+        arrowPaint.setStyle(Paint.Style.STROKE);
     }
 
     public CZoomableTargetView(Context context) {
         super(context);
         arrowPaint.setColor(Color.GREEN);
+        arrowPaint.setStyle(Paint.Style.STROKE);
     }
 
     public CZoomableTargetView(Context context, AttributeSet attrs) {
         super(context, attrs);
         arrowPaint.setColor(Color.GREEN);
+        arrowPaint.setStyle(Paint.Style.STROKE);
     }
 
     public void setDistance(CDistance distance) {
@@ -85,13 +89,12 @@ public class CZoomableTargetView extends CTargetView{
         if (distance!=null)
             for (Vector<CShot> shots : distance.rounds)
                 for (CShot shot : shots)
-                    getTarget().drawShot(buf, getCenter(), arrow.radius, arrowPaint, shot);
+                    getTarget().drawShot(buf, arrow.radius, arrowPaint, shot);
         if ((haveZoom)&&(zoomSrcRect!=null))
         {
             if (haveSightMark)
             {
-                buf.drawPoint(sightMarkX,sightMarkY,arrowPaint);
-                buf.drawCircle(sightMarkX,sightMarkY,getArrowRadius()*getCenter(),arrowPaint);
+                drawSightMark(buf);
             }
             buf.drawBitmap(bitmap,zoomSrcRect,zoomDestRect,null);
         }
@@ -101,7 +104,12 @@ public class CZoomableTargetView extends CTargetView{
         }
     }
 
-    public void drawSightMark(float x, float y) {
+    public void drawSightMark(Canvas buf) {
+        buf.drawPoint(sightMarkX,sightMarkY,arrowPaint);
+        buf.drawCircle(sightMarkX,sightMarkY,arrow.radius/getRealRadius()*getCenter(),arrowPaint);
+    }
+
+    public void beginDrawSightMark(float x, float y) {
         haveSightMark = true;
         sightMarkX = x;
         sightMarkY = y;

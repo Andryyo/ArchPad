@@ -54,7 +54,7 @@ public class CSQLiteOpenHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase database)  {
-        String CREATE_TARGETS_TABLE = "CREATE TABLE targets(_id INTEGER PRIMARY KEY,name TEXT,distance INTEGER,rings BLOB)";
+        String CREATE_TARGETS_TABLE = "CREATE TABLE targets(_id INTEGER PRIMARY KEY,name TEXT,radius INTEGER,distance INTEGER,rings BLOB)";
         database.execSQL(CREATE_TARGETS_TABLE);
         String CREATE_ARROWS_TABLE = "CREATE TABLE arrows(_id INTEGER PRIMARY KEY, radius INTEGER,name STRING,description STRING)";
         database.execSQL(CREATE_ARROWS_TABLE);
@@ -215,7 +215,7 @@ public class CSQLiteOpenHelper extends SQLiteOpenHelper {
     }
 
     public CTarget getTarget(long _id) {
-        Cursor cursor = readableDatabase.query("targets", new String[]{"_id", "name", "distance", "rings"},
+        Cursor cursor = readableDatabase.query("targets", null,
                 "_id = ?", new String[]{Long.toString(_id)}
                 , null, null, null);
         if (!cursor.moveToFirst())

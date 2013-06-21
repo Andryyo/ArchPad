@@ -24,13 +24,13 @@ public class CTargetView extends View{
 
     public CTargetView(Context context, long _id)    {
         super(context);
-        target = CSQLiteOpenHelper.getHelper(context).getTarget(_id);
+        setTarget(_id);
         this.context = context;
     }
 
     public CTargetView(Context context, CTarget target)    {
         super(context);
-        this.target = target;
+        setTarget(target);
         this.context = context;
     }
 
@@ -46,14 +46,22 @@ public class CTargetView extends View{
 
     public void setTarget(long _id) {
         target = CSQLiteOpenHelper.getHelper(context).getTarget(_id);
+        if (target!=null)
+            target.setDrawingRadius(center);
     }
 
     public void setTarget(CTarget target)   {
         this.target = target;
+        if (target!=null)
+            target.setDrawingRadius(center);
     }
 
     public CTarget getTarget() {
         return target;
+    }
+
+    public float getRealRadius()    {
+        return target.realRadius;
     }
 
     public int getCenter()  {
@@ -67,8 +75,14 @@ public class CTargetView extends View{
     }
 
     @Override
+    public void onSizeChanged(int w, int h, int oldw, int oldh) {
+        if (target!=null)
+            target.setDrawingRadius(center);
+    }
+
+    @Override
     public void onDraw(Canvas canvas)   {
         if (target!=null)
-            target.draw(canvas, center);
+            target.draw(canvas);
     }
 }

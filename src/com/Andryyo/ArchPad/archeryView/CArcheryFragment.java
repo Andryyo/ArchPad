@@ -163,9 +163,9 @@ public class CArcheryFragment extends Fragment implements IOnShotAddListener{
     }
 
     public CDistance getCurrentDistance()   {
-        if ((currentDistance==null)&&(previousDistance==null))
+        if ((currentDistance==null)&&(previousDistance==null))   {
             return new CDistance(numberOfSeries, arrowsInRound,targetId,arrowId);
-        if (currentDistance==null)
+        }   if (currentDistance==null)
             return previousDistance;
         if ((currentDistance.isEmpty()&&(previousDistance!=null)))
             return previousDistance;

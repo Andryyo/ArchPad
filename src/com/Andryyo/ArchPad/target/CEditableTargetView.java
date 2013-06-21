@@ -1,8 +1,6 @@
 package com.Andryyo.ArchPad.target;
 
 import android.content.Context;
-import android.graphics.Canvas;
-import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import com.Andryyo.ArchPad.CShot;
@@ -43,14 +41,16 @@ public class CEditableTargetView extends CZoomableTargetView {
         super.onTouchEvent(me);
         if (me.getAction()==MotionEvent.ACTION_UP)
         {
-            listener.addShot(new CShot(getTarget().rings, me.getX() / getCenter() - 1, me.getY() / getCenter() - 1,
-                getArrowRadius()));
+            CShot shot = new CShot(getTarget().rings, me.getX() / getCenter() - 1, me.getY() / getCenter() - 1,
+                    getArrowRadius());
+            getTarget().calcPoints(shot, getArrowRadius());
+            listener.addShot(shot);
             cancelDrawSightMark();
             CArcheryFragment.vibrator.vibrate(50);
         }
         if (me.getAction()==MotionEvent.ACTION_MOVE)
         {
-            drawSightMark(me.getX(), me.getY());
+            beginDrawSightMark(me.getX(), me.getY());
         }
         return true;
     }
