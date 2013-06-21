@@ -14,7 +14,7 @@ import android.view.*;
 import android.widget.*;
 import com.Andryyo.ArchPad.CShot;
 import com.Andryyo.ArchPad.R;
-import com.Andryyo.ArchPad.archeryView.CDistance;
+import com.Andryyo.ArchPad.archeryView.CRound;
 import com.Andryyo.ArchPad.database.CSQLiteOpenHelper;
 
 public class CStatisticsFragment extends Fragment {
@@ -57,7 +57,7 @@ public class CStatisticsFragment extends Fragment {
     	{
     	case R.id.clear:
     	{
-			adapter.deleteAllDistances();
+			adapter.deleteAllRounds();
 	    	break;
     	}
     	}
@@ -79,7 +79,7 @@ public class CStatisticsFragment extends Fragment {
             {
                 ExpandableListView.ExpandableListContextMenuInfo info =
                     (ExpandableListView.ExpandableListContextMenuInfo)menuItem.getMenuInfo();
-                adapter.deleteDistance(info.id);
+                adapter.deleteRound(info.id);
                 return true;
             }
             case  R.id.view_record:
@@ -140,13 +140,13 @@ public class CStatisticsFragment extends Fragment {
             tv.setText(Integer.toString(sum));
         }
 
-        public void deleteDistance(long _id)    {
-            CSQLiteOpenHelper.getHelper(context).delete(CSQLiteOpenHelper.TABLE_DISTANCES, _id);
+        public void deleteRound(long _id)    {
+            CSQLiteOpenHelper.getHelper(context).delete(CSQLiteOpenHelper.TABLE_ROUNDS, _id);
             update();
         }
 
-        public void deleteAllDistances()    {
-            CSQLiteOpenHelper.getHelper(context).delete(CSQLiteOpenHelper.TABLE_DISTANCES);
+        public void deleteAllRounds()    {
+            CSQLiteOpenHelper.getHelper(context).delete(CSQLiteOpenHelper.TABLE_ROUNDS);
             update();
         }
 
@@ -160,9 +160,9 @@ public class CStatisticsFragment extends Fragment {
         @Override
         public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
             if (i==0)
-                return CSQLiteOpenHelper.getCursorLoader(context, CSQLiteOpenHelper.TABLE_DISTANCES);
+                return CSQLiteOpenHelper.getCursorLoader(context, CSQLiteOpenHelper.TABLE_ROUNDS);
             else
-                return CSQLiteOpenHelper.getCursorLoader(context, CSQLiteOpenHelper.TABLE_DISTANCES, i, bundle);
+                return CSQLiteOpenHelper.getCursorLoader(context, CSQLiteOpenHelper.TABLE_ROUNDS, i, bundle);
 
         }
 
@@ -216,20 +216,20 @@ public class CStatisticsFragment extends Fragment {
         protected void bindChildView(View view, Context context, Cursor cursor, boolean b) {
             ((LinearLayout)view).removeAllViews();
             LayoutInflater infalInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            CDistance distance = new CDistance(cursor);
+            CRound round = new CRound(cursor);
             sum = 0;
             LinearLayout statisticsBlock;
-            for (int i =0; i<distance.rounds.size()/2;i++)
+            for (int i =0; i<round.series.size()/2;i++)
             {
                 statisticsBlock = (LinearLayout) infalInflater.inflate(R.layout.statistics_block,null);
-                fillStatisticsBlockView(statisticsBlock, new CShot[][]{distance.rounds.get(i*2).toArray(new CShot[0]),
-                        distance.rounds.get(i*2 + 1).toArray(new CShot[0])});
+                fillStatisticsBlockView(statisticsBlock, new CShot[][]{round.series.get(i*2).toArray(new CShot[0]),
+                        round.series.get(i*2 + 1).toArray(new CShot[0])});
                 ((LinearLayout) view).addView(statisticsBlock);
             }
-            if (distance.rounds.size()%2!=0)
+            if (round.series.size()%2!=0)
             {
                 statisticsBlock = (LinearLayout) infalInflater.inflate(R.layout.statistics_block,null);
-                fillStatisticsBlockView(statisticsBlock, new CShot[][]{distance.rounds.lastElement().toArray(new CShot[0]),
+                fillStatisticsBlockView(statisticsBlock, new CShot[][]{round.series.lastElement().toArray(new CShot[0]),
                         null});
                 ((LinearLayout) view).addView(statisticsBlock);
             }

@@ -18,7 +18,7 @@ import java.util.Vector;
  */
 
 public class CCurrentSeriesView extends View {
-    CDistance distance;
+    CRound round;
     int textHeight;
     int textWidth;
     int screenWidth;
@@ -42,13 +42,13 @@ public class CCurrentSeriesView extends View {
     @Override
     public void onDraw(Canvas canvas)   {
         int i=0;
-        distance = mArcheryView.getCurrentDistance();
-        textWidth = screenWidth/(distance.numberOfArrows+1);
+        round = mArcheryView.getCurrentRound();
+        textWidth = screenWidth/(round.numberOfArrows+1);
         Vector<CShot> buf;
-        if ((distance.rounds.lastElement().isEmpty())&&(distance.rounds.size()>1))
-            buf = distance.rounds.get(distance.rounds.size()-2);
+        if ((round.series.lastElement().isEmpty())&&(round.series.size()>1))
+            buf = round.series.get(round.series.size()-2);
         else
-            buf = distance.rounds.lastElement();
+            buf = round.series.lastElement();
         for (CShot shot : buf)
         {
             canvas.drawText(shot.toString(), i*textWidth+textWidth/2, textHeight, paint);

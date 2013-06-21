@@ -6,7 +6,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import com.Andryyo.ArchPad.CArrow;
 import com.Andryyo.ArchPad.CShot;
-import com.Andryyo.ArchPad.archeryView.CDistance;
+import com.Andryyo.ArchPad.archeryView.CRound;
 import com.Andryyo.ArchPad.database.CSQLiteOpenHelper;
 
 import java.util.Vector;
@@ -20,7 +20,7 @@ import java.util.Vector;
  */
 public class CZoomableTargetView extends CTargetView{
 
-    private CDistance distance;
+    private CRound round;
     private CArrow arrow;
     private CSQLiteOpenHelper helper;
     public static Paint arrowPaint = new Paint();
@@ -32,17 +32,17 @@ public class CZoomableTargetView extends CTargetView{
     private float sightMarkY;
     private static float zoom = 0.25f;
 
-    public CZoomableTargetView(Context context, CDistance distance) {
-        super(context, distance.targetId);
-        this.distance = distance;
-        arrow = helper.getArrow(distance.arrowId);
+    public CZoomableTargetView(Context context, CRound round) {
+        super(context, round.targetId);
+        this.round = round;
+        arrow = helper.getArrow(round.arrowId);
         arrowPaint.setColor(Color.GREEN);
         arrowPaint.setStyle(Paint.Style.STROKE);
     }
 
-    public CZoomableTargetView(Context context, long distanceId) {
+    public CZoomableTargetView(Context context, long roundId) {
         super(context);
-        setDistance(CSQLiteOpenHelper.getHelper(context).getDistance(distanceId));
+        setRound(CSQLiteOpenHelper.getHelper(context).getRound(roundId));
         arrowPaint.setColor(Color.GREEN);
         arrowPaint.setStyle(Paint.Style.STROKE);
     }
@@ -59,12 +59,12 @@ public class CZoomableTargetView extends CTargetView{
         arrowPaint.setStyle(Paint.Style.STROKE);
     }
 
-    public void setDistance(CDistance distance) {
-        this.distance = distance;
-        if (distance!=null)
+    public void setRound(CRound round) {
+        this.round = round;
+        if (round!=null)
         {
-            setTarget(distance.targetId);
-            setArrow(distance.arrowId);
+            setTarget(round.targetId);
+            setArrow(round.arrowId);
         }
     }
 
@@ -86,8 +86,8 @@ public class CZoomableTargetView extends CTargetView{
         Bitmap bitmap = Bitmap.createBitmap(getCenter()*2,getCenter()*2,Bitmap.Config.RGB_565);
         Canvas buf = new Canvas(bitmap);
         super.onDraw(buf);
-        if (distance!=null)
-            for (Vector<CShot> shots : distance.rounds)
+        if (round!=null)
+            for (Vector<CShot> shots : round.series)
                 for (CShot shot : shots)
                     getTarget().drawShot(buf, arrow.radius, arrowPaint, shot);
         if ((haveZoom)&&(zoomSrcRect!=null))

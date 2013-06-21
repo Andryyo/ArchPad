@@ -2,14 +2,13 @@ package com.Andryyo.ArchPad.database;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.database.ContentObserver;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.support.v4.content.AsyncTaskLoader;
 import com.Andryyo.ArchPad.CArrow;
-import com.Andryyo.ArchPad.archeryView.CDistance;
+import com.Andryyo.ArchPad.archeryView.CRound;
 import com.Andryyo.ArchPad.target.CTarget;
 
 import java.io.*;
@@ -25,7 +24,7 @@ public class CSQLiteOpenHelper extends SQLiteOpenHelper {
 
     private static CSQLiteOpenHelper helper = null;
     private Context context;
-    public static final String TABLE_DISTANCES = "distances";
+    public static final String TABLE_ROUNDS = "series";
     public static final String TABLE_ARROWS = "arrows";
     public static final String TABLE_SIGHTS = "sights";
     public static final String TABLE_NOTES = "notes";
@@ -62,15 +61,15 @@ public class CSQLiteOpenHelper extends SQLiteOpenHelper {
         database.execSQL(CREATE_SIGHTS_TABLE);
         String CREATE_NOTES_TABLE = "CREATE TABLE notes(_id INTEGER PRIMARY KEY, name TEXT, text TEXT, timemark INTEGER)";
         database.execSQL(CREATE_NOTES_TABLE);
-        String CREATE_DISTANCES_TABLE = "CREATE TABLE distances(_id INTEGER PRIMARY KEY,rounds BLOB,numberOfSeries INTEGER," +
+        String CREATE_ROUNDS_TABLE = "CREATE TABLE series(_id INTEGER PRIMARY KEY,series BLOB,numberOfSeries INTEGER," +
                 "numberOfArrows INTEGER,timemark INTEGER,arrowId INTEGER," +
                 "targetId INTEGER,FOREIGN KEY(targetId) REFERENCES targets(_id),FOREIGN KEY(arrowId) REFERENCES arrows(_id))";
-        database.execSQL(CREATE_DISTANCES_TABLE);
+        database.execSQL(CREATE_ROUNDS_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase database, int oldVersion, int newVersion) {
-        database.execSQL("DROP TABLE IF EXISTS distances");
+        database.execSQL("DROP TABLE IF EXISTS series");
         database.execSQL("DROP TABLE IF EXISTS targets");
         database.execSQL("DROP TABLE IF EXISTS sights");
         database.execSQL("DROP TABLE IF EXISTS arrows");
@@ -246,20 +245,20 @@ public class CSQLiteOpenHelper extends SQLiteOpenHelper {
     public synchronized void deleteTarget(long _id)    {
         SQLiteDatabase database = this.getWritableDatabase();
         database.delete(TABLE_TARGETS, "_id = ?", new String[]{Long.toString(_id)});
-        database.delete(TABLE_DISTANCES, "arrowId=?", new String[]{Long.toString(_id)});
+        database.delete(TABLE_ROUNDS, "arrowId=?", new String[]{Long.toString(_id)});
         database.close();
         refresh();
     }
 
-    public synchronized void addDistance(CDistance distance) throws Exception{
+    public synchronized void addRound(CRound round) throws Exception{
         SQLiteDatabase database = this.getWritableDatabase();
-        distance.writeToDatabase(database);
+        round.writeToDatabase(database);
         database.close();
         refresh();
     }
 
-    public CDistance getDistance(long id){
-        Cursor cursor = readableDatabase.query("distances", new String[]{"_id","rounds", "numberOfSeries", "numberOfArrows",
+    public CRound getRound(long id){
+        Cursor cursor = readableDatabase.query(TABLE_ROUNDS, new String[]{"_id","series", "numberOfSeries", "numberOfArrows",
                 "timemark","targetId","arrowID"},
                 "_id=?", new String[]{Long.toString(id)}, null, null, null,null);
         if (cursor.moveToFirst()==false)
@@ -267,9 +266,9 @@ public class CSQLiteOpenHelper extends SQLiteOpenHelper {
             cursor.close();
             return null;
         }
-        CDistance distance = new CDistance(cursor);
+        CRound round = new CRound(cursor);
         cursor.close();
-        return distance;
+        return round;
     }
 
     public synchronized void addArrow(CArrow arrow)  {
@@ -281,8 +280,8 @@ public class CSQLiteOpenHelper extends SQLiteOpenHelper {
 
     public synchronized void deleteArrow(long _id)    {
         SQLiteDatabase database = this.getWritableDatabase();
-        database.delete("arrows", "_id = ?", new String[]{Long.toString(_id)});
-        database.delete("distances", "arrowId=?", new String[]{Long.toString(_id)});
+        database.delete(TABLE_ARROWS, "_id = ?", new String[]{Long.toString(_id)});
+        database.delete(TABLE_ROUNDS, "arrowId=?", new String[]{Long.toString(_id)});
         database.close();
         refresh();
     }
