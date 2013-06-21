@@ -48,8 +48,6 @@ public class CTarget implements Serializable   {
             this.rings = new Vector<CRing>();
         fillPaint.setStyle(Paint.Style.FILL);
         strokePaint.setStyle(Paint.Style.STROKE);
-        for (CRing ring : rings)
-            ring.distanceFromCenter/= realRadius;
     }
 
     public void setDrawingRadius(float drawingRadius)   {

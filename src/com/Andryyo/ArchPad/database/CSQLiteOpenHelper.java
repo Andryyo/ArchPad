@@ -5,13 +5,16 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.content.AsyncTaskLoader;
 import com.Andryyo.ArchPad.CArrow;
 import com.Andryyo.ArchPad.archeryView.CRound;
+import com.Andryyo.ArchPad.target.CRing;
 import com.Andryyo.ArchPad.target.CTarget;
 
 import java.io.*;
+import java.util.Vector;
 
 /**
  * Created with IntelliJ IDEA.
@@ -24,7 +27,7 @@ public class CSQLiteOpenHelper extends SQLiteOpenHelper {
 
     private static CSQLiteOpenHelper helper = null;
     private Context context;
-    public static final String TABLE_ROUNDS = "series";
+    public static final String TABLE_ROUNDS = "rounds";
     public static final String TABLE_ARROWS = "arrows";
     public static final String TABLE_SIGHTS = "sights";
     public static final String TABLE_NOTES = "notes";
@@ -35,6 +38,7 @@ public class CSQLiteOpenHelper extends SQLiteOpenHelper {
     private CSQLiteOpenHelper(Context context) {
         super(context, "Archery", null, 1);
         this.context = context;
+        writableDatabase = getWritableDatabase();
         readableDatabase = getReadableDatabase();
     }
 
@@ -61,25 +65,47 @@ public class CSQLiteOpenHelper extends SQLiteOpenHelper {
         database.execSQL(CREATE_SIGHTS_TABLE);
         String CREATE_NOTES_TABLE = "CREATE TABLE notes(_id INTEGER PRIMARY KEY, name TEXT, text TEXT, timemark INTEGER)";
         database.execSQL(CREATE_NOTES_TABLE);
-        String CREATE_ROUNDS_TABLE = "CREATE TABLE series(_id INTEGER PRIMARY KEY,series BLOB,numberOfSeries INTEGER," +
+        String CREATE_ROUNDS_TABLE = "CREATE TABLE rounds(_id INTEGER PRIMARY KEY,series BLOB,numberOfSeries INTEGER," +
                 "numberOfArrows INTEGER,timemark INTEGER,arrowId INTEGER," +
                 "targetId INTEGER,FOREIGN KEY(targetId) REFERENCES targets(_id),FOREIGN KEY(arrowId) REFERENCES arrows(_id))";
         database.execSQL(CREATE_ROUNDS_TABLE);
     }
 
+
+    public void init()  {
+        Vector<CRing> rings = new Vector<CRing>();
+        rings.add(new CRing(10,0.2f, Color.YELLOW));
+        rings.add(new CRing(9,0.4f, Color.YELLOW));
+        rings.add(new CRing(8,0.6f, Color.RED));
+        rings.add(new CRing(7,0.8f, Color.RED));
+        rings.add(new CRing(6,1f, Color.BLUE));
+        addTarget(new CTarget("", rings, 100, 18));
+        rings.removeAllElements();
+        rings.add(new CRing(10,0.16f, Color.YELLOW));
+        rings.add(new CRing(9,0.32f, Color.YELLOW));
+        rings.add(new CRing(8,0.48f, Color.RED));
+        rings.add(new CRing(7,0.64f, Color.RED));
+        rings.add(new CRing(6, 0.8f, Color.BLUE));
+        rings.add(new CRing(5,0.96f, Color.BLUE));
+        addTarget(new CTarget("", rings, 400, 30));
+        addArrow(new CArrow("1616","",3.17f));
+        addArrow(new CArrow("1818","",3.57f));
+    }
     @Override
     public void onUpgrade(SQLiteDatabase database, int oldVersion, int newVersion) {
-        database.execSQL("DROP TABLE IF EXISTS series");
+        if (oldVersion<newVersion)
+        {
+        database.execSQL("DROP TABLE IF EXISTS rounds");
         database.execSQL("DROP TABLE IF EXISTS targets");
         database.execSQL("DROP TABLE IF EXISTS sights");
         database.execSQL("DROP TABLE IF EXISTS arrows");
         database.execSQL("DROP TABLE IF EXISTS notes");
         onCreate(database);
+        }
     }
 
     private Cursor getCursor(String table)   {
         Cursor cursor =  readableDatabase.query(table,null, null, null, null, null, null);
-        int i = cursor.getCount();
         return cursor;
     }
 

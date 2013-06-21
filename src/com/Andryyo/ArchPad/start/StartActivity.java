@@ -1,6 +1,7 @@
 package com.Andryyo.ArchPad.start;
 
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.widget.*;
@@ -21,6 +22,11 @@ public class StartActivity extends FragmentActivity{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("firstLaunch", true))
+        {
+            CSQLiteOpenHelper.getHelper(this).init();
+            PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("firstLaunch", false).commit();
+        }
         Number_of_series_spinner=(Spinner) findViewById(R.id.spinner1);
         Arrows_in_series_spinner=(Spinner) findViewById(R.id.spinner2);
         ArrayAdapter<CharSequence> Number_of_series_adapter = ArrayAdapter.createFromResource
