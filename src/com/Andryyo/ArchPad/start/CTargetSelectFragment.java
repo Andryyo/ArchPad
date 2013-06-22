@@ -198,7 +198,7 @@ public class CTargetSelectFragment extends Fragment implements LoaderManager.Loa
         }
     }
 
-    private static class RingAddDialog extends DialogFragment    {
+    public static class RingAddDialog extends DialogFragment    {
         public static RingAddDialog newInstance()  {
             return new RingAddDialog();
         }
