@@ -17,15 +17,15 @@ import java.util.Vector;
  * To change this template use File | Settings | File Templates.
  */
 
-public class CCurrentSeriesView extends View {
-    CRound round;
+public class CCurrentEndView extends View {
+    CDistance distance;
     int textHeight;
     int textWidth;
     int screenWidth;
     CArcheryFragment mArcheryView;
     Paint paint = new Paint();
 
-    public CCurrentSeriesView(Context context, CArcheryFragment mArcheryView)   {
+    public CCurrentEndView(Context context, CArcheryFragment mArcheryView)   {
         super(context);
         this.mArcheryView = mArcheryView;
         paint.setColor(Color.WHITE);
@@ -42,13 +42,13 @@ public class CCurrentSeriesView extends View {
     @Override
     public void onDraw(Canvas canvas)   {
         int i=0;
-        round = mArcheryView.getCurrentRound();
-        textWidth = screenWidth/(round.numberOfArrows+1);
+        distance = mArcheryView.getCurrentDistance();
+        textWidth = screenWidth/(distance.numberOfArrows+1);
         Vector<CShot> buf;
-        if ((round.series.lastElement().isEmpty())&&(round.series.size()>1))
-            buf = round.series.get(round.series.size()-2);
+        if ((distance.ends.lastElement().isEmpty())&&(distance.ends.size()>1))
+            buf = distance.ends.get(distance.ends.size()-2);
         else
-            buf = round.series.lastElement();
+            buf = distance.ends.lastElement();
         for (CShot shot : buf)
         {
             canvas.drawText(shot.toString(), i*textWidth+textWidth/2, textHeight, paint);

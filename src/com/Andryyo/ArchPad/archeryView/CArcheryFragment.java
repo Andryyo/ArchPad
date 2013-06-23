@@ -21,15 +21,15 @@ import com.Andryyo.ArchPad.target.CEditableTargetView;
 
 public class CArcheryFragment extends Fragment implements IOnShotAddListener{
     public static Vibrator vibrator;
-    public static final String NUMBER_OF_ROUNDS = "com.Andryyo.ArchPad.numberOfRounds";
+    public static final String NUMBER_OF_ROUNDS = "com.Andryyo.ArchPad.numberOfDistances";
     public static final String ARROWS_IN_ROUND = "com.Andryyo.ArchPad.numberOfArrows";
     public static final String TARGET_ID = "com.Andryyo.ArchPad.targetId";
     public static final String ARROW_ID = "com.Andryyo.ArchPad.arrowId";
 
-    public int numberOfSeries;
-    public int arrowsInRound;
-    private CRound currentRound = null;
-    private CRound previousRound = null;
+    public int numberOfEnds;
+    public int arrowsInDistance;
+    private CDistance currentDistance = null;
+    private CDistance previousDistance = null;
     private long targetId;
     private long arrowId;
     private Context context;
@@ -46,8 +46,8 @@ public class CArcheryFragment extends Fragment implements IOnShotAddListener{
     public CArcheryFragment() {};
 
     public CArcheryFragment(Intent data)    {
-        numberOfSeries = data.getIntExtra(NUMBER_OF_ROUNDS, 0);
-        arrowsInRound =  data.getIntExtra(ARROWS_IN_ROUND, 0);
+        numberOfEnds = data.getIntExtra(NUMBER_OF_ROUNDS, 0);
+        arrowsInDistance =  data.getIntExtra(ARROWS_IN_ROUND, 0);
         targetId = data.getLongExtra(TARGET_ID, 0);
         arrowId = data.getLongExtra(ARROW_ID, 0);
     }
@@ -57,8 +57,8 @@ public class CArcheryFragment extends Fragment implements IOnShotAddListener{
                              Bundle savedInstanceState)  {
         if (savedInstanceState!=null)
         {
-            numberOfSeries = savedInstanceState.getInt(NUMBER_OF_ROUNDS);
-            arrowsInRound =  savedInstanceState.getInt(ARROWS_IN_ROUND);
+            numberOfEnds = savedInstanceState.getInt(NUMBER_OF_ROUNDS);
+            arrowsInDistance =  savedInstanceState.getInt(ARROWS_IN_ROUND);
             targetId = savedInstanceState.getLong(TARGET_ID);
             arrowId = savedInstanceState.getLong(ARROW_ID);
         }
@@ -77,35 +77,35 @@ public class CArcheryFragment extends Fragment implements IOnShotAddListener{
         mTargetView.setTarget(targetId);
         mTargetView.setArrow(arrowId);
         if (savedInstanceState!=null)
-            restoreRound(savedInstanceState);
+            restoreDistance(savedInstanceState);
         mTargetView.setLayoutParams(new LayoutParams(0, LayoutParams.MATCH_PARENT, 15f));
         mTargetView.setTag("targetView");
         layout.addView(mTargetView);
-        СSeriesCounterView mSeriesCounterView = new СSeriesCounterView(context,this);
-        mSeriesCounterView.setLayoutParams(new LayoutParams(0, LayoutParams.MATCH_PARENT,1f));
-        layout.addView(mSeriesCounterView);
+        СEndsCounterView mEndsCounterView = new СEndsCounterView(context,this);
+        mEndsCounterView.setLayoutParams(new LayoutParams(0, LayoutParams.MATCH_PARENT,1f));
+        layout.addView(mEndsCounterView);
         parentLayout.addView(layout);
-        CCurrentSeriesView mCurrentSeriesView = new CCurrentSeriesView(context,this);
-        mCurrentSeriesView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, 0, 0.1f));
-        parentLayout.addView(mCurrentSeriesView);
+        CCurrentEndView mCurrentEndsView = new CCurrentEndView(context,this);
+        mCurrentEndsView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, 0, 0.1f));
+        parentLayout.addView(mCurrentEndsView);
         return parentLayout;
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState)    {
         super.onSaveInstanceState(outState);
-        if (currentRound!=null)
-            outState.putSerializable("savedRound", currentRound);
-        outState.putInt(NUMBER_OF_ROUNDS, numberOfSeries);
-        outState.putInt(ARROWS_IN_ROUND, arrowsInRound);
+        if (currentDistance!=null)
+            outState.putSerializable("savedDistance", currentDistance);
+        outState.putInt(NUMBER_OF_ROUNDS, numberOfEnds);
+        outState.putInt(ARROWS_IN_ROUND, arrowsInDistance);
         outState.putLong(TARGET_ID, targetId);
         outState.putLong(ARROW_ID, arrowId);
 
     }
 
-    private void restoreRound(Bundle savedInstanceState) {
-        currentRound = (CRound) savedInstanceState.getSerializable("savedRound");
-        mTargetView.setRound(currentRound);
+    private void restoreDistance(Bundle savedInstanceState) {
+        currentDistance = (CDistance) savedInstanceState.getSerializable("savedDistance");
+        mTargetView.setDistance(currentDistance);
     }
 
     public void setOnUpdateListener(IOnUpdateListener listener)  {
@@ -118,15 +118,15 @@ public class CArcheryFragment extends Fragment implements IOnShotAddListener{
             mTargetView.setOnTouchListener(listener);
     }
 
-    public void saveCurrentRound()  {
-        if (currentRound!=null)
+    public void saveCurrentDistance()  {
+        if (currentDistance!=null)
         {
-        if (!currentRound.isEmpty())
+        if (!currentDistance.isEmpty())
         {
             CSQLiteOpenHelper helper = CSQLiteOpenHelper.getHelper(context);
             try
             {
-                helper.addRound(currentRound);
+                helper.addDistance(currentDistance);
             }
             catch (Exception e)
             {
@@ -139,38 +139,38 @@ public class CArcheryFragment extends Fragment implements IOnShotAddListener{
     }
 
 	public void deleteLastShot()    {
-        if (currentRound!=null)
-		    currentRound.deleteLastShot();
+        if (currentDistance!=null)
+		    currentDistance.deleteLastShot();
 	}
 
     @Override
     public void addShot(CShot shot) {
-        if (currentRound == null)
+        if (currentDistance == null)
         {
-            currentRound = new CRound(numberOfSeries, arrowsInRound,targetId,arrowId);
-            currentRound.addShot(shot);
-            mTargetView.setRound(currentRound);
+            currentDistance = new CDistance(numberOfEnds, arrowsInDistance,targetId,arrowId);
+            currentDistance.addShot(shot);
+            mTargetView.setDistance(currentDistance);
         }
         else
-        if (currentRound.addShot(shot) == 0)
+        if (currentDistance.addShot(shot) == 0)
         {
-            saveCurrentRound();
-            previousRound = currentRound;
-            currentRound = null;
-            mTargetView.setRound(previousRound);
+            saveCurrentDistance();
+            previousDistance = currentDistance;
+            currentDistance = null;
+            mTargetView.setDistance(previousDistance);
         }
         getView().invalidate();
     }
 
-    public CRound getCurrentRound()   {
-        if ((currentRound==null)&&(previousRound==null))   {
-            return new CRound(numberOfSeries, arrowsInRound,targetId,arrowId);
-        }   if (currentRound==null)
-            return previousRound;
-        if ((currentRound.isEmpty()&&(previousRound!=null)))
-            return previousRound;
+    public CDistance getCurrentDistance()   {
+        if ((currentDistance==null)&&(previousDistance==null))   {
+            return new CDistance(numberOfEnds, arrowsInDistance,targetId,arrowId);
+        }   if (currentDistance==null)
+            return previousDistance;
+        if ((currentDistance.isEmpty()&&(previousDistance!=null)))
+            return previousDistance;
         else
-            return currentRound;
+            return currentDistance;
     }
 
     @Override
@@ -214,8 +214,8 @@ public class CArcheryFragment extends Fragment implements IOnShotAddListener{
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if ((currentRound!=null)&&(!currentRound.isEmpty()))
-            saveCurrentRound();
+        if ((currentDistance!=null)&&(!currentDistance.isEmpty()))
+            saveCurrentDistance();
     }
 
     @Override

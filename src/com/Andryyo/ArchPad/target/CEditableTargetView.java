@@ -5,7 +5,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import com.Andryyo.ArchPad.CShot;
 import com.Andryyo.ArchPad.archeryView.CArcheryFragment;
-import com.Andryyo.ArchPad.archeryView.CRound;
+import com.Andryyo.ArchPad.archeryView.CDistance;
 import com.Andryyo.ArchPad.archeryView.IOnShotAddListener;
 
 /**
@@ -20,8 +20,8 @@ public class CEditableTargetView extends CZoomableTargetView {
 
     private IOnShotAddListener listener;
 
-    public CEditableTargetView(Context context, CRound round) {
-        super(context, round);
+    public CEditableTargetView(Context context, CDistance distance) {
+        super(context, distance);
     }
 
     public CEditableTargetView(Context context, AttributeSet attrs) {

@@ -11,7 +11,7 @@
         android:id="@+id/textView1"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/Number_of_series" 
+        android:text="@string/Number_of_ends"
         android:textColor="#ffffffff"/>
 
     <Spinner
@@ -22,7 +22,7 @@
         android:id="@+id/textView2"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/Arrows_in_series"
+        android:text="@string/Arrows_in_end"
         android:textColor="#ffffffff" />
 
     <Spinner

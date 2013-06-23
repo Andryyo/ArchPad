@@ -14,7 +14,7 @@ import android.view.*;
 import android.widget.*;
 import com.Andryyo.ArchPad.CShot;
 import com.Andryyo.ArchPad.R;
-import com.Andryyo.ArchPad.archeryView.CRound;
+import com.Andryyo.ArchPad.archeryView.CDistance;
 import com.Andryyo.ArchPad.database.CSQLiteOpenHelper;
 
 public class CStatisticsFragment extends Fragment {
@@ -57,7 +57,7 @@ public class CStatisticsFragment extends Fragment {
     	{
     	case R.id.clear:
     	{
-			adapter.deleteAllRounds();
+			adapter.deleteAllDistances();
 	    	break;
     	}
     	}
@@ -79,7 +79,7 @@ public class CStatisticsFragment extends Fragment {
             {
                 ExpandableListView.ExpandableListContextMenuInfo info =
                     (ExpandableListView.ExpandableListContextMenuInfo)menuItem.getMenuInfo();
-                adapter.deleteRound(info.id);
+                adapter.deleteDistance(info.id);
                 return true;
             }
             case  R.id.view_record:
@@ -112,40 +112,40 @@ public class CStatisticsFragment extends Fragment {
             loaderManager.restartLoader(0, null, this);
         }
 
-        private void fillStatisticsBlockView(LinearLayout layout, CShot[][] series)  {
-            int first_series_sum = 0;
-            int second_series_sum = 0;
-            for (CShot shot : series[0])
+        private void fillStatisticsBlockView(LinearLayout layout, CShot[][] ends)  {
+            int first_ends_sum = 0;
+            int second_ends_sum = 0;
+            for (CShot shot : ends[0])
                 if (shot!=null)
-                    first_series_sum+=shot.getPoints();
-            if (series[1]!=null)
-                for (CShot shot : series[1])
+                    first_ends_sum+=shot.getPoints();
+            if (ends[1]!=null)
+                for (CShot shot : ends[1])
                     if (shot!=null)
-                        second_series_sum+=shot.getPoints();
-            CBorderedTextView tv = (CBorderedTextView)layout.findViewById(R.id.first_series);
-            tv.setText(Arrays.deepToString(series[0]));
-            if (series[1]!=null)
+                        second_ends_sum+=shot.getPoints();
+            CBorderedTextView tv = (CBorderedTextView)layout.findViewById(R.id.first_ends);
+            tv.setText(Arrays.deepToString(ends[0]));
+            if (ends[1]!=null)
                 {
-                tv = (CBorderedTextView)layout.findViewById(R.id.second_series);
-                tv.setText(Arrays.deepToString(series[1]));
-                tv = (CBorderedTextView)layout.findViewById(R.id.second_series_sum);
-                tv.setText(Integer.toString(second_series_sum));
+                tv = (CBorderedTextView)layout.findViewById(R.id.second_ends);
+                tv.setText(Arrays.deepToString(ends[1]));
+                tv = (CBorderedTextView)layout.findViewById(R.id.second_ends_sum);
+                tv.setText(Integer.toString(second_ends_sum));
                 }
-            tv = (CBorderedTextView)layout.findViewById(R.id.first_series_sum);
-            tv.setText(Integer.toString(first_series_sum));
-            tv = (CBorderedTextView)layout.findViewById(R.id.two_series);
-            tv.setText(Integer.toString((first_series_sum+second_series_sum)));
-            tv = (CBorderedTextView)layout.findViewById(R.id.all_series);
-            sum+=first_series_sum+second_series_sum;
+            tv = (CBorderedTextView)layout.findViewById(R.id.first_ends_sum);
+            tv.setText(Integer.toString(first_ends_sum));
+            tv = (CBorderedTextView)layout.findViewById(R.id.two_ends);
+            tv.setText(Integer.toString((first_ends_sum+second_ends_sum)));
+            tv = (CBorderedTextView)layout.findViewById(R.id.all_ends);
+            sum+=first_ends_sum+second_ends_sum;
             tv.setText(Integer.toString(sum));
         }
 
-        public void deleteRound(long _id)    {
+        public void deleteDistance(long _id)    {
             CSQLiteOpenHelper.getHelper(context).delete(CSQLiteOpenHelper.TABLE_ROUNDS, _id);
             update();
         }
 
-        public void deleteAllRounds()    {
+        public void deleteAllDistances()    {
             CSQLiteOpenHelper.getHelper(context).delete(CSQLiteOpenHelper.TABLE_ROUNDS);
             update();
         }
@@ -216,20 +216,20 @@ public class CStatisticsFragment extends Fragment {
         protected void bindChildView(View view, Context context, Cursor cursor, boolean b) {
             ((LinearLayout)view).removeAllViews();
             LayoutInflater infalInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            CRound round = new CRound(cursor);
+            CDistance distance = new CDistance(cursor);
             sum = 0;
             LinearLayout statisticsBlock;
-            for (int i =0; i<round.series.size()/2;i++)
+            for (int i =0; i<distance.ends.size()/2;i++)
             {
                 statisticsBlock = (LinearLayout) infalInflater.inflate(R.layout.statistics_block,null);
-                fillStatisticsBlockView(statisticsBlock, new CShot[][]{round.series.get(i*2).toArray(new CShot[0]),
-                        round.series.get(i*2 + 1).toArray(new CShot[0])});
+                fillStatisticsBlockView(statisticsBlock, new CShot[][]{distance.ends.get(i*2).toArray(new CShot[0]),
+                        distance.ends.get(i*2 + 1).toArray(new CShot[0])});
                 ((LinearLayout) view).addView(statisticsBlock);
             }
-            if (round.series.size()%2!=0)
+            if (distance.ends.size()%2!=0)
             {
                 statisticsBlock = (LinearLayout) infalInflater.inflate(R.layout.statistics_block,null);
-                fillStatisticsBlockView(statisticsBlock, new CShot[][]{round.series.lastElement().toArray(new CShot[0]),
+                fillStatisticsBlockView(statisticsBlock, new CShot[][]{distance.ends.lastElement().toArray(new CShot[0]),
                         null});
                 ((LinearLayout) view).addView(statisticsBlock);
             }

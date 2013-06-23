@@ -48,7 +48,7 @@ public class ActivitySightProperties extends FragmentActivity implements Spinner
                 if (editTextY.getText().toString().equals(""))
                     editTextY.setText("0.0");
                 BigDecimal b = new BigDecimal(editTextY.getText().toString());
-                b = b.subtract(new BigDecimal(0.1)).setScale(1,RoundingMode.HALF_UP);
+                b = b.subtract(new BigDecimal(0.1)).setScale(1, RoundingMode.HALF_UP);
                 editTextY.setText(b.toString());
                 break;
             }

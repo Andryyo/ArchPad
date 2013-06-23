@@ -2,9 +2,9 @@
 
     <string name="app_name">ArchPad</string>
     <string name="title_activity_main">ArchPad</string>
-    <string name="Number_of_series">Количество серий</string>
-    <string name="Arrows_in_series">Количество стрел в серии</string>
-    <string-array name="Number_of_series_array">
+    <string name="Number_of_ends">Количество серий</string>
+    <string name="Arrows_in_end">Количество стрел в серии</string>
+    <string-array name="Number_of_ends_array">
         <item>1</item>
         <item>3</item>
         <item>5</item>
@@ -12,7 +12,7 @@
         <item>10</item>
         <item>12</item>
     </string-array>
-    <string-array name="Arrows_in_series_array">
+    <string-array name="Arrows_in_end_array">
         <item>2</item>
         <item>3</item>
         <item>4</item>

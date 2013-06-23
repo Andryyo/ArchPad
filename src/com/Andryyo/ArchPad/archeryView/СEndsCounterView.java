@@ -13,7 +13,7 @@ import android.view.View;
  * Time: 11:01
  * To change this template use File | Settings | File Templates.
  */
-public class СSeriesCounterView extends View {
+public class СEndsCounterView extends View {
     int radius;
     int offset;
     int screenWidth;
@@ -21,7 +21,7 @@ public class СSeriesCounterView extends View {
     CArcheryFragment mArcheryView;
     Paint paint = new Paint();
 
-    public СSeriesCounterView(Context context, CArcheryFragment mArcheryView)   {
+    public СEndsCounterView(Context context, CArcheryFragment mArcheryView)   {
         super(context);
         this.mArcheryView = mArcheryView;
         paint.setColor(Color.WHITE);
@@ -36,15 +36,15 @@ public class СSeriesCounterView extends View {
 
     @Override
     public void onDraw(Canvas canvas)   {
-        radius = Math.min(screenWidth*8/20,screenHeight/(mArcheryView.numberOfSeries+2));
+        radius = Math.min(screenWidth*8/20,screenHeight/(mArcheryView.numberOfEnds+2));
         offset = (int) (2.5*radius);
         paint.setStyle(Paint.Style.FILL_AND_STROKE);
-        CRound round;
-        round = mArcheryView.getCurrentRound();
-        for (int i =0;i<round.series.size();i++)
+        CDistance distance;
+        distance = mArcheryView.getCurrentDistance();
+        for (int i =0;i<distance.ends.size();i++)
             canvas.drawCircle(radius,(i+1)*offset+2,radius,paint);
         paint.setStyle(Paint.Style.STROKE);
-        for (int i =round.series.size();i<round.numberOfSeries;i++)
+        for (int i =distance.ends.size();i<distance.numberOfEnds;i++)
             canvas.drawCircle(radius,(i+1)*offset,radius,paint);
     }
 }

@@ -15,8 +15,8 @@ import com.Andryyo.ArchPad.target.CTarget;
 
 public class StartActivity extends FragmentActivity{
 	
-	public Spinner Number_of_series_spinner;
-    public Spinner Arrows_in_series_spinner;
+	public Spinner Number_of_ends_spinner;
+    public Spinner Arrows_in_ends_spinner;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -27,16 +27,16 @@ public class StartActivity extends FragmentActivity{
             CSQLiteOpenHelper.getHelper(this).init();
             PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("firstLaunch", false).commit();
         }
-        Number_of_series_spinner=(Spinner) findViewById(R.id.spinner1);
-        Arrows_in_series_spinner=(Spinner) findViewById(R.id.spinner2);
-        ArrayAdapter<CharSequence> Number_of_series_adapter = ArrayAdapter.createFromResource
-                (this, R.array.Number_of_series_array, android.R.layout.simple_spinner_item);
-        Number_of_series_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        Number_of_series_spinner.setAdapter(Number_of_series_adapter);
-        ArrayAdapter<CharSequence> Arrows_in_series_adapter = ArrayAdapter.createFromResource
-                (this, R.array.Arrows_in_series_array, android.R.layout.simple_spinner_item);
-        Arrows_in_series_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        Arrows_in_series_spinner.setAdapter(Arrows_in_series_adapter);
+        Number_of_ends_spinner=(Spinner) findViewById(R.id.spinner1);
+        Arrows_in_ends_spinner=(Spinner) findViewById(R.id.spinner2);
+        ArrayAdapter<CharSequence> Number_of_ends_adapter = ArrayAdapter.createFromResource
+                (this, R.array.Number_of_ends_array, android.R.layout.simple_spinner_item);
+        Number_of_ends_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        Number_of_ends_spinner.setAdapter(Number_of_ends_adapter);
+        ArrayAdapter<CharSequence> Arrows_in_ends_adapter = ArrayAdapter.createFromResource
+                (this, R.array.Arrows_in_end_array, android.R.layout.simple_spinner_item);
+        Arrows_in_ends_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        Arrows_in_ends_spinner.setAdapter(Arrows_in_ends_adapter);
     }
 
 
@@ -54,8 +54,8 @@ public class StartActivity extends FragmentActivity{
         else
         {
             Intent intent = new Intent(this, MainActivity.class);
-            intent.putExtra(CArcheryFragment.NUMBER_OF_ROUNDS, Integer.parseInt(Number_of_series_spinner.getSelectedItem().toString()));
-            intent.putExtra(CArcheryFragment.ARROWS_IN_ROUND, Integer.parseInt(Arrows_in_series_spinner.getSelectedItem().toString()));
+            intent.putExtra(CArcheryFragment.NUMBER_OF_ROUNDS, Integer.parseInt(Number_of_ends_spinner.getSelectedItem().toString()));
+            intent.putExtra(CArcheryFragment.ARROWS_IN_ROUND, Integer.parseInt(Arrows_in_ends_spinner.getSelectedItem().toString()));
             intent.putExtra(CArcheryFragment.TARGET_ID,targetId);
             intent.putExtra(CArcheryFragment.ARROW_ID,arrowId);
     	    startActivity(intent);

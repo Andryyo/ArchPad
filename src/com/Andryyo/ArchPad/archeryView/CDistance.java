@@ -17,31 +17,31 @@ import java.util.Vector;
  * Time: 23:03
  * To change this template use File | Settings | File Templates.
  */
-public class CRound implements Serializable{
+public class CDistance implements Serializable{
     long _id;
     public Calendar timemark;
     int numberOfArrows;
-    int numberOfSeries;
+    int numberOfEnds;
     public long targetId;
-    public Vector<Vector<CShot>> series;
+    public Vector<Vector<CShot>> ends;
     public long arrowId;
 
-    public CRound(int numberOfSeries, int numberOfArrows, long targetId, long arrowId)  {
+    public CDistance(int numberOfEnds, int numberOfArrows, long targetId, long arrowId)  {
         timemark = Calendar.getInstance();
-        this.numberOfSeries = numberOfSeries;
+        this.numberOfEnds = numberOfEnds;
         this.numberOfArrows = numberOfArrows;
         this.targetId = targetId;
         this.arrowId = arrowId;
-        series = new Vector<Vector<CShot>>();
-        series.add(new Vector<CShot>());
+        ends = new Vector<Vector<CShot>>();
+        ends.add(new Vector<CShot>());
     }
 
-    public CRound(Cursor cursor)
+    public CDistance(Cursor cursor)
     {
-        //"series" "numberOfSeries" "numberOfArrows" "isFinished" "timemark"
+        //"ends" "numberOfEnds" "numberOfArrows" "isFinished" "timemark"
         try
         {
-            series = (Vector<Vector<CShot>>) CSQLiteOpenHelper.setObjectBytes(cursor.getBlob(cursor.getColumnIndex("series")));
+            ends = (Vector<Vector<CShot>>) CSQLiteOpenHelper.setObjectBytes(cursor.getBlob(cursor.getColumnIndex("ends")));
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -49,21 +49,21 @@ public class CRound implements Serializable{
         timemark = Calendar.getInstance();
         timemark.setTimeInMillis(cursor.getLong(cursor.getColumnIndex("timemark")));
         _id = cursor.getLong(cursor.getColumnIndex("_id"));
-        numberOfSeries = cursor.getInt(cursor.getColumnIndex("numberOfSeries"));
+        numberOfEnds = cursor.getInt(cursor.getColumnIndex("numberOfEnds"));
         numberOfArrows = cursor.getInt(cursor.getColumnIndex("numberOfArrows"));
         targetId = cursor.getLong(cursor.getColumnIndex("targetId"));
         arrowId = cursor.getLong(cursor.getColumnIndex("arrowId"));
     }
 
     public int addShot(CShot shot)   {
-        series.lastElement().add(shot);
-        if (series.lastElement().size() == numberOfArrows)
+        ends.lastElement().add(shot);
+        if (ends.lastElement().size() == numberOfArrows)
         {
-            series.add(new Vector<CShot>());
+            ends.add(new Vector<CShot>());
         }
-        if (series.size() ==  numberOfSeries+1)
+        if (ends.size() ==  numberOfEnds+1)
         {
-            series.remove(series.lastElement());
+            ends.remove(ends.lastElement());
             return 0;
         }
         else
@@ -71,23 +71,23 @@ public class CRound implements Serializable{
     }
 
     public void deleteLastShot()    {
-        if (series.lastElement().size()>0)
+        if (ends.lastElement().size()>0)
         {
-            series.lastElement().remove(series.lastElement().lastElement());
+            ends.lastElement().remove(ends.lastElement().lastElement());
         }
         else
-        if (series.size()>1)
+        if (ends.size()>1)
             {
-                series.remove(series.lastElement());
-                series.lastElement().remove(series.lastElement().lastElement());
+                ends.remove(ends.lastElement());
+                ends.lastElement().remove(ends.lastElement().lastElement());
             }
     }
 
     public boolean isEmpty()    {
-        if (series.isEmpty())
+        if (ends.isEmpty())
             return true;
         else
-        if ((series.size()==1)&&(series.lastElement().isEmpty()))
+        if ((ends.size()==1)&&(ends.lastElement().isEmpty()))
             return true;
         else
         return false;
@@ -98,8 +98,8 @@ public class CRound implements Serializable{
         try
         {
         ContentValues values = new ContentValues();
-        values.put("series", CSQLiteOpenHelper.getObjectBytes(series));
-        values.put("numberOfSeries",numberOfSeries);
+        values.put("ends", CSQLiteOpenHelper.getObjectBytes(ends));
+        values.put("numberOfEnds",numberOfEnds);
         values.put("numberOfArrows",numberOfArrows);
         values.put("timemark",timemark.getTimeInMillis());
         values.put("targetId",targetId);

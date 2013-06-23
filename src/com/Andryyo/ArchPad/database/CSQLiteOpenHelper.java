@@ -9,7 +9,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.content.AsyncTaskLoader;
 import com.Andryyo.ArchPad.CArrow;
-import com.Andryyo.ArchPad.archeryView.CRound;
+import com.Andryyo.ArchPad.archeryView.CDistance;
 import com.Andryyo.ArchPad.target.CRing;
 import com.Andryyo.ArchPad.target.CTarget;
 
@@ -27,7 +27,7 @@ public class CSQLiteOpenHelper extends SQLiteOpenHelper {
 
     private static CSQLiteOpenHelper helper = null;
     private Context context;
-    public static final String TABLE_ROUNDS = "rounds";
+    public static final String TABLE_ROUNDS = "distances";
     public static final String TABLE_ARROWS = "arrows";
     public static final String TABLE_SIGHTS = "sights";
     public static final String TABLE_NOTES = "notes";
@@ -65,7 +65,7 @@ public class CSQLiteOpenHelper extends SQLiteOpenHelper {
         database.execSQL(CREATE_SIGHTS_TABLE);
         String CREATE_NOTES_TABLE = "CREATE TABLE notes(_id INTEGER PRIMARY KEY, name TEXT, text TEXT, timemark INTEGER)";
         database.execSQL(CREATE_NOTES_TABLE);
-        String CREATE_ROUNDS_TABLE = "CREATE TABLE rounds(_id INTEGER PRIMARY KEY,series BLOB,numberOfSeries INTEGER," +
+        String CREATE_ROUNDS_TABLE = "CREATE TABLE distances(_id INTEGER PRIMARY KEY,ends BLOB,numberOfEnds INTEGER," +
                 "numberOfArrows INTEGER,timemark INTEGER,arrowId INTEGER," +
                 "targetId INTEGER,FOREIGN KEY(targetId) REFERENCES targets(_id),FOREIGN KEY(arrowId) REFERENCES arrows(_id))";
         database.execSQL(CREATE_ROUNDS_TABLE);
@@ -95,7 +95,7 @@ public class CSQLiteOpenHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase database, int oldVersion, int newVersion) {
         if (oldVersion<newVersion)
         {
-        database.execSQL("DROP TABLE IF EXISTS rounds");
+        database.execSQL("DROP TABLE IF EXISTS distances");
         database.execSQL("DROP TABLE IF EXISTS targets");
         database.execSQL("DROP TABLE IF EXISTS sights");
         database.execSQL("DROP TABLE IF EXISTS arrows");
@@ -276,15 +276,15 @@ public class CSQLiteOpenHelper extends SQLiteOpenHelper {
         refresh();
     }
 
-    public synchronized void addRound(CRound round) throws Exception{
+    public synchronized void addDistance(CDistance distance) throws Exception{
         SQLiteDatabase database = this.getWritableDatabase();
-        round.writeToDatabase(database);
+        distance.writeToDatabase(database);
         database.close();
         refresh();
     }
 
-    public CRound getRound(long id){
-        Cursor cursor = readableDatabase.query(TABLE_ROUNDS, new String[]{"_id","series", "numberOfSeries", "numberOfArrows",
+    public CDistance getDistance(long id){
+        Cursor cursor = readableDatabase.query(TABLE_ROUNDS, new String[]{"_id","ends", "numberOfEnds", "numberOfArrows",
                 "timemark","targetId","arrowID"},
                 "_id=?", new String[]{Long.toString(id)}, null, null, null,null);
         if (cursor.moveToFirst()==false)
@@ -292,9 +292,9 @@ public class CSQLiteOpenHelper extends SQLiteOpenHelper {
             cursor.close();
             return null;
         }
-        CRound round = new CRound(cursor);
+        CDistance distance = new CDistance(cursor);
         cursor.close();
-        return round;
+        return distance;
     }
 
     public synchronized void addArrow(CArrow arrow)  {

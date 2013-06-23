@@ -15,7 +15,7 @@
                           android:layout_height="wrap_content"
                           android:layout_width="match_parent">
                             <com.Andryyo.ArchPad.statistics.CBorderedTextView
-                                android:id="@+id/first_series"
+                                android:id="@+id/first_ends"
                                 android:layout_height="wrap_content"
                                 android:layout_width="0dp"
                                 android:layout_weight="1"
@@ -25,7 +25,7 @@
                                 BorderedTextView:borderWidth = "1"
                             />
                             <com.Andryyo.ArchPad.statistics.CBorderedTextView
-                                android:id="@+id/first_series_sum"
+                                android:id="@+id/first_ends_sum"
                                 android:layout_height="wrap_content"
                                 android:layout_width="wrap_content"
                                 android:gravity="center"
@@ -40,7 +40,7 @@
                           android:layout_width="match_parent"
                           >
                       <com.Andryyo.ArchPad.statistics.CBorderedTextView
-                              android:id="@+id/second_series"
+                              android:id="@+id/second_ends"
                               android:layout_height="wrap_content"
                               android:layout_width="0dp"
                               android:layout_weight="1"
@@ -50,7 +50,7 @@
                               BorderedTextView:borderWidth = "1"
                               />
                       <com.Andryyo.ArchPad.statistics.CBorderedTextView
-                              android:id="@+id/second_series_sum"
+                              android:id="@+id/second_ends_sum"
                               android:layout_height="wrap_content"
                               android:layout_width="wrap_content"
                               android:gravity="center"
@@ -61,7 +61,7 @@
                   </LinearLayout>
               </LinearLayout>
               <com.Andryyo.ArchPad.statistics.CBorderedTextView
-                    android:id="@+id/two_series"
+                    android:id="@+id/two_ends"
                     android:layout_height="match_parent"
                     android:layout_width="0dp"
                     android:layout_weight="0.2"
@@ -70,7 +70,7 @@
                     BorderedTextView:borderColor = "#ffffff"
                     BorderedTextView:borderWidth = "1"/>
               <com.Andryyo.ArchPad.statistics.CBorderedTextView
-                    android:id="@+id/all_series"
+                    android:id="@+id/all_ends"
                     android:layout_height="match_parent"
                     android:layout_width="0dp"
                     android:layout_weight="0.2"
