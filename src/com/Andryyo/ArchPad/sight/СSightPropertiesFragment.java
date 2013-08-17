@@ -19,7 +19,7 @@ import java.math.RoundingMode;
  * Time: 17:08
  * To change this template use File | Settings | File Templates.
  */
-public class ActivitySightProperties extends FragmentActivity implements Spinner.OnItemSelectedListener {
+public class СSightPropertiesFragment extends FragmentActivity implements Spinner.OnItemSelectedListener {
 
     private long currentSightId;
     private EditText editTextX;

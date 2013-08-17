@@ -1,4 +1,4 @@
-package com.Andryyo.ArchPad.archeryView;
+package com.Andryyo.ArchPad.archeryFragment;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -36,7 +36,7 @@ public class СEndsCounterView extends View {
 
     @Override
     public void onDraw(Canvas canvas)   {
-        radius = Math.min(screenWidth*8/20,screenHeight/(mArcheryView.numberOfEnds+2));
+        radius = Math.min(screenWidth*8/20,screenHeight/(mArcheryView.getCurrentDistance().numberOfEnds+2));
         offset = (int) (2.5*radius);
         paint.setStyle(Paint.Style.FILL_AND_STROKE);
         CDistance distance;

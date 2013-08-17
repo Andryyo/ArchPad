@@ -4,9 +4,9 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import com.Andryyo.ArchPad.CShot;
-import com.Andryyo.ArchPad.archeryView.CArcheryFragment;
-import com.Andryyo.ArchPad.archeryView.CDistance;
-import com.Andryyo.ArchPad.archeryView.IOnShotAddListener;
+import com.Andryyo.ArchPad.archeryFragment.CArcheryFragment;
+import com.Andryyo.ArchPad.archeryFragment.CDistance;
+import com.Andryyo.ArchPad.archeryFragment.IOnShotAddListener;
 
 /**
  * Created with IntelliJ IDEA.
@@ -54,6 +54,5 @@ public class CEditableTargetView extends CZoomableTargetView {
         }
         return true;
     }
-
 
 }

@@ -1,4 +1,4 @@
-package com.Andryyo.ArchPad.archeryView;
+package com.Andryyo.ArchPad.archeryFragment;
 
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -7,7 +7,6 @@ import com.Andryyo.ArchPad.CShot;
 import com.Andryyo.ArchPad.database.CSQLiteOpenHelper;
 
 import java.io.*;
-import java.util.Calendar;
 import java.util.Vector;
 
 /**
@@ -18,27 +17,27 @@ import java.util.Vector;
  * To change this template use File | Settings | File Templates.
  */
 public class CDistance implements Serializable{
-    long _id;
-    public Calendar timemark;
-    int numberOfArrows;
-    int numberOfEnds;
+    private long _id;
+    public int arrowsInEnd;
+    public int numberOfEnds;
     public long targetId;
     public Vector<Vector<CShot>> ends;
+    private long roundId;
     public long arrowId;
 
-    public CDistance(int numberOfEnds, int numberOfArrows, long targetId, long arrowId)  {
-        timemark = Calendar.getInstance();
+
+    public CDistance(int numberOfEnds, int arrowsInEnd, long targetId, long arrowId, long roundId)  {
         this.numberOfEnds = numberOfEnds;
-        this.numberOfArrows = numberOfArrows;
+        this.arrowsInEnd = arrowsInEnd;
         this.targetId = targetId;
         this.arrowId = arrowId;
+        this.roundId = roundId;
         ends = new Vector<Vector<CShot>>();
         ends.add(new Vector<CShot>());
     }
 
     public CDistance(Cursor cursor)
     {
-        //"ends" "numberOfEnds" "numberOfArrows" "isFinished" "timemark"
         try
         {
             ends = (Vector<Vector<CShot>>) CSQLiteOpenHelper.setObjectBytes(cursor.getBlob(cursor.getColumnIndex("ends")));
@@ -46,28 +45,27 @@ public class CDistance implements Serializable{
         catch (Exception e) {
             e.printStackTrace();
         }
-        timemark = Calendar.getInstance();
-        timemark.setTimeInMillis(cursor.getLong(cursor.getColumnIndex("timemark")));
         _id = cursor.getLong(cursor.getColumnIndex("_id"));
         numberOfEnds = cursor.getInt(cursor.getColumnIndex("numberOfEnds"));
-        numberOfArrows = cursor.getInt(cursor.getColumnIndex("numberOfArrows"));
+        arrowsInEnd = cursor.getInt(cursor.getColumnIndex("arrowsInEnd"));
         targetId = cursor.getLong(cursor.getColumnIndex("targetId"));
         arrowId = cursor.getLong(cursor.getColumnIndex("arrowId"));
+        roundId = cursor.getLong(cursor.getColumnIndex("roundId"));
     }
 
-    public int addShot(CShot shot)   {
+    public boolean addShot(CShot shot)   {
         ends.lastElement().add(shot);
-        if (ends.lastElement().size() == numberOfArrows)
+        if (ends.lastElement().size() == arrowsInEnd)
         {
             ends.add(new Vector<CShot>());
         }
         if (ends.size() ==  numberOfEnds+1)
         {
             ends.remove(ends.lastElement());
-            return 0;
+            return false;
         }
         else
-            return 1;
+            return true;
     }
 
     public void deleteLastShot()    {
@@ -100,11 +98,11 @@ public class CDistance implements Serializable{
         ContentValues values = new ContentValues();
         values.put("ends", CSQLiteOpenHelper.getObjectBytes(ends));
         values.put("numberOfEnds",numberOfEnds);
-        values.put("numberOfArrows",numberOfArrows);
-        values.put("timemark",timemark.getTimeInMillis());
+        values.put("arrowsInEnd", arrowsInEnd);
         values.put("targetId",targetId);
         values.put("arrowId",arrowId);
-        database.insert(CSQLiteOpenHelper.TABLE_ROUNDS,null,values);
+        values.put("roundId",roundId);
+        database.insert(CSQLiteOpenHelper.TABLE_DISTANCES,null,values);
         }
         catch (Exception e)
         {

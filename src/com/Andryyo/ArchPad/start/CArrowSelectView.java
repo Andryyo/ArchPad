@@ -1,12 +1,11 @@
 package com.Andryyo.ArchPad.start;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
@@ -24,41 +23,51 @@ import com.Andryyo.ArchPad.database.CSQLiteOpenHelper;
  * Time: 20:43
  * To change this template use File | Settings | File Templates.
  */
-public class CArrowSelectFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, View.OnClickListener, DialogInterface.OnClickListener {
-    SimpleCursorAdapter adapter;
-    Spinner spinner;
-    LoaderManager loaderManager;
+public class CArrowSelectView extends LinearLayout implements LoaderManager.LoaderCallbacks<Cursor>, View.OnClickListener, DialogInterface.OnClickListener {
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)  {
-        View view = inflater.inflate(R.layout.arrow_select_fragment, null);
+    public static final int arrowLoaderId = 1;
+
+    private Context context;
+    private SimpleCursorAdapter adapter;
+    private Spinner spinner;
+    private LoaderManager loaderManager;
+    private FragmentManager fragmentManager;
+
+    public CArrowSelectView(Context context, LoaderManager loaderManager, FragmentManager fragmentManager) {
+        super(context);
+        this.context = context;
+        this.loaderManager = loaderManager;
+        this.fragmentManager = fragmentManager;
+        View view = LayoutInflater.from(context).inflate(R.layout.arrow_select_view, this);
         spinner = (Spinner) view.findViewById(R.id.spinner);
+        spinner.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT,1));
         view.findViewById(R.id.addArrow).setOnClickListener(this);
         view.findViewById(R.id.deleteArrow).setOnClickListener(this);
-        adapter = new SimpleCursorAdapter(getActivity(),
+        adapter = new SimpleCursorAdapter(context,
                 R.layout.spinner_child_2,
                 null,
                 new String[]{"name","description"},
                 new int[]{R.id.text1,R.id.text2});
         spinner.setAdapter(adapter);
-        loaderManager = getLoaderManager();
-        loaderManager.initLoader(0, null, this);
-        return view;
+        loaderManager.initLoader(arrowLoaderId, null, this);
+        setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        return  CSQLiteOpenHelper.getCursorLoader(getActivity(), CSQLiteOpenHelper.TABLE_ARROWS);
+        return  CSQLiteOpenHelper.getCursorLoader(context, CSQLiteOpenHelper.TABLE_ARROWS);
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-        adapter.changeCursor(cursor);
+        if (cursorLoader.getId()==arrowLoaderId)
+            adapter.changeCursor(cursor);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> cursorLoader) {
-        adapter.changeCursor(null);
+        if (cursorLoader.getId()==arrowLoaderId)
+            adapter.changeCursor(null);
     }
 
     @Override
@@ -66,9 +75,9 @@ public class CArrowSelectFragment extends Fragment implements LoaderManager.Load
         switch (view.getId())   {
             case R.id.addArrow:
             {
-                new AlertDialog.Builder(getActivity()).
+                new AlertDialog.Builder(context).
                         setTitle("Новый тип стрел").
-                        setView(getActivity().getLayoutInflater().inflate(R.layout.arrow_add_dialog,null)).
+                        setView(LayoutInflater.from(context).inflate(R.layout.arrow_add_dialog, null)).
                         setNegativeButton("Отменить", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
@@ -81,16 +90,16 @@ public class CArrowSelectFragment extends Fragment implements LoaderManager.Load
             }
             case R.id.deleteArrow:
             {
-                CSQLiteOpenHelper.getHelper(getActivity()).deleteArrow(spinner.getSelectedItemId());
-                loaderManager.restartLoader(0, null, this);
+                CSQLiteOpenHelper.getHelper(context).deleteArrow(spinner.getSelectedItemId());
+                loaderManager.restartLoader(arrowLoaderId, null, this);
                 break;
             }
         }
     }
 
     public void saveArrow(CArrow arrow) {
-        CSQLiteOpenHelper.getHelper(getActivity()).addArrow(arrow);
-        getLoaderManager().restartLoader(0, null, this);
+        CSQLiteOpenHelper.getHelper(context).addArrow(arrow);
+        loaderManager.restartLoader(arrowLoaderId, null, this);
     }
 
     public long getSelectedItemId()    {
@@ -109,6 +118,6 @@ public class CArrowSelectFragment extends Fragment implements LoaderManager.Load
         } catch (Exception e)   {
             e.printStackTrace();
         }
-            dialogInterface.dismiss();
+        dialogInterface.dismiss();
     }
 }

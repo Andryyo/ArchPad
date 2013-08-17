@@ -40,12 +40,20 @@ public class CNoteCreateActivity extends FragmentActivity{
     @Override
     public void onBackPressed() {
         String string = text.getText().toString();
-        if (!string.equals(""))
-            CSQLiteOpenHelper.getHelper(this).addNote(
-                string.substring(0, string.indexOf("\n")),
-                text.getText().toString(),
-                Calendar.getInstance().getTimeInMillis()
-            );
+        if (!string.equals("")) {
+            if (string.indexOf("\n")!=-1)
+                CSQLiteOpenHelper.getHelper(this).addNote(
+                    string.substring(0, string.indexOf("\n")),
+                    text.getText().toString(),
+                    Calendar.getInstance().getTimeInMillis()
+                );
+            else
+                CSQLiteOpenHelper.getHelper(this).addNote(
+                        text.getText().toString(),
+                        text.getText().toString(),
+                        Calendar.getInstance().getTimeInMillis()
+                );
+        }
         super.onBackPressed();
     }
 }

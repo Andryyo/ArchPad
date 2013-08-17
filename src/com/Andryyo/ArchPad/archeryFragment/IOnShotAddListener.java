@@ -1,4 +1,4 @@
-package com.Andryyo.ArchPad.archeryView;
+package com.Andryyo.ArchPad.archeryFragment;
 
 import com.Andryyo.ArchPad.CShot;
 

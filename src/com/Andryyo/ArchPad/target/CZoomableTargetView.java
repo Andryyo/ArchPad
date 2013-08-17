@@ -6,7 +6,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import com.Andryyo.ArchPad.CArrow;
 import com.Andryyo.ArchPad.CShot;
-import com.Andryyo.ArchPad.archeryView.CDistance;
+import com.Andryyo.ArchPad.archeryFragment.CDistance;
 import com.Andryyo.ArchPad.database.CSQLiteOpenHelper;
 
 import java.util.Vector;

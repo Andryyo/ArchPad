@@ -14,7 +14,7 @@ import android.view.*;
 import android.widget.*;
 import com.Andryyo.ArchPad.CShot;
 import com.Andryyo.ArchPad.R;
-import com.Andryyo.ArchPad.archeryView.CDistance;
+import com.Andryyo.ArchPad.archeryFragment.CDistance;
 import com.Andryyo.ArchPad.database.CSQLiteOpenHelper;
 
 public class CStatisticsFragment extends Fragment {
@@ -58,10 +58,10 @@ public class CStatisticsFragment extends Fragment {
     	case R.id.clear:
     	{
 			adapter.deleteAllDistances();
-	    	break;
+	    	return true;
     	}
     	}
-    	return true;
+    	return false;
     }
 
     @Override
@@ -79,7 +79,7 @@ public class CStatisticsFragment extends Fragment {
             {
                 ExpandableListView.ExpandableListContextMenuInfo info =
                     (ExpandableListView.ExpandableListContextMenuInfo)menuItem.getMenuInfo();
-                adapter.deleteDistance(info.id);
+                adapter.deleteRound(adapter.getGroupId(ExpandableListView.getPackedPositionGroup(info.packedPosition)));
                 return true;
             }
             case  R.id.view_record:
@@ -140,13 +140,13 @@ public class CStatisticsFragment extends Fragment {
             tv.setText(Integer.toString(sum));
         }
 
-        public void deleteDistance(long _id)    {
-            CSQLiteOpenHelper.getHelper(context).delete(CSQLiteOpenHelper.TABLE_ROUNDS, _id);
+        public void deleteRound(long _id)    {
+            CSQLiteOpenHelper.getHelper(context).deleteRound(_id);
             update();
         }
 
         public void deleteAllDistances()    {
-            CSQLiteOpenHelper.getHelper(context).delete(CSQLiteOpenHelper.TABLE_ROUNDS);
+            CSQLiteOpenHelper.getHelper(context).deleteAllRounds();
             update();
         }
 
@@ -162,7 +162,7 @@ public class CStatisticsFragment extends Fragment {
             if (i==0)
                 return CSQLiteOpenHelper.getCursorLoader(context, CSQLiteOpenHelper.TABLE_ROUNDS);
             else
-                return CSQLiteOpenHelper.getCursorLoader(context, CSQLiteOpenHelper.TABLE_ROUNDS, i, bundle);
+                return CSQLiteOpenHelper.getDistancesCursorLoader(context, i, bundle);
 
         }
 

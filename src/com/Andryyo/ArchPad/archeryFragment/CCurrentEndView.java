@@ -1,4 +1,4 @@
-package com.Andryyo.ArchPad.archeryView;
+package com.Andryyo.ArchPad.archeryFragment;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -43,7 +43,7 @@ public class CCurrentEndView extends View {
     public void onDraw(Canvas canvas)   {
         int i=0;
         distance = mArcheryView.getCurrentDistance();
-        textWidth = screenWidth/(distance.numberOfArrows+1);
+        textWidth = screenWidth/(distance.arrowsInEnd +1);
         Vector<CShot> buf;
         if ((distance.ends.lastElement().isEmpty())&&(distance.ends.size()>1))
             buf = distance.ends.get(distance.ends.size()-2);

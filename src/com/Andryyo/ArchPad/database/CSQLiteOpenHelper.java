@@ -9,7 +9,8 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.content.AsyncTaskLoader;
 import com.Andryyo.ArchPad.CArrow;
-import com.Andryyo.ArchPad.archeryView.CDistance;
+import com.Andryyo.ArchPad.archeryFragment.CDistance;
+import com.Andryyo.ArchPad.archeryFragment.CRound;
 import com.Andryyo.ArchPad.target.CRing;
 import com.Andryyo.ArchPad.target.CTarget;
 
@@ -27,7 +28,8 @@ public class CSQLiteOpenHelper extends SQLiteOpenHelper {
 
     private static CSQLiteOpenHelper helper = null;
     private Context context;
-    public static final String TABLE_ROUNDS = "distances";
+    public static final String TABLE_DISTANCES = "distances";
+    public static final String TABLE_ROUNDS = "rounds";
     public static final String TABLE_ARROWS = "arrows";
     public static final String TABLE_SIGHTS = "sights";
     public static final String TABLE_NOTES = "notes";
@@ -59,15 +61,19 @@ public class CSQLiteOpenHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase database)  {
         String CREATE_TARGETS_TABLE = "CREATE TABLE targets(_id INTEGER PRIMARY KEY,name TEXT,radius INTEGER,distance INTEGER,rings BLOB)";
         database.execSQL(CREATE_TARGETS_TABLE);
-        String CREATE_ARROWS_TABLE = "CREATE TABLE arrows(_id INTEGER PRIMARY KEY, radius INTEGER,name STRING,description STRING)";
+        String CREATE_ARROWS_TABLE = "CREATE TABLE arrows(_id INTEGER PRIMARY KEY, radius INTEGER,name TEXT,description TEXT)";
         database.execSQL(CREATE_ARROWS_TABLE);
         String CREATE_SIGHTS_TABLE = "CREATE TABLE sights(_id INTEGER PRIMARY KEY, name TEXT, description TEXT, x INTEGER, y INTEGER)";
         database.execSQL(CREATE_SIGHTS_TABLE);
         String CREATE_NOTES_TABLE = "CREATE TABLE notes(_id INTEGER PRIMARY KEY, name TEXT, text TEXT, timemark INTEGER)";
         database.execSQL(CREATE_NOTES_TABLE);
-        String CREATE_ROUNDS_TABLE = "CREATE TABLE distances(_id INTEGER PRIMARY KEY,ends BLOB,numberOfEnds INTEGER," +
-                "numberOfArrows INTEGER,timemark INTEGER,arrowId INTEGER," +
-                "targetId INTEGER,FOREIGN KEY(targetId) REFERENCES targets(_id),FOREIGN KEY(arrowId) REFERENCES arrows(_id))";
+        String CREATE_DISTANCES_TABLE = "CREATE TABLE distances(_id INTEGER PRIMARY KEY,ends BLOB,numberOfEnds INTEGER," +
+                "roundId INTEGER,arrowsInEnd INTEGER,arrowId INTEGER," +
+                "targetId INTEGER,FOREIGN KEY(targetId) REFERENCES targets(_id),FOREIGN KEY(arrowId) REFERENCES arrows(_id)" +
+                ",FOREIGN KEY(roundId) REFERENCES rounds(_id))";
+        database.execSQL(CREATE_DISTANCES_TABLE);
+        String CREATE_ROUNDS_TABLE = "CREATE TABLE rounds(_id INTEGER PRIMARY KEY, description TEXT, arrowId INTEGER," +
+                "timemark INTEGER, FOREIGN KEY(arrowId) REFERENCES arrows(_id))";
         database.execSQL(CREATE_ROUNDS_TABLE);
     }
 
@@ -87,7 +93,7 @@ public class CSQLiteOpenHelper extends SQLiteOpenHelper {
         rings.add(new CRing(7,0.64f, Color.RED));
         rings.add(new CRing(6, 0.8f, Color.BLUE));
         rings.add(new CRing(5,0.96f, Color.BLUE));
-        addTarget(new CTarget("", rings, 400, 30));
+        addTarget(new CTarget("", rings, 200, 30));
         addArrow(new CArrow("1616","",3.17f));
         addArrow(new CArrow("1818","",3.57f));
     }
@@ -109,9 +115,9 @@ public class CSQLiteOpenHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
-    private Cursor getCursor(String table, long _id) {
+    private Cursor getCursor(String table,String selection, long _id) {
         return readableDatabase.query(table, null,
-                "_id=?", new String[]{Long.toString(_id)}, null, null, null, null);
+                selection+"=?", new String[]{Long.toString(_id)}, null, null, null, null);
     }
 
     public static CSQLiteCursorLoader getCursorLoader(Context context, String table)   {
@@ -119,7 +125,11 @@ public class CSQLiteOpenHelper extends SQLiteOpenHelper {
     }
 
     public static CSQLiteCursorLoader getCursorLoader(Context context, String table, long _id, Bundle data)   {
-        return new CSQLiteCursorLoader(context, table, _id, data);
+        return new CSQLiteCursorLoader(context, table, "_id",_id, data);
+    }
+
+    public static CSQLiteCursorLoader getDistancesCursorLoader(Context context, long roundId, Bundle data)   {
+        return new CSQLiteCursorLoader(context, TABLE_DISTANCES, "roundId",roundId, data);
     }
 
     public static class CSQLiteCursorLoader extends AsyncTaskLoader<Cursor> {
@@ -130,11 +140,13 @@ public class CSQLiteOpenHelper extends SQLiteOpenHelper {
         private Bundle data;
         private final ForceLoadContentObserver observer = new ForceLoadContentObserver();
         private Cursor mCursor;
+        private String selection;
 
-        public CSQLiteCursorLoader(Context context, String table, long _id, Bundle data) {
+        public CSQLiteCursorLoader(Context context, String table, String selection,long _id, Bundle data) {
             super(context);
             this.context = context;
             this.table = table;
+            this.selection = selection;
             this._id = _id;
             this.data = data;
         }
@@ -156,7 +168,7 @@ public class CSQLiteOpenHelper extends SQLiteOpenHelper {
             if (_id == -1)
                 mCursor = getHelper(context).getCursor(table);
             else
-                mCursor =  getHelper(context).getCursor(table, _id);
+                mCursor =  getHelper(context).getCursor(table, selection,_id);
             if (mCursor != null) {
                 int i = mCursor.getCount();
                 // Ensure the cursor window is filled
@@ -271,12 +283,13 @@ public class CSQLiteOpenHelper extends SQLiteOpenHelper {
     public synchronized void deleteTarget(long _id)    {
         SQLiteDatabase database = this.getWritableDatabase();
         database.delete(TABLE_TARGETS, "_id = ?", new String[]{Long.toString(_id)});
-        database.delete(TABLE_ROUNDS, "arrowId=?", new String[]{Long.toString(_id)});
+        //TODO:разобратся
+        //database.delete(TABLE_ROUNDS, "arrowId=?", new String[]{Long.toString(_id)});
         database.close();
         refresh();
     }
 
-    public synchronized void addDistance(CDistance distance) throws Exception{
+    public synchronized void addDistance(CDistance distance) {
         SQLiteDatabase database = this.getWritableDatabase();
         distance.writeToDatabase(database);
         database.close();
@@ -284,8 +297,7 @@ public class CSQLiteOpenHelper extends SQLiteOpenHelper {
     }
 
     public CDistance getDistance(long id){
-        Cursor cursor = readableDatabase.query(TABLE_ROUNDS, new String[]{"_id","ends", "numberOfEnds", "numberOfArrows",
-                "timemark","targetId","arrowID"},
+        Cursor cursor = readableDatabase.query(TABLE_DISTANCES, null,
                 "_id=?", new String[]{Long.toString(id)}, null, null, null,null);
         if (cursor.moveToFirst()==false)
         {
@@ -296,6 +308,8 @@ public class CSQLiteOpenHelper extends SQLiteOpenHelper {
         cursor.close();
         return distance;
     }
+
+
 
     public synchronized void addArrow(CArrow arrow)  {
         SQLiteDatabase database = this.getWritableDatabase();
@@ -380,6 +394,30 @@ public class CSQLiteOpenHelper extends SQLiteOpenHelper {
         values.put("text",text);
         values.put("timemark",timemark);
         database.insert("notes",null,values);
+        database.close();
+        refresh();
+    }
+
+    public synchronized long addRound(CRound round) {
+        SQLiteDatabase database = this.getWritableDatabase();
+        long id = round.writeToDatabase(database);
+        database.close();
+        refresh();
+        return id;
+    }
+
+    public synchronized void deleteRound(long _id) {
+        SQLiteDatabase database = this.getWritableDatabase();
+        database.delete(TABLE_DISTANCES, "roundId = ?", new String[]{Long.toString(_id)});
+        database.delete(TABLE_ROUNDS, "_id = ?", new String[]{Long.toString(_id)});
+        database.close();
+        refresh();
+    }
+
+    public synchronized void deleteAllRounds() {
+        SQLiteDatabase database = this.getWritableDatabase();
+        database.delete(TABLE_DISTANCES, null, null);
+        database.delete(TABLE_ROUNDS, null, null);
         database.close();
         refresh();
     }

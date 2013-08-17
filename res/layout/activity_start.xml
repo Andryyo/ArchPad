@@ -5,7 +5,8 @@
 <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-	android:orientation="vertical">
+	android:orientation="vertical"
+    android:id="@+id/parentLinearLayout">
     
     <TextView
         android:id="@+id/textView1"
@@ -29,33 +30,6 @@
         android:id="@+id/spinner2"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" />
-
-    <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent">
-
-
-    </LinearLayout>
-
-    <fragment class="com.Andryyo.ArchPad.start.CArrowSelectFragment"
-                android:id="@+id/arrowSelectFragment"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-
-    <fragment class="com.Andryyo.ArchPad.start.CTargetSelectFragment"
-              android:id="@+id/targetSelectFragment"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"/>
-
-
-    <Button
-            android:id="@+id/button1"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/Start"
-            android:onClick="Start"/>
-
 
 </LinearLayout>
 </ScrollView>

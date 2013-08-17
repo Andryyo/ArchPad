@@ -7,10 +7,11 @@ import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
@@ -30,23 +31,28 @@ import java.util.Vector;
  * Time: 23:15
  * To change this template use File | Settings | File Templates.
  */
-public class CTargetSelectFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,View.OnClickListener {
-    CTargetSelectAdapter adapter;
-    Gallery gallery;
-    LoaderManager loaderManager;
+public class CTargetSelectView extends LinearLayout implements LoaderManager.LoaderCallbacks<Cursor>,View.OnClickListener {
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState)  {
-        View view = inflater.inflate(R.layout.target_select_fragment, null);
+    public static final int targetLoaderId = 0;
+
+    private Context context;
+    private CTargetSelectAdapter adapter;
+    private Gallery gallery;
+    private LoaderManager loaderManager;
+    private FragmentManager fragmentManager;
+
+    public CTargetSelectView(Context context, LoaderManager loaderManager, FragmentManager fragmentManager) {
+        super(context);
+        this.context = context;
+        this.loaderManager = loaderManager;
+        this.fragmentManager = fragmentManager;
+        View view = LayoutInflater.from(context).inflate(R.layout.target_select_view, this);
         gallery = (Gallery) view.findViewById(R.id.gallery);
-        adapter = new CTargetSelectAdapter(getActivity(), null);
+        adapter = new CTargetSelectAdapter(context, null);
         gallery.setAdapter(adapter);
         view.findViewById(R.id.addTarget).setOnClickListener(this);
         view.findViewById(R.id.deleteTarget).setOnClickListener(this);
-        loaderManager = getLoaderManager();
-        loaderManager.initLoader(0, null, this);
-        return view;
+        loaderManager.initLoader(targetLoaderId, null, this);
     }
 
     public long getSelectedItemId() {
@@ -55,17 +61,24 @@ public class CTargetSelectFragment extends Fragment implements LoaderManager.Loa
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        return CSQLiteOpenHelper.getCursorLoader(getActivity(), CSQLiteOpenHelper.TABLE_TARGETS);
+        return CSQLiteOpenHelper.getCursorLoader(context, CSQLiteOpenHelper.TABLE_TARGETS);
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> objectLoader, Cursor cursor) {
-        adapter.changeCursor(cursor);
+    public void onLoadFinished(Loader<Cursor>cursorLoader, Cursor cursor) {
+        if (cursorLoader.getId()==targetLoaderId)
+            adapter.changeCursor(cursor);
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> objectLoader) {
-        adapter.changeCursor(null);
+    public void onLoaderReset(Loader<Cursor> cursorLoader) {
+        if (cursorLoader.getId()==targetLoaderId)
+            adapter.changeCursor(null);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent me)    {
+        return false;
     }
 
     @Override
@@ -73,13 +86,13 @@ public class CTargetSelectFragment extends Fragment implements LoaderManager.Loa
         switch (view.getId())   {
             case R.id.addTarget:
             {
-                CTargetCreateDialog.newInstance().show(getFragmentManager().beginTransaction(), "targetCreateDialog");
+                CTargetCreateDialog.newInstance().show(fragmentManager.beginTransaction(), "targetCreateDialog");
                 break;
             }
             case R.id.deleteTarget:
             {
-                CSQLiteOpenHelper.getHelper(getActivity()).deleteTarget(gallery.getSelectedItemId());
-                loaderManager.restartLoader(0, null, this);
+                CSQLiteOpenHelper.getHelper(context).deleteTarget(gallery.getSelectedItemId());
+                loaderManager.restartLoader(targetLoaderId, null, this);
                 break;
             }
         }
@@ -90,9 +103,9 @@ public class CTargetSelectFragment extends Fragment implements LoaderManager.Loa
         if (!target.isEmpty())
         {
             target.addClosingRing();
-            CSQLiteOpenHelper.getHelper(getActivity()).addTarget(target);
+            CSQLiteOpenHelper.getHelper(context).addTarget(target);
         }
-        getLoaderManager().restartLoader(0, null, this);
+        loaderManager.restartLoader(targetLoaderId, null, this);
     }
 
     private class CTargetSelectAdapter extends CursorAdapter {
@@ -150,7 +163,7 @@ public class CTargetSelectFragment extends Fragment implements LoaderManager.Loa
                     .setPositiveButton("Сохранить", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            ((StartActivity)getActivity()).saveTarget(target);
+                            ((CStartFragment)getParentFragment()).saveTarget(target);
                             dialogInterface.dismiss();
                         }
                     })
@@ -221,7 +234,7 @@ public class CTargetSelectFragment extends Fragment implements LoaderManager.Loa
                             points = Integer.parseInt(((EditText) alertDialog.findViewById(R.id.points)).getText().toString());
                         } catch (NumberFormatException e) {}
                         int color = ((CColorSelectView)((AlertDialog) dialog).findViewById(R.id.ringColor)).getSelectedColor();
-                        ((StartActivity)getActivity()).saveRing(
+                        ((CStartFragment)getParentFragment()).saveRing(
                                                        ringWidth,
                                                        points,
                                                        color);

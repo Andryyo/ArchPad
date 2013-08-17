@@ -7,6 +7,6 @@ package com.Andryyo.ArchPad.statistics;
  * Time: 21:57
  * To change this template use File | Settings | File Templates.
  */
-public interface IOnUpdateListener{
+public interface IOnUpdateListener {
     public abstract void update();
 }
