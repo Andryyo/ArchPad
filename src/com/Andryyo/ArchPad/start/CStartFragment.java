@@ -62,15 +62,6 @@ public class CStartFragment extends Fragment implements View.OnClickListener {
         return scrollView;
     }
 
-    public void saveRing(float ringWidth, int points, int color)    {
-        ((CTargetSelectView.CTargetCreateDialog)getFragmentManager().
-                findFragmentByTag("targetCreateDialog")).saveRing(ringWidth, points, color);
-    }
-
-    public void saveTarget(CTarget target)  {
-        targetSelectView.saveTarget(target);
-    }
-
     @Override
     public void onClick(View view) {
         long targetId = targetSelectView.getSelectedItemId();
@@ -100,5 +91,9 @@ public class CStartFragment extends Fragment implements View.OnClickListener {
         onTouchListener = listener;
         if (targetSelectView!=null)
             targetSelectView.setOnTouchListener(listener);
+    }
+
+    public void saveTarget(CTarget target) {
+        targetSelectView.saveTarget(target);
     }
 }

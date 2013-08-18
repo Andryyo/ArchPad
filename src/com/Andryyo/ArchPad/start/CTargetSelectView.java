@@ -15,6 +15,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
+import com.Andryyo.ArchPad.MainActivity;
 import com.Andryyo.ArchPad.R;
 import com.Andryyo.ArchPad.database.CSQLiteOpenHelper;
 import com.Andryyo.ArchPad.target.CRing;
@@ -163,7 +164,9 @@ public class CTargetSelectView extends LinearLayout implements LoaderManager.Loa
                     .setPositiveButton("Сохранить", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            ((CStartFragment)getParentFragment()).saveTarget(target);
+                            //TODO: Страшный костыль, но получать доступ к фрагментам в ViewPager то надо?
+                            ((CStartFragment)getFragmentManager().
+                                    findFragmentByTag("android:switcher:"+R.id.pager+":1")).saveTarget(target);
                             dialogInterface.dismiss();
                         }
                     })
@@ -234,10 +237,8 @@ public class CTargetSelectView extends LinearLayout implements LoaderManager.Loa
                             points = Integer.parseInt(((EditText) alertDialog.findViewById(R.id.points)).getText().toString());
                         } catch (NumberFormatException e) {}
                         int color = ((CColorSelectView)((AlertDialog) dialog).findViewById(R.id.ringColor)).getSelectedColor();
-                        ((CStartFragment)getParentFragment()).saveRing(
-                                                       ringWidth,
-                                                       points,
-                                                       color);
+                        ((CTargetSelectView.CTargetCreateDialog)getFragmentManager().
+                                    findFragmentByTag("targetCreateDialog")).saveRing(ringWidth, points, color);
                 }
                 })
                 .setNegativeButton("Отменить", new DialogInterface.OnClickListener() {
