@@ -11,6 +11,6 @@ import com.Andryyo.ArchPad.archeryFragment.CRoundTemplate;
  * To change this template use File | Settings | File Templates.
  */
 public interface IOnFragmentSwapRequiredListener {
-    public void startArcheryFragment(CRoundTemplate template);
-    public void startStartFragment();
+    public void swapToArcheryFragment(CRoundTemplate template);
+    public void swapToStartFragment();
 }

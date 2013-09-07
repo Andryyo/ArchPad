@@ -162,7 +162,7 @@ public class CStatisticsFragment extends Fragment {
             if (i==0)
                 return CSQLiteOpenHelper.getCursorLoader(context, CSQLiteOpenHelper.TABLE_ROUNDS);
             else
-                return CSQLiteOpenHelper.getDistancesCursorLoader(context, i, bundle);
+                return CSQLiteOpenHelper.getRoundCursorLoader(context, i, bundle);
 
         }
 

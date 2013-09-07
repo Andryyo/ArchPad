@@ -10,7 +10,9 @@ import android.os.Bundle;
 import android.support.v4.content.AsyncTaskLoader;
 import com.Andryyo.ArchPad.CArrow;
 import com.Andryyo.ArchPad.archeryFragment.CDistance;
+import com.Andryyo.ArchPad.archeryFragment.CDistanceTemplate;
 import com.Andryyo.ArchPad.archeryFragment.CRound;
+import com.Andryyo.ArchPad.archeryFragment.CRoundTemplate;
 import com.Andryyo.ArchPad.target.CRing;
 import com.Andryyo.ArchPad.target.CTarget;
 
@@ -34,6 +36,7 @@ public class CSQLiteOpenHelper extends SQLiteOpenHelper {
     public static final String TABLE_SIGHTS = "sights";
     public static final String TABLE_NOTES = "notes";
     public static final String TABLE_TARGETS = "targets";
+    public static final String TABLE_ROUND_TEMPLATES = "roundTemplates";
     private SQLiteDatabase readableDatabase;
     private SQLiteDatabase writableDatabase;
 
@@ -75,6 +78,8 @@ public class CSQLiteOpenHelper extends SQLiteOpenHelper {
         String CREATE_ROUNDS_TABLE = "CREATE TABLE rounds(_id INTEGER PRIMARY KEY, description TEXT, arrowId INTEGER," +
                 "timemark INTEGER, FOREIGN KEY(arrowId) REFERENCES arrows(_id))";
         database.execSQL(CREATE_ROUNDS_TABLE);
+        String CREATE_ROUND_TEMPLATES_TABLE = "CREATE TABLE roundTemplates(_id INTEGER PRIMARY KEY, description TEXT, template BLOB)";
+        database.execSQL(CREATE_ROUND_TEMPLATES_TABLE);
     }
 
 
@@ -96,17 +101,15 @@ public class CSQLiteOpenHelper extends SQLiteOpenHelper {
         addTarget(new CTarget("", rings, 200, 30));
         addArrow(new CArrow("1616","",3.17f));
         addArrow(new CArrow("1818","",3.57f));
+        CRoundTemplate template = new CRoundTemplate();
+        template.addDistanceTemplate(new CDistanceTemplate(6,6,1));
+        template.addDistanceTemplate(new CDistanceTemplate(6,6,2));
+        addRoundTemplate(template);
     }
     @Override
     public void onUpgrade(SQLiteDatabase database, int oldVersion, int newVersion) {
         if (oldVersion<newVersion)
         {
-        database.execSQL("DROP TABLE IF EXISTS distances");
-        database.execSQL("DROP TABLE IF EXISTS targets");
-        database.execSQL("DROP TABLE IF EXISTS sights");
-        database.execSQL("DROP TABLE IF EXISTS arrows");
-        database.execSQL("DROP TABLE IF EXISTS notes");
-        onCreate(database);
         }
     }
 
@@ -128,7 +131,7 @@ public class CSQLiteOpenHelper extends SQLiteOpenHelper {
         return new CSQLiteCursorLoader(context, table, "_id",_id, data);
     }
 
-    public static CSQLiteCursorLoader getDistancesCursorLoader(Context context, long roundId, Bundle data)   {
+    public static CSQLiteCursorLoader getRoundCursorLoader(Context context, long roundId, Bundle data)   {
         return new CSQLiteCursorLoader(context, TABLE_DISTANCES, "roundId",roundId, data);
     }
 
@@ -420,6 +423,30 @@ public class CSQLiteOpenHelper extends SQLiteOpenHelper {
         database.delete(TABLE_ROUNDS, null, null);
         database.close();
         refresh();
+    }
+
+    public synchronized void addRoundTemplate(CRoundTemplate template) {
+        SQLiteDatabase database = this.getWritableDatabase();
+        template.writeToDatabase(database);
+        database.close();
+        refresh();
+    }
+
+    public synchronized CRoundTemplate getRoundTemplate(long id)  {
+        Cursor cursor = readableDatabase.query(TABLE_ROUND_TEMPLATES,null,
+                "_id = ?",new String[]{Long.toString(id)}
+                ,null,null,null);
+        cursor.moveToFirst();
+        CRoundTemplate template = null;
+        try {
+            template = (CRoundTemplate) setObjectBytes(cursor.getBlob(cursor.getColumnIndex("template")));
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+        cursor.close();
+        return template;
     }
 
 

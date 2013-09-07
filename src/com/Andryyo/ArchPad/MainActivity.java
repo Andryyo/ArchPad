@@ -147,7 +147,7 @@ public class MainActivity extends FragmentActivity implements DialogInterface.On
         }
 
         @Override
-        public void startArcheryFragment(CRoundTemplate template) {
+        public void swapToArcheryFragment(CRoundTemplate template) {
             getSupportFragmentManager().beginTransaction().remove(archeryFragment).commit();
             archeryFragment = new CArcheryFragment(template);
             ((CArcheryFragment)archeryFragment).setOnTouchListener(this);
@@ -158,7 +158,7 @@ public class MainActivity extends FragmentActivity implements DialogInterface.On
         }
 
         @Override
-        public void startStartFragment() {
+        public void swapToStartFragment() {
             getSupportFragmentManager().beginTransaction().remove(archeryFragment).commit();
             archeryFragment = null;
             updateRequired = true;

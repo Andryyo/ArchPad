@@ -1,7 +1,12 @@
 package com.Andryyo.ArchPad.archeryFragment;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import com.Andryyo.ArchPad.database.CSQLiteOpenHelper;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -36,5 +41,16 @@ public class CRoundTemplate implements Serializable{
     public CRoundTemplate setDescription(String description)  {
         this.description = new String(description);
         return this;
+    }
+
+    public void writeToDatabase(SQLiteDatabase database)    {
+        ContentValues values = new ContentValues();
+        values.put("description", description);
+        try {
+            values.put("template",CSQLiteOpenHelper.getObjectBytes(this));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        database.insert(CSQLiteOpenHelper.TABLE_ROUND_TEMPLATES, null, values);
     }
 }

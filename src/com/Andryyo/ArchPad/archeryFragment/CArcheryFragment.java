@@ -99,7 +99,7 @@ public class CArcheryFragment extends Fragment implements IOnShotAddListener{
     @Override
     public void addShot(CShot shot) {
         if (!currentRound.addShot(shot))    {
-            onFragmentSwapRequiredListener.startStartFragment();
+            onFragmentSwapRequiredListener.swapToStartFragment();
             onUpdateListener.update();
         }
         else    {
